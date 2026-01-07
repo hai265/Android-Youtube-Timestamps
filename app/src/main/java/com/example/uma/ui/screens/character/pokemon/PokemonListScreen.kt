@@ -22,7 +22,6 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.example.uma.data.models.CharacterBasic
 import com.example.uma.ui.screens.common.GradientBackground
 import com.example.uma.ui.screens.common.ImageWithFavoriteButton
-import com.example.uma.ui.screens.common.ScreenWithSearchBar
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.first
 
@@ -45,23 +44,23 @@ fun PokemonListScreen(modifier: Modifier = Modifier, onTapCharacter: (Int) -> Un
         }
     }
 
-    ScreenWithSearchBar(
-        textFieldState = viewModel.searchTextBoxState,
-        onRefresh = { viewModel.refreshList() },
-        contentEmpty = characterListState.list.isEmpty(),
-        searchBoxLabel = "Search Character",
-        syncing = characterListState.syncing,
-        modifier = modifier
-    ) {
-        CharacterColumn(
-            characterBasics = characterListState.list,
-            onTapCharacter = onTapCharacter,
-            state = gridState,
-            onTapFavorite = { id: Int ->
-                viewModel.onFavoriteCharacter(id)
-            }
-        )
-    }
+//    ScreenWithSearchBar(
+//        textFieldState = viewModel.searchTextBoxState,
+//        onRefresh = { viewModel.refreshList() },
+//        contentEmpty = characterListState.list.isEmpty(),
+//        searchBoxLabel = "Search Character",
+//        syncing = characterListState.syncing,
+//        modifier = modifier
+//    ) {
+//        CharacterColumn(
+//            characterBasics = characterListState.list,
+//            onTapCharacter = onTapCharacter,
+//            state = gridState,
+//            onTapFavorite = { id: Int ->
+//                viewModel.onFavoriteCharacter(id)
+//            }
+//        )
+//    }
 }
 
 @Composable

@@ -1,67 +1,42 @@
 package com.example.uma.ui.screens.character.pokemon
 
-import android.util.Log
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.uma.data.models.CharacterBasic
 import com.example.uma.data.repository.pokemon.PokemonRepository
-import com.example.uma.ui.screens.common.BaseListViewModel
-import com.example.uma.ui.screens.common.UiState
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 private const val TAG = "CharacterListViewModel"
 
 //TODO: Make this a sealed class so we can show blank screen, loading, normal screen
 data class CharacterListState(
-    override val list: List<CharacterBasic> = emptyList(),
-    override val syncing: Boolean = false
-) : UiState<CharacterBasic>
+    val list: List<CharacterBasic> = emptyList(),
+    val syncing: Boolean = false
+)
 
-/*
- TODO Features
- 1. Allow user to filter, sort (ascending, descending, filter based on some criteria
-*/
 @HiltViewModel
 class PokemonListViewModel @Inject constructor(
     private val pokmeonRepository: PokemonRepository,
-) : BaseListViewModel<CharacterBasic, CharacterListState>(initialState = CharacterListState()) {
+) : ViewModel() {
+
+    private val _uiState = MutableStateFlow(CharacterListState())
+    val uiState: StateFlow<CharacterListState> = _uiState.asStateFlow()
 
     init {
-        start()
+        getCharacters()
     }
 
-    override fun getAllItems() = pokmeonRepository.getAllCharacters(1)
-
-    override fun filterItems(
-        searchTerm: String,
-        items: List<CharacterBasic>
-    ): List<CharacterBasic> {
-        //Trim leading spaces
-        val trimmedSearchTerm = searchTerm.trimStart()
-        if (trimmedSearchTerm.isEmpty()) {
-            return items
+    fun getCharacters() {
+        viewModelScope.launch {
+            pokmeonRepository.getAllCharacters(0).collect {
+                uiState.value.copy(list = it)
+            }
         }
-        return items.filter { it.name.contains(searchTerm, ignoreCase = true) }
     }
 
-    override suspend fun syncData() {
-        Log.d(TAG, "refreshList triggered")
-//        characterRepository.sync()
-    }
-
-    override fun CharacterListState.copy(
-        list: List<CharacterBasic>?,
-        syncing: Boolean?
-    ): CharacterListState {
-        return this.copy(
-            list = list ?: this.list,
-            syncing = syncing ?: this.syncing
-        )
-    }
-
-    fun onFavoriteCharacter(id: Int) {
-//        val currentFavoriteStatus = uiState.value.list.find { it.id == id }?.isFavorite ?: return
-//        viewModelScope.launch {
-//            characterRepository.setCharacterFavoriteStatus(id, !currentFavoriteStatus)
-//        }
-    }
 }

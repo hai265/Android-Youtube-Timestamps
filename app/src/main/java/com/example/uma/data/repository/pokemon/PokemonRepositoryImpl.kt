@@ -12,7 +12,7 @@ class PokemonRepositoryImpl @Inject constructor(
     val pokemonApi: PokemonApiService
 ) : PokemonRepository {
     override fun getAllCharacters(page: Int): Flow<List<CharacterBasic>> = flow {
-        val pokemons = pokemonApi.getAllPokemon().results.map {
+        val pokemons = pokemonApi.getAllPokemon(0).results.map {
             it.toBasicCharacter()
         }
         emit(pokemons)
