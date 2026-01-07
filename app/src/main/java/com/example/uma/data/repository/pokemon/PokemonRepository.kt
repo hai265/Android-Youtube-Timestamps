@@ -4,5 +4,5 @@ import com.example.uma.data.models.CharacterBasic
 import kotlinx.coroutines.flow.Flow
 
 interface PokemonRepository {
-    fun getAllCharacters(): Flow<List<CharacterBasic>>
+    fun getAllCharacters(page: Int): Flow<List<CharacterBasic>>
 }

@@ -7,10 +7,11 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
 
+
 class PokemonRepositoryImpl @Inject constructor(
     val pokemonApi: PokemonApiService
 ) : PokemonRepository {
-    override fun getAllCharacters(): Flow<List<CharacterBasic>> = flow {
+    override fun getAllCharacters(page: Int): Flow<List<CharacterBasic>> = flow {
         val pokemons = pokemonApi.getAllPokemon().results.map {
             it.toBasicCharacter()
         }
