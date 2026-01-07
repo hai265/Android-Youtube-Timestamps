@@ -21,7 +21,7 @@ data class CharacterListState(
  1. Allow user to filter, sort (ascending, descending, filter based on some criteria
 */
 @HiltViewModel
-class CharacterListViewModel @Inject constructor(
+class PokemonListViewModel @Inject constructor(
     private val pokmeonRepository: PokemonRepository,
 ) : BaseListViewModel<CharacterBasic, CharacterListState>(initialState = CharacterListState()) {
 

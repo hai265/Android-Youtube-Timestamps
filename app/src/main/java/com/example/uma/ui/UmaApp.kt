@@ -28,6 +28,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.uma.R
 import com.example.uma.ui.screens.character.CharacterDetailsScreen
 import com.example.uma.ui.screens.character.CharacterListScreen
+import com.example.uma.ui.screens.character.pokemon.PokemonListScreen
 import com.example.uma.ui.screens.supportcard.SupportCardDetailsScreen
 import com.example.uma.ui.screens.supportcard.SupportCardListScreen
 import kotlinx.serialization.Serializable
@@ -44,6 +45,9 @@ sealed class UmaNavigables {
 
     @Serializable
     data class SupportCardDetails(val id: Int) : UmaNavigables()
+
+    @Serializable
+    object PokemonList: UmaNavigables()
 }
 
 enum class NavigationBarNavigables(
@@ -60,7 +64,8 @@ enum class NavigationBarNavigables(
         //Icons taken from flaticon.com
         R.drawable.black_head_horse_side_view_with_horsehair
     ),
-    SupportCards(UmaNavigables.SupportCards, "Support Cards", R.drawable.support_card)
+    SupportCards(UmaNavigables.SupportCards, "Support Cards", R.drawable.support_card),
+    PokemonList(UmaNavigables.PokemonList, "Pokemon", R.drawable.pokeball)
 }
 
 //TODO: Add a top bar and buttons to navigate to different screens
@@ -124,6 +129,9 @@ private fun NavGraph(
         }
         composable<UmaNavigables.SupportCardDetails> { backStackEntry ->
             SupportCardDetailsScreen(modifier = Modifier.padding(top = values.calculateTopPadding()))
+        }
+        composable<UmaNavigables.PokemonList> {
+            PokemonListScreen(onTapCharacter = {})
         }
     }
 }

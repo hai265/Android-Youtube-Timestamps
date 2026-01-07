@@ -20,7 +20,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.example.uma.data.models.CharacterBasic
-import com.example.uma.ui.screens.character.CharacterListViewModel
 import com.example.uma.ui.screens.common.GradientBackground
 import com.example.uma.ui.screens.common.ImageWithFavoriteButton
 import com.example.uma.ui.screens.common.ScreenWithSearchBar
@@ -28,8 +27,8 @@ import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.first
 
 @Composable
-fun CharacterListScreen(modifier: Modifier = Modifier, onTapCharacter: (Int) -> Unit) {
-    val viewModel: CharacterListViewModel = hiltViewModel()
+fun PokemonListScreen(modifier: Modifier = Modifier, onTapCharacter: (Int) -> Unit) {
+    val viewModel: PokemonListViewModel = hiltViewModel()
     val characterListState by viewModel.uiState.collectAsState()
     val gridState = rememberLazyGridState()
 
