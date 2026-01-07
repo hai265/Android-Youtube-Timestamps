@@ -2,6 +2,8 @@ package com.example.uma.data.repository
 
 import com.example.uma.data.repository.character.CharacterRepository
 import com.example.uma.data.repository.character.CharacterRepositoryImpl
+import com.example.uma.data.repository.pokemon.PokemonRepository
+import com.example.uma.data.repository.pokemon.PokemonRepositoryImpl
 import com.example.uma.data.repository.supportcard.SupportCardRepository
 import com.example.uma.data.repository.supportcard.SupportCardRepositoryImpl
 import dagger.Binds
@@ -14,6 +16,9 @@ import dagger.hilt.components.SingletonComponent
 abstract class RepositoryModule {
     @Binds
     abstract fun bindsCharacterRepository(repository: CharacterRepositoryImpl): CharacterRepository
+
+    @Binds
+    abstract fun bindsPokemonCharacterRepository(repository: PokemonRepositoryImpl): PokemonRepository
 
     @Binds
     abstract fun bindsSupportCardRepository(repository: SupportCardRepositoryImpl): SupportCardRepository
