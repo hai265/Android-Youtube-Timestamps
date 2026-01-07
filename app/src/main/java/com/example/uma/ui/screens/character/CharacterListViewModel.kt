@@ -1,13 +1,11 @@
 package com.example.uma.ui.screens.character
 
 import android.util.Log
-import androidx.lifecycle.viewModelScope
 import com.example.uma.data.models.CharacterBasic
-import com.example.uma.data.repository.character.CharacterRepository
+import com.example.uma.data.repository.pokemon.PokemonRepository
 import com.example.uma.ui.screens.common.BaseListViewModel
 import com.example.uma.ui.screens.common.UiState
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 private const val TAG = "CharacterListViewModel"
@@ -24,14 +22,14 @@ data class CharacterListState(
 */
 @HiltViewModel
 class CharacterListViewModel @Inject constructor(
-    private val characterRepository: CharacterRepository,
+    private val pokmeonRepository: PokemonRepository,
 ) : BaseListViewModel<CharacterBasic, CharacterListState>(initialState = CharacterListState()) {
 
     init {
         start()
     }
 
-    override fun getAllItems() = characterRepository.getAllCharacters()
+    override fun getAllItems() = pokmeonRepository.getAllCharacters()
 
     override fun filterItems(
         searchTerm: String,
@@ -47,7 +45,7 @@ class CharacterListViewModel @Inject constructor(
 
     override suspend fun syncData() {
         Log.d(TAG, "refreshList triggered")
-        characterRepository.sync()
+//        characterRepository.sync()
     }
 
     override fun CharacterListState.copy(
@@ -61,9 +59,9 @@ class CharacterListViewModel @Inject constructor(
     }
 
     fun onFavoriteCharacter(id: Int) {
-        val currentFavoriteStatus = uiState.value.list.find { it.id == id }?.isFavorite ?: return
-        viewModelScope.launch {
-            characterRepository.setCharacterFavoriteStatus(id, !currentFavoriteStatus)
-        }
+//        val currentFavoriteStatus = uiState.value.list.find { it.id == id }?.isFavorite ?: return
+//        viewModelScope.launch {
+//            characterRepository.setCharacterFavoriteStatus(id, !currentFavoriteStatus)
+//        }
     }
 }

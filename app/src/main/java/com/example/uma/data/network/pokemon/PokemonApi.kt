@@ -10,11 +10,12 @@ import okhttp3.MediaType.Companion.toMediaType
 import retrofit2.Retrofit
 import retrofit2.http.GET
 
-private const val BASE_URL = "https://pokeapi.co/api/v2"
+// https://pokeapi.co/docs/v2#pokemon
+private const val BASE_URL = "https://pokeapi.co/api/v2/"
 
 interface PokemonApiService {
-    @GET("character/info")
-    suspend fun getAllPokemon(): List<NetworkPokemonCharacter>
+    @GET("pokemon")
+    suspend fun getAllPokemon(): PokemonResponse
 }
 
 @Module
