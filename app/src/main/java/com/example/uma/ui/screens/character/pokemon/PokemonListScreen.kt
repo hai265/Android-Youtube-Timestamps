@@ -1,71 +1,78 @@
 package com.example.uma.ui.screens.character.pokemon
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
-import androidx.compose.runtime.snapshotFlow
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.paging.LoadState
+import androidx.paging.PagingData
+import androidx.paging.compose.LazyPagingItems
+import androidx.paging.compose.collectAsLazyPagingItems
+import androidx.paging.compose.itemKey
 import com.example.uma.data.models.CharacterBasic
 import com.example.uma.ui.screens.common.GradientBackground
 import com.example.uma.ui.screens.common.ImageWithFavoriteButton
-import kotlinx.coroutines.flow.filter
-import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flowOf
 
 @Composable
 fun PokemonListScreen(modifier: Modifier = Modifier, onTapCharacter: (Int) -> Unit) {
     val viewModel: PokemonListViewModel = hiltViewModel()
-    val characterListState by viewModel.uiState.collectAsStateWithLifecycle()
     val gridState = rememberLazyGridState()
+    val pagingItems = viewModel.items.collectAsLazyPagingItems()
 
-    //Keep track of previousListSize so we don't scroll back up when navigating back
-    var previousListSize by remember { mutableStateOf(characterListState.list.size) }
-    LaunchedEffect(characterListState.list.size) {
-        val currentSize = characterListState.list.size
-        if (currentSize != previousListSize) {
-            snapshotFlow { gridState.layoutInfo.visibleItemsInfo.isNotEmpty() }
-                .filter { it }
-                .first()
-            gridState.scrollToItem(0)
-            previousListSize = currentSize
+    when (pagingItems.loadState.refresh) {
+        is LoadState.Loading -> {
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                CircularProgressIndicator()
+            }
+        }
+        is LoadState.Error -> {
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                Text("Failed to load")
+                Button(onClick = { pagingItems.retry() }) {
+                    Text("Retry")
+                }
+            }
+        }
+        else -> {
+            CharacterColumn(
+                characterPagingItems = pagingItems,
+                onTapCharacter = onTapCharacter,
+                state = gridState,
+                onTapFavorite = { id: Int ->
+
+                },
+                modifier = modifier
+            )
         }
     }
-
-//    ScreenWithSearchBar(
-//        textFieldState = viewModel.searchTextBoxState,
-//        onRefresh = { viewModel.refreshList() },
-//        contentEmpty = characterListState.list.isEmpty(),
-//        searchBoxLabel = "Search Character",
-//        syncing = characterListState.syncing,
-//        modifier = modifier
-//    ) {
-        CharacterColumn(
-            characterBasics = characterListState.list,
-            onTapCharacter = onTapCharacter,
-            state = gridState,
-            onTapFavorite = { id: Int ->
-
-            }
-        )
-//    }
 }
 
 @Composable
 fun CharacterColumn(
-    characterBasics: List<CharacterBasic>,
+    characterPagingItems: LazyPagingItems<CharacterBasic>,
     onTapCharacter: (Int) -> Unit,
     modifier: Modifier = Modifier,
     state: LazyGridState,
@@ -79,8 +86,9 @@ fun CharacterColumn(
         horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         items(
-            items = characterBasics,
-            key = { characters: CharacterBasic -> characters.id }) { character ->
+            characterPagingItems.itemCount,
+            key = characterPagingItems.itemKey { it.id }) { index ->
+            val character = characterPagingItems[index] ?: return@items
             Card {
                 GradientBackground(
                     primaryColorHex = character.colorMain,
@@ -92,6 +100,26 @@ fun CharacterColumn(
                         isFavorite = character.isFavorite,
                         onTapFavorite = { onTapFavorite(character.id) }
                     )
+                }
+            }
+        }
+        if (characterPagingItems.loadState.append is LoadState.Loading) {
+            item(span = { GridItemSpan(3) }) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator()
+                }
+            }
+        }
+
+        if (characterPagingItems.loadState.append is LoadState.Error) {
+            item(span = { GridItemSpan(3) }) {
+                Button(onClick = { characterPagingItems.retry() }) {
+                    Text("Retry")
                 }
             }
         }
@@ -107,8 +135,12 @@ fun CharacterColumnPreview() {
             CharacterBasic(2, 2, "Tokai Teio", "", "", "", false),
             CharacterBasic(3, 2, "Silence Suzuka", "", "", "", false),
         )
+    val pagingItems = flowOf(
+        PagingData.from(characterBasicLists)
+    ).collectAsLazyPagingItems()
+
     CharacterColumn(
-        characterBasicLists,
+        characterPagingItems = pagingItems,
         onTapCharacter = {},
         state = rememberLazyGridState(),
         onTapFavorite = { _ -> })

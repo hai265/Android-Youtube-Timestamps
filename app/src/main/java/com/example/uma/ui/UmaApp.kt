@@ -131,7 +131,7 @@ private fun NavGraph(
             SupportCardDetailsScreen(modifier = Modifier.padding(top = values.calculateTopPadding()))
         }
         composable<UmaNavigables.PokemonList> {
-            PokemonListScreen(onTapCharacter = {})
+            PokemonListScreen(modifier = Modifier.padding(top = values.calculateTopPadding()), onTapCharacter = {})
         }
     }
 }

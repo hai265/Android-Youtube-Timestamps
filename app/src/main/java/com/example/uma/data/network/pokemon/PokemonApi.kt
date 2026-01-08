@@ -19,7 +19,7 @@ interface PokemonApiService {
     suspend fun getAllPokemon(
         @Query("offset") offset: Int,
         @Query("limit") limit: Int
-    ): PokemonResponse
+   ): PokemonResponse
 }
 
 @Module
