@@ -9,6 +9,7 @@ import javax.inject.Inject
 // https://developer.android.com/codelabs/android-paging-basics#5
 // expose paging pokemons from pokemonRepository
 private const val STARTING_KEY = 0
+private const val NUM_TO_FETCH = 21
 class PokemonPagingSource @Inject constructor(
     val pokemonApi: PokemonApiService
 ): PagingSource<Int, NetworkPokemonCharacter>() {
@@ -16,11 +17,11 @@ class PokemonPagingSource @Inject constructor(
         val start = params.key ?: STARTING_KEY
 
         try {
-            val response = pokemonApi.getAllPokemon(start)
+            val response = pokemonApi.getAllPokemon(offset = start, limit = NUM_TO_FETCH)
             return LoadResult.Page(
                 data = response.results,
-                prevKey = null,
-                nextKey = response.next.getNextKey()
+                prevKey = response.previous.getOffset(),
+                nextKey = response.next.getOffset()
             )
         } catch (e: Exception) {
             return LoadResult.Error(e)
@@ -34,7 +35,7 @@ class PokemonPagingSource @Inject constructor(
         }
     }
 
-    private fun String?.getNextKey(): Int {
+    private fun String?.getOffset(): Int {
         return Uri.parse(this).getQueryParameter("offset")?.toInt() ?: 0
     }
 }

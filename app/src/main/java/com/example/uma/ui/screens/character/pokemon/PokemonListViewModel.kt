@@ -34,7 +34,7 @@ class PokemonListViewModel @Inject constructor(
     fun getCharacters() {
         viewModelScope.launch {
             pokmeonRepository.getAllCharacters(0).collect {
-                uiState.value.copy(list = it)
+                _uiState.value = uiState.value.copy(list = it)
             }
         }
     }

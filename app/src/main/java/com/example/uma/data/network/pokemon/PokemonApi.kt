@@ -9,14 +9,17 @@ import kotlinx.serialization.json.Json
 import okhttp3.MediaType.Companion.toMediaType
 import retrofit2.Retrofit
 import retrofit2.http.GET
-import retrofit2.http.Path
+import retrofit2.http.Query
 
 // https://pokeapi.co/docs/v2#pokemon
 private const val BASE_URL = "https://pokeapi.co/api/v2/"
 
 interface PokemonApiService {
-    @GET("pokemon?offset={offset}")
-    suspend fun getAllPokemon(@Path(value="offset") offset: Int): PokemonResponse
+    @GET("pokemon")
+    suspend fun getAllPokemon(
+        @Query("offset") offset: Int,
+        @Query("limit") limit: Int
+    ): PokemonResponse
 }
 
 @Module
