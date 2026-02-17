@@ -1,17 +1,28 @@
 package com.example.uma.ui.screens.supportcard
 
+import androidx.compose.foundation.text.input.TextFieldState
+import androidx.compose.runtime.snapshotFlow
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.uma.domain.GetSupportCardsWithCharacterNameUseCase
-import com.example.uma.ui.screens.common.BaseListViewModel
-import com.example.uma.ui.screens.common.UiState
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 private const val TAG = "SupportCardListViewModel"
 data class SupportCardListState(
-    override val list : List<SupportCardListItem> = emptyList(),
-    override val syncing: Boolean = false
-): UiState<SupportCardListItem>
+    val list : List<SupportCardListItem> = emptyList(),
+    val syncing: Boolean = false
+)
 
 /*
  TODO Features
@@ -20,17 +31,28 @@ data class SupportCardListState(
 @HiltViewModel
 class SupportCardListViewModel @Inject constructor(
     private val getSupportCardsWithCharacterNameUseCase: GetSupportCardsWithCharacterNameUseCase
-) : BaseListViewModel<SupportCardListItem, SupportCardListState>(initialState = SupportCardListState()) {
+) : ViewModel() {
     // This is flow to eventually support sorting, etc
+    val searchTextBoxState: TextFieldState = TextFieldState()
+
+    private val _uiState = MutableStateFlow(SupportCardListState())
+    val uiState: StateFlow<SupportCardListState> = _uiState.asStateFlow()
 
     init {
-        start()
+        @OptIn(FlowPreview::class)
+        snapshotFlow { searchTextBoxState.text }
+            .debounce(300L)
+            .combine(getAllItems()) { searchText, items ->
+                _uiState.update { currentState: SupportCardListState ->
+                    (currentState.copy(list = filterItems(searchText.toString(), items)))
+                }
+            }.launchIn(viewModelScope)
     }
 
-    override fun getAllItems(): Flow<List<SupportCardListItem>> =
+    private fun getAllItems(): Flow<List<SupportCardListItem>> =
         getSupportCardsWithCharacterNameUseCase.invoke()
 
-    override fun filterItems(
+    private fun filterItems(
         searchTerm: String,
         items: List<SupportCardListItem>
     ): List<SupportCardListItem> {
@@ -42,21 +64,21 @@ class SupportCardListViewModel @Inject constructor(
         return items.filter { it.characterName.contains(searchTerm, ignoreCase = true) }
     }
 
-    override suspend fun syncData() {
+    private suspend fun syncData() {
         getSupportCardsWithCharacterNameUseCase.sync()
     }
 
-    override fun SupportCardListState.copy(
-        list: List<SupportCardListItem>?,
-        syncing: Boolean?
-    ): SupportCardListState {
-        return this.copy(
-            list = list ?: this.list,
-            syncing = syncing ?: this.syncing
-        )
-    }
+    // --- Public methods for the UI to call ---
 
-    init {
-        start()
+    fun refreshList() {
+        _uiState.update {
+            it.copy(syncing = true)
+        }
+        viewModelScope.launch {
+            syncData()
+            _uiState.update {
+                it.copy(syncing = false)
+            }
+        }
     }
 }

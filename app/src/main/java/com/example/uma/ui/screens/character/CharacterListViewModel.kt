@@ -1,12 +1,21 @@
 package com.example.uma.ui.screens.character
 
-import android.util.Log
+import androidx.compose.foundation.text.input.TextFieldState
+import androidx.compose.runtime.snapshotFlow
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.uma.data.models.CharacterBasic
 import com.example.uma.data.repository.character.CharacterRepository
-import com.example.uma.ui.screens.common.BaseListViewModel
-import com.example.uma.ui.screens.common.UiState
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -14,9 +23,9 @@ private const val TAG = "CharacterListViewModel"
 
 //TODO: Make this a sealed class so we can show blank screen, loading, normal screen
 data class CharacterListState(
-    override val list: List<CharacterBasic> = emptyList(),
-    override val syncing: Boolean = false
-) : UiState<CharacterBasic>
+    val list: List<CharacterBasic> = emptyList(),
+    val syncing: Boolean = false
+)
 
 /*
  TODO Features
@@ -25,15 +34,30 @@ data class CharacterListState(
 @HiltViewModel
 class CharacterListViewModel @Inject constructor(
     private val characterRepository: CharacterRepository,
-) : BaseListViewModel<CharacterBasic, CharacterListState>(initialState = CharacterListState()) {
+) : ViewModel() {
+    val searchTextBoxState: TextFieldState = TextFieldState()
+
+    private val _uiState = MutableStateFlow(CharacterListState())
+    val uiState: StateFlow<CharacterListState> = _uiState.asStateFlow()
 
     init {
-        start()
+        @OptIn(FlowPreview::class)
+        snapshotFlow { searchTextBoxState.text }
+            .debounce(300L)
+            .combine(getAllItems()) { searchText, items ->
+                _uiState.update { currentState: CharacterListState ->
+                    (currentState.copy(list = filterItems(searchText.toString(), items)))
+                }
+            }.launchIn(viewModelScope)
     }
 
-    override fun getAllItems() = characterRepository.getAllCharacters()
+    private fun getAllItems(): Flow<List<CharacterBasic>> = characterRepository.getAllCharacters()
 
-    override fun filterItems(
+    /**
+     * The logic to filter the list based on a search term.
+     * TODO: Make a comparator instead?
+     */
+    private fun filterItems(
         searchTerm: String,
         items: List<CharacterBasic>
     ): List<CharacterBasic> {
@@ -45,19 +69,18 @@ class CharacterListViewModel @Inject constructor(
         return items.filter { it.name.contains(searchTerm, ignoreCase = true) }
     }
 
-    override suspend fun syncData() {
-        Log.d(TAG, "refreshList triggered")
-        characterRepository.sync()
-    }
+    // --- Public methods for the UI to call ---
 
-    override fun CharacterListState.copy(
-        list: List<CharacterBasic>?,
-        syncing: Boolean?
-    ): CharacterListState {
-        return this.copy(
-            list = list ?: this.list,
-            syncing = syncing ?: this.syncing
-        )
+    fun refreshList() {
+        _uiState.update {
+            it.copy(syncing = true)
+        }
+        viewModelScope.launch {
+            characterRepository.sync()
+            _uiState.update {
+                it.copy(syncing = false)
+            }
+        }
     }
 
     fun onFavoriteCharacter(id: Int) {
