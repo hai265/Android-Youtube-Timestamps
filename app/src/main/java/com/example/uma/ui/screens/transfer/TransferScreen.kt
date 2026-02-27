@@ -34,6 +34,13 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.example.uma.R
 import com.example.uma.data.models.Bank
 
+
+//Features:
+// can't transfer between two externals
+// can't transfer more than balance
+
+//TODO: For now we can disable the button when they chooose two externals
+//better: we don't allow them to choose between two external accounts
 @Composable
 fun TransferScreen(modifier: Modifier = Modifier) {
     val viewModel: TransferViewModel = hiltViewModel()
@@ -41,7 +48,7 @@ fun TransferScreen(modifier: Modifier = Modifier) {
     viewModel.fetchAccounts()
 
     Content(
-        viewModel.textFieldState, { viewModel.onTransfer() },
+        viewModel.transferAmountState, { viewModel.onTransfer() },
         sourceAccounts = state.list,
         targetAccounts = state.list,
         canTransfer = state.canTransfer,
@@ -101,8 +108,9 @@ fun LongBasicDropdownMenu(
             onDismissRequest = { expanded = !expanded },
         ) {
             bankList.forEach { account ->
-                Box(modifier = Modifier.clickable { onSelectBank(account)
-                expanded = !expanded
+                Box(modifier = Modifier.clickable {
+                    onSelectBank(account)
+                    expanded = !expanded
                 }) {
                     BankCard(bank = account)
                 }
@@ -144,6 +152,10 @@ fun BankCard(bank: Bank) {
                 )
                 Text(
                     text = bank.balance.amount,
+                    style = MaterialTheme.typography.titleMedium
+                )
+                Text(
+                    text = if (bank.isExternal) "External" else "Internal",
                     style = MaterialTheme.typography.titleMedium
                 )
                 // You can add more details here later (type, balance, etc.)

@@ -1,6 +1,7 @@
 package com.example.uma.ui.screens.transfer
 
 import androidx.compose.foundation.text.input.TextFieldState
+import androidx.compose.runtime.snapshotFlow
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.uma.data.models.Bank
@@ -27,9 +28,19 @@ class TransferViewModel @Inject constructor(
 ) : ViewModel() {
 
 
-    val textFieldState: TextFieldState = TextFieldState("0.00")
+    val transferAmountState: TextFieldState = TextFieldState("100")
     private val _uiState = MutableStateFlow(TransferState())
     val uiState: StateFlow<TransferState> = _uiState.asStateFlow()
+
+    init {
+        viewModelScope.launch {
+            snapshotFlow { transferAmountState.text }
+                .collect {
+                    updateCanTransfer()
+                }
+        }
+    }
+
 
     fun onTransfer() {
 
@@ -44,9 +55,35 @@ class TransferViewModel @Inject constructor(
 
     fun setSourceBank(bank: Bank) {
         _uiState.update { it.copy(sourceBank = bank) }
+        updateCanTransfer()
     }
 
     fun setTargetBank(bank: Bank) {
         _uiState.update { it.copy(targetBank = bank) }
+        updateCanTransfer()
+    }
+
+    fun onAmountChanges() {
+        updateCanTransfer()
+    }
+
+    private fun updateCanTransfer() {
+        //Rules:
+        //1.can't transfer between two external
+        //2. can't transfer when balance exceeds source balance
+        val targetBank = uiState.value.targetBank
+        val sourceBank = uiState.value.sourceBank
+
+        if (targetBank == null || sourceBank == null) {
+            _uiState.update { it.copy(canTransfer = false) }
+        } else if (targetBank.isExternal && sourceBank.isExternal) {
+            _uiState.update { it.copy(canTransfer = false) }
+        } else if (targetBank.balance.amount.toFloat() < transferAmountState.text.toString()
+                .toFloat()
+        ) {
+            _uiState.update { it.copy(canTransfer = false) }
+        } else {
+            _uiState.update { it.copy(canTransfer = true) }
+        }
     }
 }
