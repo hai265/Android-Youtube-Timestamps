@@ -1,4 +1,4 @@
-package com.example.uma.ui.screens.character.pokemon
+package com.example.uma.ui.screens.pokemon
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box

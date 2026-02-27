@@ -28,7 +28,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.uma.R
 import com.example.uma.ui.screens.character.CharacterDetailsScreen
 import com.example.uma.ui.screens.character.CharacterListScreen
-import com.example.uma.ui.screens.character.pokemon.PokemonListScreen
+import com.example.uma.ui.screens.pokemon.PokemonListScreen
 import com.example.uma.ui.screens.supportcard.SupportCardDetailsScreen
 import com.example.uma.ui.screens.supportcard.SupportCardListScreen
 import kotlinx.serialization.Serializable
