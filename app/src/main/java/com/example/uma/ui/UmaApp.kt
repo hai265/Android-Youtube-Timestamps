@@ -31,6 +31,7 @@ import com.example.uma.ui.screens.character.CharacterListScreen
 import com.example.uma.ui.screens.pokemon.PokemonListScreen
 import com.example.uma.ui.screens.supportcard.SupportCardDetailsScreen
 import com.example.uma.ui.screens.supportcard.SupportCardListScreen
+import com.example.uma.ui.screens.transfer.TransferScreen
 import kotlinx.serialization.Serializable
 
 sealed class UmaNavigables {
@@ -48,6 +49,9 @@ sealed class UmaNavigables {
 
     @Serializable
     object PokemonList: UmaNavigables()
+
+    @Serializable
+    object Transfer: UmaNavigables()
 }
 
 enum class NavigationBarNavigables(
@@ -65,7 +69,8 @@ enum class NavigationBarNavigables(
         R.drawable.black_head_horse_side_view_with_horsehair
     ),
     SupportCards(UmaNavigables.SupportCards, "Support Cards", R.drawable.support_card),
-    PokemonList(UmaNavigables.PokemonList, "Pokemon", R.drawable.pokeball)
+    PokemonList(UmaNavigables.PokemonList, "Pokemon", R.drawable.pokeball),
+    Transfer(UmaNavigables.Transfer, "Transfer", R.drawable.carrot_filled)
 }
 
 //TODO: Add a top bar and buttons to navigate to different screens
@@ -132,6 +137,9 @@ private fun NavGraph(
         }
         composable<UmaNavigables.PokemonList> {
             PokemonListScreen(modifier = Modifier.padding(top = values.calculateTopPadding()), onTapCharacter = {})
+        }
+        composable<UmaNavigables.Transfer> {
+            TransferScreen(modifier = Modifier.padding(top = values.calculateTopPadding()))
         }
     }
 }
