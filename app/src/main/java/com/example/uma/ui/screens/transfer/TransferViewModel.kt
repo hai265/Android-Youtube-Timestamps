@@ -16,7 +16,9 @@ import javax.inject.Inject
 
 data class TransferState(
     val list: List<Bank> = emptyList(),
-    val canTransfer: Boolean = false
+    val canTransfer: Boolean = false,
+    val sourceBank: Bank? = null,
+    val targetBank: Bank? = null,
 )
 
 @HiltViewModel
@@ -38,5 +40,13 @@ class TransferViewModel @Inject constructor(
             val accounts = bankRepository.getAccounts()
             _uiState.update { it.copy(list = accounts) }
         }
+    }
+
+    fun setSourceBank(bank: Bank) {
+        _uiState.update { it.copy(sourceBank = bank) }
+    }
+
+    fun setTargetBank(bank: Bank) {
+        _uiState.update { it.copy(targetBank = bank) }
     }
 }

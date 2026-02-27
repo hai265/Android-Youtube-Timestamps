@@ -1,18 +1,22 @@
 package com.example.uma.ui.screens.transfer
 
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.input.TextFieldState
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowRight
 import androidx.compose.material3.Button
+import androidx.compose.material3.Card
 import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
@@ -21,10 +25,13 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import com.example.uma.R
 import com.example.uma.data.models.Bank
 
 @Composable
@@ -38,6 +45,10 @@ fun TransferScreen(modifier: Modifier = Modifier) {
         sourceAccounts = state.list,
         targetAccounts = state.list,
         canTransfer = state.canTransfer,
+        sourceBank = state.sourceBank,
+        targetBank = state.targetBank,
+        setSourceBank = { viewModel.setSourceBank(it) },
+        setTargetBank = { viewModel.setTargetBank(it) },
         modifier = modifier
     )
 }
@@ -49,12 +60,16 @@ private fun Content(
     canTransfer: Boolean,
     sourceAccounts: List<Bank>,
     targetAccounts: List<Bank>,
+    sourceBank: Bank?,
+    targetBank: Bank?,
+    setSourceBank: (bank: Bank) -> Unit,
+    setTargetBank: (bank: Bank) -> Unit,
     modifier: Modifier = Modifier.fillMaxSize()
 ) {
     Column(modifier = modifier) {
         TextField(state = textFieldState)
-        LongBasicDropdownMenu(sourceAccounts)
-        LongBasicDropdownMenu(targetAccounts)
+        LongBasicDropdownMenu(sourceAccounts, sourceBank, setSourceBank)
+        LongBasicDropdownMenu(targetAccounts, targetBank, setTargetBank)
         Button(onClick = { onTransfer() }, enabled = canTransfer) {
             Text("Transfer")
         }
@@ -63,26 +78,75 @@ private fun Content(
 
 
 @Composable
-fun LongBasicDropdownMenu(accounts: List<Bank>) {
+fun LongBasicDropdownMenu(
+    bankList: List<Bank>,
+    selectedBank: Bank?,
+    onSelectBank: (bank: Bank) -> Unit
+) {
     var expanded by remember { mutableStateOf(false) }
-    // Placeholder list of 100 strings for demonstration
 
     Box(
         modifier = Modifier
             .padding(16.dp)
     ) {
-        IconButton(onClick = { expanded = !expanded }) {
-            Icon(Icons.AutoMirrored.Filled.ArrowRight, contentDescription = "More options")
+        Box(modifier = Modifier.clickable { expanded = !expanded }) {
+            if (selectedBank == null) {
+                Text("Select a bank")
+            } else {
+                BankCard(selectedBank)
+            }
         }
         DropdownMenu(
             expanded = expanded,
-            onDismissRequest = { expanded = false }
+            onDismissRequest = { expanded = !expanded },
         ) {
-            accounts.forEach { account ->
-                DropdownMenuItem(
-                    text = { Text(account.name) },
-                    onClick = { expanded = false }
+            bankList.forEach { account ->
+                Box(modifier = Modifier.clickable { onSelectBank(account)
+                expanded = !expanded
+                }) {
+                    BankCard(bank = account)
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun BankCard(bank: Bank) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(8.dp),
+        shape = RoundedCornerShape(8.dp)
+    ) {
+        Row(
+            modifier = Modifier
+                .padding(16.dp)
+                .fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            // Left: Bank image
+            Image(
+                painter = painterResource(R.drawable.carrot_filled), // Don't use url
+                contentDescription = "${bank.name} logo",
+                modifier = Modifier
+                    .size(48.dp)
+                    .clip(RoundedCornerShape(8.dp))
+            )
+
+            Spacer(modifier = Modifier.width(16.dp))
+
+            // Right: Bank info
+            Column {
+                Text(
+                    text = bank.name,
+                    style = MaterialTheme.typography.titleMedium
                 )
+                Text(
+                    text = bank.balance.amount,
+                    style = MaterialTheme.typography.titleMedium
+                )
+                // You can add more details here later (type, balance, etc.)
             }
         }
     }
@@ -94,17 +158,4 @@ fun BankItem(onClick: () -> Unit) {
 
     }
 
-}
-
-
-@Preview
-@Composable
-fun TransferScreenPreview() {
-    Content(
-        TextFieldState("0.00"),
-        {},
-        sourceAccounts = listOf(),
-        targetAccounts = listOf(),
-        canTransfer = false
-    )
 }
