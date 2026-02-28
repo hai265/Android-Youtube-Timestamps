@@ -6,10 +6,13 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.uma.data.models.Bank
 import com.example.uma.data.repository.transfer.BankRepository
+import com.example.uma.data.repository.transfer.TransferResult
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -32,8 +35,11 @@ class TransferViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(TransferState())
     val uiState: StateFlow<TransferState> = _uiState.asStateFlow()
 
+    private val _events = Channel<TransferResult>()
+    val events = _events.receiveAsFlow()
+
     init {
-        viewModelScope.launch {
+        viewModelScope.launch { 
             snapshotFlow { transferAmountState.text }
                 .collect {
                     updateCanTransfer()
@@ -51,11 +57,13 @@ class TransferViewModel @Inject constructor(
 
         viewModelScope.launch {
             _uiState.update { it.copy(canTransfer = false) }
-            bankRepository.transfer(
-                sourceBank.id,
-                targetBank.id,
-                transferAmountState.text.toString().toInt()
-            )
+                val transferResult = bankRepository.transfer(
+                    sourceBank.id,
+                    targetBank.id,
+                    transferAmountState.text.toString().toInt()
+                )
+                _events.send(transferResult) // Emit success event
+
             _uiState.update { it.copy(canTransfer = true) }
         }
     }
@@ -91,7 +99,7 @@ class TransferViewModel @Inject constructor(
         } else if (targetBank.balance.amount.toFloat() < transferAmountState.text.toString()
                 .toFloat()
         ) {
-            _uiState.update { it.copy(canTransfer = false) }
+            _uiState.update { it.copy(canTransfer = false) } // The existing logic seems to prevent transfer if target balance is less than amount
         } else {
             _uiState.update { it.copy(canTransfer = true) }
         }

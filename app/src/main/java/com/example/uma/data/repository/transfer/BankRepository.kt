@@ -9,6 +9,7 @@ sealed class TransferResult {
     data object Success : TransferResult()
     data object InsufficientFunds : TransferResult()
     data object ExternalTransferNotAllowed : TransferResult()
+    data object SameAccountNotAllowed : TransferResult()
     data class UnknownError(val message: String) : TransferResult()
 }
 
@@ -48,6 +49,7 @@ class BankRepository @Inject constructor() {
     suspend fun transfer(sourceId: Int, targetId: Int, transferAmount: Int): TransferResult {
         //mock success
         delay(1000)
+        if(sourceId == targetId) return TransferResult.SameAccountNotAllowed
         return TransferResult.Success
     }
 }
