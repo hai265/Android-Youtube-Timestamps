@@ -43,7 +43,21 @@ class TransferViewModel @Inject constructor(
 
 
     fun onTransfer() {
+        val sourceBank = _uiState.value.sourceBank
+        val targetBank = _uiState.value.targetBank
+        if (sourceBank == null || targetBank == null) {
+            return
+        }
 
+        viewModelScope.launch {
+            _uiState.update { it.copy(canTransfer = false) }
+            bankRepository.transfer(
+                sourceBank.id,
+                targetBank.id,
+                transferAmountState.text.toString().toInt()
+            )
+            _uiState.update { it.copy(canTransfer = true) }
+        }
     }
 
     fun fetchAccounts() {
@@ -60,10 +74,6 @@ class TransferViewModel @Inject constructor(
 
     fun setTargetBank(bank: Bank) {
         _uiState.update { it.copy(targetBank = bank) }
-        updateCanTransfer()
-    }
-
-    fun onAmountChanges() {
         updateCanTransfer()
     }
 

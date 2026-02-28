@@ -163,11 +163,3 @@ fun BankCard(bank: Bank) {
         }
     }
 }
-
-@Composable
-fun BankItem(onClick: () -> Unit) {
-    Row() {
-
-    }
-
-}

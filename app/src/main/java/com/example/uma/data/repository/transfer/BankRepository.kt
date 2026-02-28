@@ -2,6 +2,7 @@ package com.example.uma.data.repository.transfer
 
 import com.example.uma.data.models.Bank
 import com.example.uma.data.models.Money
+import kotlinx.coroutines.delay
 import javax.inject.Inject
 
 sealed class TransferResult {
@@ -44,8 +45,9 @@ class BankRepository @Inject constructor() {
         )
     }
 
-    suspend fun transfer(sourceId: Int, targetId: Int, transferAmount: Money): TransferResult {
+    suspend fun transfer(sourceId: Int, targetId: Int, transferAmount: Int): TransferResult {
         //mock success
+        delay(1000)
         return TransferResult.Success
     }
 }
