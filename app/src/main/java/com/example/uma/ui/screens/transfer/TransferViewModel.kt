@@ -23,6 +23,7 @@ data class TransferState(
     val canTransfer: Boolean = false,
     val sourceBank: Bank? = null,
     val targetBank: Bank? = null,
+    val isLoading: Boolean = false
 )
 
 @HiltViewModel
@@ -39,7 +40,7 @@ class TransferViewModel @Inject constructor(
     val events = _events.receiveAsFlow()
 
     init {
-        viewModelScope.launch { 
+        viewModelScope.launch {
             snapshotFlow { transferAmountState.text }
                 .collect {
                     updateCanTransfer()
@@ -56,7 +57,7 @@ class TransferViewModel @Inject constructor(
         }
 
         viewModelScope.launch {
-            _uiState.update { it.copy(canTransfer = false) }
+            _uiState.update { it.copy(canTransfer = false, isLoading = true) }
                 val transferResult = bankRepository.transfer(
                     sourceBank.id,
                     targetBank.id,
@@ -64,7 +65,7 @@ class TransferViewModel @Inject constructor(
                 )
                 _events.send(transferResult) // Emit success event
 
-            _uiState.update { it.copy(canTransfer = true) }
+            _uiState.update { it.copy(canTransfer = true, isLoading = false) }
         }
     }
 

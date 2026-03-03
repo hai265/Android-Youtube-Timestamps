@@ -65,7 +65,9 @@ fun TransferScreen(modifier: Modifier = Modifier) {
         }
     }
 
-    viewModel.fetchAccounts()
+    LaunchedEffect(Unit) {
+        viewModel.fetchAccounts()
+    }
 
     Content(
         viewModel.transferAmountState, { viewModel.onTransfer() },
