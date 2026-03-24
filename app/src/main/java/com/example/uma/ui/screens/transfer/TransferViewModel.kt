@@ -11,12 +11,21 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+
+private data class InternalTransferState(
+    val list: List<Bank> = emptyList(),
+    val canTransfer: Boolean = false,
+    val sourceBank: Bank? = null,
+    val targetBank: Bank? = null,
+    val isLoading: Boolean = false
+)
 
 data class TransferState(
     val list: List<Bank> = emptyList(),
@@ -33,31 +42,43 @@ class TransferViewModel @Inject constructor(
 
 
     val transferAmountState: TextFieldState = TextFieldState("100")
-    private val _uiState = MutableStateFlow(TransferState())
-    val uiState: StateFlow<TransferState> = _uiState.asStateFlow()
+    private val _internalUiState = MutableStateFlow(TransferState())
+    val uiState: StateFlow<TransferState> = combine(
+        _internalUiState,
+        snapshotFlow { transferAmountState.text } // React to text field changes
+    ) { internalState, amountText ->
+        val canTransfer = calculateCanTransfer(
+            sourceBank = internalState.sourceBank,
+            targetBank = internalState.targetBank,
+            transferAmountString = amountText.toString()
+        )
+        // Return a new data class that includes the derived canTransfer
+        TransferState(
+            list = internalState.list,
+            sourceBank = internalState.sourceBank,
+            targetBank = internalState.targetBank,
+            isLoading = internalState.isLoading,
+            canTransfer = canTransfer
+        )
+    }.stateIn(
+        viewModelScope,
+        started = kotlinx.coroutines.flow.SharingStarted.WhileSubscribed(5000L),
+        initialValue = TransferState(isLoading = true) // Initial value with isLoading true until data fetched
+    )
 
     private val _events = Channel<TransferResult>()
     val events = _events.receiveAsFlow()
 
-    init {
-        viewModelScope.launch {
-            snapshotFlow { transferAmountState.text }
-                .collect {
-                    updateCanTransfer()
-                }
-        }
-    }
-
 
     fun onTransfer() {
-        val sourceBank = _uiState.value.sourceBank
-        val targetBank = _uiState.value.targetBank
+        val sourceBank = _internalUiState.value.sourceBank
+        val targetBank = _internalUiState.value.targetBank
         if (sourceBank == null || targetBank == null) {
             return
         }
 
         viewModelScope.launch {
-            _uiState.update { it.copy(canTransfer = false, isLoading = true) }
+            _internalUiState.update { it.copy(canTransfer = false, isLoading = true) }
                 val transferResult = bankRepository.transfer(
                     sourceBank.id,
                     targetBank.id,
@@ -65,44 +86,48 @@ class TransferViewModel @Inject constructor(
                 )
                 _events.send(transferResult) // Emit success event
 
-            _uiState.update { it.copy(canTransfer = true, isLoading = false) }
+            _internalUiState.update { it.copy(canTransfer = true, isLoading = false) }
         }
     }
 
     fun fetchAccounts() {
         viewModelScope.launch {
             val accounts = bankRepository.getAccounts()
-            _uiState.update { it.copy(list = accounts) }
+            _internalUiState.update { it.copy(list = accounts) }
         }
     }
 
     fun setSourceBank(bank: Bank) {
-        _uiState.update { it.copy(sourceBank = bank) }
-        updateCanTransfer()
+        _internalUiState.update { it.copy(sourceBank = bank) }
     }
 
     fun setTargetBank(bank: Bank) {
-        _uiState.update { it.copy(targetBank = bank) }
-        updateCanTransfer()
+        _internalUiState.update { it.copy(targetBank = bank) }
     }
 
-    private fun updateCanTransfer() {
-        //Rules:
-        //1.can't transfer between two external
-        //2. can't transfer when balance exceeds source balance
-        val targetBank = uiState.value.targetBank
-        val sourceBank = uiState.value.sourceBank
+    private fun calculateCanTransfer(
+        sourceBank: Bank?,
+        targetBank: Bank?,
+        transferAmountString: String
+    ): Boolean {
 
-        if (targetBank == null || sourceBank == null) {
-            _uiState.update { it.copy(canTransfer = false) }
-        } else if (targetBank.isExternal && sourceBank.isExternal) {
-            _uiState.update { it.copy(canTransfer = false) }
-        } else if (targetBank.balance.amount.toFloat() < transferAmountState.text.toString()
-                .toFloat()
-        ) {
-            _uiState.update { it.copy(canTransfer = false) } // The existing logic seems to prevent transfer if target balance is less than amount
-        } else {
-            _uiState.update { it.copy(canTransfer = true) }
+        if (sourceBank == null || targetBank == null) {
+            return false
         }
+
+        if (sourceBank.isExternal && targetBank.isExternal) {
+            return false
+        }
+
+        val transferAmount = transferAmountString.toFloatOrNull() ?: 0f // Handle invalid number gracefully
+        if (transferAmount <= 0) { // Ensure amount is positive
+            return false
+        }
+
+        if (sourceBank.balance.amount.toFloat() < transferAmount) {
+            return false
+        }
+
+        return true
     }
 }
