@@ -1,4 +1,4 @@
-package com.example.uma.ui.theme
+package com.hai265.timestamper.ui.theme
 
 import androidx.compose.ui.graphics.Color
 

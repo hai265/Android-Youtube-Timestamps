@@ -19,5 +19,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "Uma"
+rootProject.name = "Android Youtube Timestamps"
 include(":app")
