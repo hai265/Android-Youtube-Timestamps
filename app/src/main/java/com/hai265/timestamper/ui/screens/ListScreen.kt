@@ -1,9 +1,12 @@
 package com.hai265.timestamper.ui.screens
 
-import androidx.compose.material3.Text
+import androidx.compose.foundation.layout.Column
 import androidx.compose.runtime.Composable
+import com.hai265.timestamper.ComposeYouTubePlayer
 
 @Composable
 fun ListScreen() {
-    Text("Hello")
+    Column {
+        ComposeYouTubePlayer("tQDO-uVCl40")
+    }
 }

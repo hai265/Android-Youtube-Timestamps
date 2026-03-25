@@ -69,6 +69,7 @@ dependencies {
     implementation("androidx.fragment:fragment-ktx:1.8.2")
     implementation(libs.androidx.fragment.compose)
     implementation(libs.androidx.media3.exoplayer)
+    implementation(libs.androidyoutubeplayer)
     ksp(libs.hilt.android.compiler)
     ksp(libs.androidx.room.compiler)
     implementation(libs.androidx.hilt.navigation.compose)
