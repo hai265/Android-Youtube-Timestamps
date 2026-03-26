@@ -48,7 +48,13 @@ private fun NavGraph(
         startDestination = Navigables.ListScreen,
     ) {
         composable<Navigables.ListScreen> {
-            ListScreen(onTapVideo = { TODO("Unimplemented") })
+            ListScreen(onTapVideo = { id ->
+                navController.navigateSingleTopTo(
+                    Navigables.VideoScreen(
+                        id
+                    )
+                )
+            })
         }
         composable<Navigables.VideoScreen> {
             VideoScreen()
