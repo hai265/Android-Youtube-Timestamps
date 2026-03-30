@@ -5,10 +5,9 @@ import androidx.lifecycle.viewModelScope
 import com.hai265.timestamper.data.database.Video
 import com.hai265.timestamper.data.repos.TimestampsRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import javax.inject.Inject
 
 data class ListScreenState(
@@ -18,21 +17,18 @@ data class ListScreenState(
 
 @HiltViewModel
 class ListScreenViewModel @Inject constructor(
-    private val repo: TimestampsRepository
+    repo: TimestampsRepository
 ) : ViewModel() {
 
-    private val _state = MutableStateFlow(ListScreenState())
-    val state = _state.asStateFlow()
-
-    init {
-        load()
-    }
-
-    fun load() {
-        viewModelScope.launch {
-            _state.update { it.copy(syncing = true) }
-            _state.update { it.copy(videos = repo.getVideos(), syncing = false) }
+    val state = repo.getVideos()
+        .map {
+            ListScreenState(videos = it, syncing = false)
         }
-    }
-
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000L),
+            initialValue = ListScreenState(
+                syncing = false
+            )
+        )
 }

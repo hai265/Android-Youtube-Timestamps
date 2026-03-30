@@ -11,6 +11,9 @@ interface VideoDao {
     @Query("SELECT * from videos ORDER BY lastEdited DESC")
     fun getAllVideos(): Flow<List<Video>>
 
+    @Query("SELECT * from videos WHERE videoId =:id")
+    suspend fun getVideoById(id: String): Video
+
     @Query("SELECT * from timestamps WHERE videoId = :id")
     fun getVideoTimestamps(id: String): Flow<List<Timestamp>>
 
