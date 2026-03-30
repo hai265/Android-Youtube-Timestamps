@@ -2,8 +2,8 @@ package com.hai265.timestamper.ui.screens.list
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.hai265.timestamper.data.TimestampsRepository
-import com.hai265.timestamper.data.Video
+import com.hai265.timestamper.data.database.Video
+import com.hai265.timestamper.data.repos.TimestampsRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow

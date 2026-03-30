@@ -2,9 +2,11 @@ package com.hai265.timestamper.ui.screens.list
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -18,7 +20,7 @@ import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
 import coil3.request.crossfade
 import com.hai265.timestamper.R
-import com.hai265.timestamper.data.Video
+import com.hai265.timestamper.data.database.Video
 import com.hai265.timestamper.ui.fakes.fakeVideo1
 import com.hai265.timestamper.ui.fakes.fakeVideoList
 
@@ -28,7 +30,12 @@ fun ListScreen(onTapVideo: (id: String) -> Unit) {
     val viewmodel: ListScreenViewModel = hiltViewModel()
     val state by viewmodel.state.collectAsState()
 
-    VideoList(state.videos, onTapVideo)
+    Column(modifier = Modifier.fillMaxSize()) {
+        VideoList(state.videos, onTapVideo)
+        Button(onClick = { TODO("Implement") }) {
+            Text("Add video")
+        }
+    }
 }
 
 @Composable

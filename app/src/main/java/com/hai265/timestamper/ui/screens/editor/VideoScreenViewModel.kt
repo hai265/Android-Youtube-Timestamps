@@ -4,8 +4,8 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
-import com.hai265.timestamper.data.TimestampsRepository
-import com.hai265.timestamper.data.Video
+import com.hai265.timestamper.data.database.Video
+import com.hai265.timestamper.data.repos.TimestampsRepository
 import com.hai265.timestamper.ui.Navigables
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
