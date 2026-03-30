@@ -9,7 +9,7 @@ import androidx.room.PrimaryKey
 data class Video(
     @PrimaryKey
     val videoId: String,
-    val videoTitle: String,
+    val videoTitle: String?,
     val thumbnail: String,
     val lastEdited: Long = 0
 )

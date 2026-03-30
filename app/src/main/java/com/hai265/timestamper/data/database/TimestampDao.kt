@@ -4,6 +4,7 @@ import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.Query
+import androidx.room.Upsert
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -17,8 +18,8 @@ interface VideoDao {
     @Query("SELECT * from timestamps WHERE videoId = :id")
     fun getVideoTimestamps(id: String): Flow<List<Timestamp>>
 
-    @Insert
-    fun addVideo(video: Video)
+    @Upsert
+    suspend fun addVideo(video: Video)
 
     @Insert
     fun addTimestamp(timestamp: Timestamp)
