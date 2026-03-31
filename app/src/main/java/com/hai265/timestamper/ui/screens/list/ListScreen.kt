@@ -162,7 +162,7 @@ fun AddVideoDialog(
                     onDismissRequest()
                 }
             ) {
-                Text("Dismiss")
+                Text("Cancel")
             }
         }
     )
