@@ -34,11 +34,10 @@ class TimestampsRepository @Inject constructor(
     //Two errors can occur
     // 1. url is invalid
     // 2. video already added
-    //TODO: Add share target
     suspend fun addVideo(url: String): VideoResult {
-        /*TODO: I can get title and thumbnail two ways:
+        /*TODO: I can get title two ways:
             1. Try to see if android-youtube-player exposes something to get youtube title (update these fields when video page entered)
-            2. Use Youtube api to get title and thumbnail
+            2. Use yt-dlp to get title (local bundle or backend)
         */
         val videoId = getYouTubeId(url) ?: return VideoResult.InvalidUrl(url)
 

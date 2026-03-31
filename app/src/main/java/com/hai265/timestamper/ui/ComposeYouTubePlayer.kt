@@ -1,4 +1,4 @@
-package com.hai265.timestamper
+package com.hai265.timestamper.ui
 
 import android.app.Activity
 import android.content.Context

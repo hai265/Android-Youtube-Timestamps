@@ -1,6 +1,5 @@
 package com.hai265.timestamper.ui.screens.list
 
-import android.widget.Toast
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -30,9 +29,9 @@ import coil3.request.ImageRequest
 import coil3.request.crossfade
 import com.hai265.timestamper.R
 import com.hai265.timestamper.data.database.Video
-import com.hai265.timestamper.data.repos.VideoResult
 import com.hai265.timestamper.ui.fakes.fakeVideo1
 import com.hai265.timestamper.ui.fakes.fakeVideoList
+import com.hai265.timestamper.ui.handleVideoResult
 import kotlinx.coroutines.launch
 
 //https://www.figma.com/design/9GKdOD5q3yAT0mKgrcGmpf/Android-Youtube-Timestamp-Tool?node-id=1-5026&t=xjloAEfEmnkGJuPR-0
@@ -57,19 +56,7 @@ fun ListScreen(onTapVideo: (id: String) -> Unit) {
             onConfirmation = { url ->
                 composableScope.launch {
                     val videoResult = viewmodel.addVideo(url)
-                    when (videoResult) {
-                        VideoResult.Success -> {
-                            openDialog = false
-                        }
-                        //TODO:  VideoResult errors
-                        is VideoResult.InvalidUrl -> {
-                            Toast.makeText(
-                                context,
-                                "Invalid Url: ${videoResult.url}",
-                                Toast.LENGTH_LONG
-                            ).show()
-                        }
-                    }
+                    handleVideoResult(context, videoResult, { openDialog = false })
                 }
             }
         )
