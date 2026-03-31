@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -42,8 +41,8 @@ import kotlinx.coroutines.launch
 
 //https://www.figma.com/design/9GKdOD5q3yAT0mKgrcGmpf/Android-Youtube-Timestamp-Tool?node-id=1-5026&t=xjloAEfEmnkGJuPR-0
 @Composable
-fun ListScreen(onTapVideo: (id: String) -> Unit) {
-    val viewmodel: ListScreenViewModel = hiltViewModel()
+fun VideoList(onTapVideo: (id: String) -> Unit) {
+    val viewmodel: VideoListScreenViewModel = hiltViewModel()
     val state by viewmodel.state.collectAsState()
     var openDialog by rememberSaveable { mutableStateOf(false) }
     val context = LocalContext.current

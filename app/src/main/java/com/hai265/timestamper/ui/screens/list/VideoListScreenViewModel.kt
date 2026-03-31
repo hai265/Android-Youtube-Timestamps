@@ -18,7 +18,7 @@ data class ListScreenState(
 )
 
 @HiltViewModel
-class ListScreenViewModel @Inject constructor(
+class VideoListScreenViewModel @Inject constructor(
     private val repo: TimestampsRepository
 ) : ViewModel() {
 
@@ -42,6 +42,6 @@ class ListScreenViewModel @Inject constructor(
         viewModelScope.launch {
             repo.deleteVideo(video)
         }
-    
+
 
 }
