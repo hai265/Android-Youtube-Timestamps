@@ -4,6 +4,8 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -105,10 +107,11 @@ private fun VideoItem(
                 .build(),
             contentDescription = null,
             //TODO placeholder: grey thumbnail like youtube
-            placeholder = painterResource(R.drawable.test_thumbnail1),
-            error = painterResource(R.drawable.test_thumbnail1),
+            placeholder = painterResource(R.drawable.loading_thumbnail),
+            error = painterResource(R.drawable.default_thumbnail),
             modifier = Modifier
-                .fillMaxWidth()
+                .fillMaxSize()
+                .aspectRatio(16f / 9f)
         )
         Row(
             modifier = Modifier
