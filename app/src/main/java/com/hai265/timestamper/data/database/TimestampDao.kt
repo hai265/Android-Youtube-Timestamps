@@ -25,7 +25,7 @@ interface VideoDao {
     fun addTimestamp(timestamp: Timestamp)
 
     @Delete
-    fun deleteVideo(video: Video)
+    fun deleteVideo(id: Video)
 
     @Delete
     fun deleteTimestamp(timestamp: Timestamp)

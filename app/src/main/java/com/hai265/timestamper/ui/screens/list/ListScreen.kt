@@ -1,9 +1,12 @@
 package com.hai265.timestamper.ui.screens.list
 
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.text.input.rememberTextFieldState
@@ -23,6 +26,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
@@ -43,7 +47,11 @@ fun ListScreen(onTapVideo: (id: String) -> Unit) {
     val context = LocalContext.current
 
     Column(modifier = Modifier.fillMaxSize()) {
-        VideoList(state.videos, onTapVideo)
+        VideoList(
+            videoList = state.videos,
+            onTapVideo = onTapVideo,
+            onDeleteVideo = viewmodel::deleteVideo,
+        )
         Button(onClick = { openDialog = true }) {
             Text("Add video")
         }
@@ -51,7 +59,7 @@ fun ListScreen(onTapVideo: (id: String) -> Unit) {
 
     if (openDialog) {
         val composableScope = rememberCoroutineScope()
-        AlertDialogExample(
+        AddVideoDialog(
             onDismissRequest = { openDialog = false },
             onConfirmation = { url ->
                 composableScope.launch {
@@ -67,13 +75,15 @@ fun ListScreen(onTapVideo: (id: String) -> Unit) {
 private fun VideoList(
     videoList: List<Video>,
     onTapVideo: (id: String) -> Unit,
+    onDeleteVideo: (video: Video) -> Unit,
     modifier: Modifier = Modifier
 ) {
     LazyColumn(modifier = modifier) {
         items(videoList) { video ->
-            VideoThumbnail(
+            VideoItem(
                 video = video,
                 onTap = { onTapVideo(video.videoId) },
+                onTapDeleteVideo = onDeleteVideo,
                 modifier = Modifier.fillMaxWidth()
             )
         }
@@ -81,7 +91,12 @@ private fun VideoList(
 }
 
 @Composable
-private fun VideoThumbnail(video: Video, onTap: () -> Unit, modifier: Modifier = Modifier) {
+private fun VideoItem(
+    video: Video,
+    onTap: () -> Unit,
+    onTapDeleteVideo: (Video) -> Unit,
+    modifier: Modifier = Modifier,
+) {
     Column(modifier = modifier.clickable(onClick = onTap)) {
         AsyncImage(
             model = ImageRequest.Builder(LocalContext.current)
@@ -95,13 +110,23 @@ private fun VideoThumbnail(video: Video, onTap: () -> Unit, modifier: Modifier =
             modifier = Modifier
                 .fillMaxWidth()
         )
-        Text(video.videoTitle ?: "Video ID: ${video.videoId}")
-        Text("Updated today") //Read from video.timestamp
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(8.dp),
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Column {
+                Text(video.videoTitle ?: "Video ID: ${video.videoId}")
+                Text("Updated today") //Read from video.timestamp
+            }
+            Button(onClick = { onTapDeleteVideo(video) }) { Text("Delete") }
+        }
     }
 }
 
 @Composable
-fun AlertDialogExample(
+fun AddVideoDialog(
     onDismissRequest: () -> Unit,
     onConfirmation: (url: String) -> Unit,
 ) {
@@ -147,13 +172,14 @@ private fun VideoListPreview() {
     VideoList(
         videoList = fakeVideoList,
         onTapVideo = {},
+        onDeleteVideo = {}
     )
 }
 
 @Preview
 @Composable
-private fun VideoThumbnailPreview() {
-    VideoThumbnail(video = fakeVideo1, onTap = {})
+private fun VideoItemPreview() {
+    VideoItem(video = fakeVideo1, onTap = {}, onTapDeleteVideo = {})
 }
 
 

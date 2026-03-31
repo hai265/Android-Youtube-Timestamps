@@ -7,7 +7,9 @@ import com.hai265.timestamper.data.getYoutubeThumbnail
 import com.hai265.timestamper.data.models.VideoInfo
 import com.hai265.timestamper.ui.fakes.fakeVideo1
 import com.hai265.timestamper.ui.fakes.fakeVideo2
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 sealed interface VideoResult {
@@ -50,8 +52,14 @@ class TimestampsRepository @Inject constructor(
             )
         )
         return VideoResult.Success
-
     }
+
+    suspend fun deleteVideo(video: Video) {
+        withContext(Dispatchers.IO) {
+            dao.deleteVideo(video)
+        }
+    }
+
 
     //TODO: Add delete video
 
