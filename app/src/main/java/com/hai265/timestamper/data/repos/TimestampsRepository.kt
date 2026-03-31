@@ -10,17 +10,11 @@ import com.hai265.timestamper.ui.fakes.fakeVideo2
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
-sealed class VideoResult {
-    data object Success : VideoResult()
-    data class Failure(val error: AddVideoError) : VideoResult()
+sealed interface VideoResult {
+    data object Success : VideoResult
+    data class InvalidUrl(val url: String) : VideoResult
 }
 
-sealed class AddVideoError {
-    data class InvalidUrl(val url: String) : AddVideoError()
-    data object VideoAlreadyAdded : AddVideoError()
-}
-
-//TODO: Implement w/ room database (also add video button)
 class TimestampsRepository @Inject constructor(
     val dao: VideoDao
 ) {
@@ -40,12 +34,13 @@ class TimestampsRepository @Inject constructor(
     //Two errors can occur
     // 1. url is invalid
     // 2. video already added
+    //TODO: Add share target
     suspend fun addVideo(url: String): VideoResult {
         /*TODO: I can get title and thumbnail two ways:
             1. Try to see if android-youtube-player exposes something to get youtube title (update these fields when video page entered)
             2. Use Youtube api to get title and thumbnail
         */
-        val videoId = getYouTubeId(url) ?: return VideoResult.Failure(AddVideoError.InvalidUrl(url))
+        val videoId = getYouTubeId(url) ?: return VideoResult.InvalidUrl(url)
 
         dao.addVideo(
             Video(
@@ -59,8 +54,10 @@ class TimestampsRepository @Inject constructor(
 
     }
 
+    //TODO: Add delete video
+
     fun getVideoInfo(videoId: String): VideoInfo {
-        TODO("Returo videoInfo from youtube-api-v3")
+        TODO("Return videoInfo from youtube-api-v3")
     }
 
 }

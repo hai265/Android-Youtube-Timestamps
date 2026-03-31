@@ -56,14 +56,18 @@ fun ListScreen(onTapVideo: (id: String) -> Unit) {
             onDismissRequest = { openDialog = false },
             onConfirmation = { url ->
                 composableScope.launch {
-                    when (viewmodel.addVideo(url)) {
-                        //TODO:  VideoResult errors
-                        is VideoResult.Failure -> {
-                            Toast.makeText(context, "Error adding video", Toast.LENGTH_LONG).show()
-                        }
-
+                    val videoResult = viewmodel.addVideo(url)
+                    when (videoResult) {
                         VideoResult.Success -> {
                             openDialog = false
+                        }
+                        //TODO:  VideoResult errors
+                        is VideoResult.InvalidUrl -> {
+                            Toast.makeText(
+                                context,
+                                "Invalid Url: ${videoResult.url}",
+                                Toast.LENGTH_LONG
+                            ).show()
                         }
                     }
                 }
