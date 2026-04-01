@@ -1,10 +1,21 @@
 package com.hai265.timestamper.ui
 
+import androidx.compose.animation.AnimatedContentTransitionScope
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.MutableTransitionState
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkVertically
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
@@ -46,6 +57,18 @@ private fun NavGraph(
     NavHost(
         navController = navController,
         startDestination = Navigables.ListScreen,
+        enterTransition = {
+            slideIntoContainer(
+                AnimatedContentTransitionScope.SlideDirection.Start,
+                tween(700)
+            )
+        },
+        exitTransition = {
+            slideOutOfContainer(
+                AnimatedContentTransitionScope.SlideDirection.End,
+                tween(700)
+            )
+        }
     ) {
         composable<Navigables.ListScreen> {
             VideoListScreen(onTapVideo = { id ->
@@ -72,3 +95,26 @@ fun NavHostController.navigateSingleTopTo(route: Navigables) =
             saveState = true
         }
     }
+
+
+// Source - https://stackoverflow.com/a/66919245
+// Posted by Константин Семочкин, modified by community. See post 'Timeline' for change history
+// Retrieved 2026-04-01, License - CC BY-SA 4.0
+
+@Composable
+fun EnterAnimation(content: @Composable () -> Unit) {
+    AnimatedVisibility(
+        visibleState = MutableTransitionState(
+            initialState = false
+        ).apply { targetState = true },
+        modifier = Modifier,
+        enter = slideInVertically(
+            initialOffsetY = { -40 }
+        ) + expandVertically(
+            expandFrom = Alignment.Top
+        ) + fadeIn(initialAlpha = 0.3f),
+        exit = slideOutVertically() + shrinkVertically() + fadeOut(),
+    ) {
+        content()
+    }
+}
