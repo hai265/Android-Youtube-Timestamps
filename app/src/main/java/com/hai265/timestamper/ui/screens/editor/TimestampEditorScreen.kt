@@ -19,13 +19,15 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.hai265.timestamper.R
 import com.hai265.timestamper.data.database.Timestamp
-import com.hai265.timestamper.ui.ComposeYouTubePlayer
+import com.hai265.timestamper.ui.screens.youtubeplayer.ComposeYouTubePlayer
+import com.hai265.timestamper.ui.screens.youtubeplayer.YouTubePlayerController
 import java.util.Locale
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
@@ -44,6 +46,8 @@ fun TimestampEditorScreen() {
     val state by viewmodel.state.collectAsState()
 
     val videoId = state.video?.videoId
+    val controller = remember { YouTubePlayerController() }
+
     Scaffold(
         floatingActionButton = {
             FloatingActionButton(onClick = { viewmodel.addTimestamp() }) {
@@ -53,16 +57,16 @@ fun TimestampEditorScreen() {
         floatingActionButtonPosition = FabPosition.End,
     ) { innerPadding ->
         if (videoId != null) {
-            Column(modifier = Modifier.padding(innerPadding)) {
+            Column(modifier = Modifier.padding(bottom = innerPadding.calculateBottomPadding())) {
                 ComposeYouTubePlayer(
                     videoId = videoId,
                     onCurrentTime = viewmodel::updateCurrentTime,
-                    onPlayerReady = viewmodel::onPlayerReady
+                    controller = controller
                 )
                 TimestampList(
                     timestamps = state.timestamps,
                     onDelete = viewmodel::deleteTimestamp,
-                    onTimestampClick = viewmodel::seekToTimestamp
+                    onTimestampClick = { duration -> controller.seekTo(duration) },
                 )
             }
         }

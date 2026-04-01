@@ -19,7 +19,6 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 import kotlin.time.Duration
-import kotlin.time.DurationUnit
 
 data class TimestampEditorState(
     val video: Video? = null,
@@ -37,8 +36,6 @@ class TimestampEditorViewModel @Inject constructor(
 
     private val _currentTime = MutableStateFlow(Duration.ZERO)
 
-    private var seekTo: ((Float) -> Unit)? = null
-
     val state = combine(
         timestampRepo.getTimestamps(videoId),
         flow { emit(videoRepo.getVideoById(videoId)) },
@@ -50,14 +47,6 @@ class TimestampEditorViewModel @Inject constructor(
         started = SharingStarted.WhileSubscribed(5000L),
         initialValue = TimestampEditorState()
     )
-
-    fun onPlayerReady(seekTo: (Float) -> Unit) {
-        this.seekTo = seekTo
-    }
-
-    fun seekToTimestamp(duration: Duration) {
-        seekTo?.invoke(duration.toDouble(DurationUnit.SECONDS).toFloat())
-    }
 
     fun addTimestamp() {
         viewModelScope.launch {

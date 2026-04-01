@@ -1,4 +1,4 @@
-package com.hai265.timestamper.ui
+package com.hai265.timestamper.ui.screens.youtubeplayer
 
 import android.app.Activity
 import android.content.Context
@@ -34,8 +34,8 @@ import kotlin.time.toDuration
 fun ComposeYouTubePlayer(
     videoId: String,
     onCurrentTime: (duration: Duration) -> Unit,
-    onPlayerReady: (seekTo: (Float) -> Unit) -> Unit = {},
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    controller: YouTubePlayerController
 ) {
     val context = LocalContext.current
     val activity = remember(context) { context.findActivity() }
@@ -64,7 +64,7 @@ fun ComposeYouTubePlayer(
                 val listener = object : AbstractYouTubePlayerListener() {
                     override fun onReady(player: YouTubePlayer) {
                         youTubePlayer = player
-                        onPlayerReady { seconds -> player.seekTo(seconds) }
+                        controller.player = player
                     }
 
                     override fun onCurrentSecond(youTubePlayer: YouTubePlayer, second: Float) {
@@ -128,7 +128,11 @@ class ComposeExampleActivity : ComponentActivity() {
         setContent {
             var videoId by remember { mutableStateOf("tQDO-uVCl40") }
             Column {
-                ComposeYouTubePlayer(videoId = videoId, onCurrentTime = {})
+                ComposeYouTubePlayer(
+                    videoId = videoId,
+                    onCurrentTime = {},
+                    controller = YouTubePlayerController()
+                )
 
             }
         }
