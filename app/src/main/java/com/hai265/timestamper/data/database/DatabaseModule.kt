@@ -24,5 +24,8 @@ abstract class DatabaseModule {
 
         @Provides
         fun providesVideoDao(database: AppDatabase) = database.videoDao()
+
+        @Provides
+        fun providesTimestampDao(database: AppDatabase) = database.timestampDao()
     }
 }

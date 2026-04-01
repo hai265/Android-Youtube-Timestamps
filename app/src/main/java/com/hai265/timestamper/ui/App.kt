@@ -11,8 +11,8 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.hai265.timestamper.ui.screens.editor.VideoScreen
-import com.hai265.timestamper.ui.screens.list.VideoList
+import com.hai265.timestamper.ui.screens.editor.TimestampEditorScreen
+import com.hai265.timestamper.ui.screens.list.VideoListScreen
 import kotlinx.serialization.Serializable
 
 sealed class Navigables {
@@ -48,7 +48,7 @@ private fun NavGraph(
         startDestination = Navigables.ListScreen,
     ) {
         composable<Navigables.ListScreen> {
-            VideoList(onTapVideo = { id ->
+            VideoListScreen(onTapVideo = { id ->
                 navController.navigateSingleTopTo(
                     Navigables.VideoScreen(
                         id
@@ -57,7 +57,7 @@ private fun NavGraph(
             })
         }
         composable<Navigables.VideoScreen> {
-            VideoScreen()
+            TimestampEditorScreen()
         }
     }
 }

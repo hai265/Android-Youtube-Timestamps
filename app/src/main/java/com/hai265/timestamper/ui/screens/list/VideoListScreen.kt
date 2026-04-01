@@ -41,14 +41,14 @@ import kotlinx.coroutines.launch
 
 //https://www.figma.com/design/9GKdOD5q3yAT0mKgrcGmpf/Android-Youtube-Timestamp-Tool?node-id=1-5026&t=xjloAEfEmnkGJuPR-0
 @Composable
-fun VideoList(onTapVideo: (id: String) -> Unit) {
+fun VideoListScreen(onTapVideo: (id: String) -> Unit) {
     val viewmodel: VideoListScreenViewModel = hiltViewModel()
     val state by viewmodel.state.collectAsState()
     var openDialog by rememberSaveable { mutableStateOf(false) }
     val context = LocalContext.current
 
     Column(modifier = Modifier.fillMaxSize()) {
-        VideoList(
+        VideoListScreen(
             videoList = state.videos,
             onTapVideo = onTapVideo,
             onDeleteVideo = viewmodel::deleteVideo,
@@ -73,7 +73,7 @@ fun VideoList(onTapVideo: (id: String) -> Unit) {
 }
 
 @Composable
-private fun VideoList(
+private fun VideoListScreen(
     videoList: List<Video>,
     onTapVideo: (id: String) -> Unit,
     onDeleteVideo: (video: Video) -> Unit,
@@ -171,7 +171,7 @@ fun AddVideoDialog(
 @Preview
 @Composable
 private fun VideoListPreview() {
-    VideoList(
+    VideoListScreen(
         videoList = fakeVideoList,
         onTapVideo = {},
         onDeleteVideo = {}

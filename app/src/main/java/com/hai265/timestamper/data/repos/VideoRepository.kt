@@ -17,7 +17,7 @@ sealed interface VideoResult {
     data class InvalidUrl(val url: String) : VideoResult
 }
 
-class TimestampsRepository @Inject constructor(
+class VideoRepository @Inject constructor(
     val dao: VideoDao
 ) {
     fun getVideos(): Flow<List<Video>> {

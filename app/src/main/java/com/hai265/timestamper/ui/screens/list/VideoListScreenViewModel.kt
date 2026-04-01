@@ -3,7 +3,7 @@ package com.hai265.timestamper.ui.screens.list
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.hai265.timestamper.data.database.Video
-import com.hai265.timestamper.data.repos.TimestampsRepository
+import com.hai265.timestamper.data.repos.VideoRepository
 import com.hai265.timestamper.data.repos.VideoResult
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
@@ -19,7 +19,7 @@ data class ListScreenState(
 
 @HiltViewModel
 class VideoListScreenViewModel @Inject constructor(
-    private val repo: TimestampsRepository
+    private val repo: VideoRepository
 ) : ViewModel() {
 
     val state = repo.getVideos()
