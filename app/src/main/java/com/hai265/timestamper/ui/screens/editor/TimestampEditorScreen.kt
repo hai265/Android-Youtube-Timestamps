@@ -13,6 +13,7 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.FabPosition
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -26,14 +27,16 @@ import com.hai265.timestamper.R
 import com.hai265.timestamper.data.database.Timestamp
 import com.hai265.timestamper.ui.ComposeYouTubePlayer
 import java.util.Locale
+import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.DurationUnit
+import kotlin.time.toDuration
 
 //https://www.figma.com/design/9GKdOD5q3yAT0mKgrcGmpf/Android-Youtube-Timestamp-Tool?node-id=1-6261&t=xjloAEfEmnkGJuPR-0
 
 /*
 TODO:
 2. Sort by time
-3. When tap timestamp move player to that time
  */
 @Composable
 fun TimestampEditorScreen() {
@@ -53,9 +56,14 @@ fun TimestampEditorScreen() {
             Column(modifier = Modifier.padding(innerPadding)) {
                 ComposeYouTubePlayer(
                     videoId = videoId,
-                    onCurrentTime = viewmodel::updateCurrentTime
+                    onCurrentTime = viewmodel::updateCurrentTime,
+                    onPlayerReady = viewmodel::onPlayerReady
                 )
-                TimestampList(timestamps = state.timestamps, onDelete = viewmodel::deleteTimestamp)
+                TimestampList(
+                    timestamps = state.timestamps,
+                    onDelete = viewmodel::deleteTimestamp,
+                    onTimestampClick = viewmodel::seekToTimestamp
+                )
             }
         }
     }
@@ -68,21 +76,37 @@ fun TimestampEditorScreen() {
 fun TimestampList(
     timestamps: List<Timestamp>,
     onDelete: (timestamp: Timestamp) -> Unit,
+    onTimestampClick: (Duration) -> Unit,
     modifier: Modifier = Modifier
 ) {
     LazyColumn(modifier = modifier) {
         items(timestamps) { timestamp ->
-            TimestampItem(timestamp, onClickDelete = { onDelete(timestamp) })
+            TimestampItem(
+                timestamp,
+                onClickDelete = { onDelete(timestamp) },
+                onTimestampClick = onTimestampClick
+            )
         }
     }
 }
 
 @Composable
-fun TimestampItem(timestamp: Timestamp, onClickDelete: () -> Unit, modifier: Modifier = Modifier) {
+fun TimestampItem(
+    timestamp: Timestamp,
+    onClickDelete: () -> Unit,
+    onTimestampClick: (Duration) -> Unit,
+    modifier: Modifier = Modifier
+) {
     Row(
         modifier = modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        Text(formatMilisToHHMMSS(timestamp.timeMs))
+        Text(
+            text = formatMilisToHHMMSS(timestamp.timeMs),
+            color = MaterialTheme.colorScheme.primary,
+            modifier = Modifier.clickable {
+                onTimestampClick(timestamp.timeMs.toDuration(DurationUnit.MILLISECONDS))
+            }
+        )
         Text("Description")
         Icon(
             painter = painterResource(R.drawable.close),
@@ -113,6 +137,7 @@ fun TimestampItemPreview() {
             timeMs = 0L,
             description = "timestamp description"
         ),
-        onClickDelete = {}
+        onClickDelete = {},
+        onTimestampClick = {}
     )
 }

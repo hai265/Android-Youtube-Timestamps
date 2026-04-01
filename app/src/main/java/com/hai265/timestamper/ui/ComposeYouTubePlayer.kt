@@ -34,6 +34,7 @@ import kotlin.time.toDuration
 fun ComposeYouTubePlayer(
     videoId: String,
     onCurrentTime: (duration: Duration) -> Unit,
+    onPlayerReady: (seekTo: (Float) -> Unit) -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
@@ -63,6 +64,7 @@ fun ComposeYouTubePlayer(
                 val listener = object : AbstractYouTubePlayerListener() {
                     override fun onReady(player: YouTubePlayer) {
                         youTubePlayer = player
+                        onPlayerReady { seconds -> player.seekTo(seconds) }
                     }
 
                     override fun onCurrentSecond(youTubePlayer: YouTubePlayer, second: Float) {
