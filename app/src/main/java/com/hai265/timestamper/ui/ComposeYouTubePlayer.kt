@@ -26,24 +26,14 @@ import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.listeners.Ful
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.options.IFramePlayerOptions
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.utils.loadOrCueVideo
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.views.YouTubePlayerView
-
-class ComposeExampleActivity : ComponentActivity() {
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-        setContent {
-            var videoId by remember { mutableStateOf("tQDO-uVCl40") }
-            Column {
-                ComposeYouTubePlayer(videoId = videoId)
-
-            }
-        }
-    }
-}
+import kotlin.time.Duration
+import kotlin.time.DurationUnit
+import kotlin.time.toDuration
 
 @Composable
 fun ComposeYouTubePlayer(
     videoId: String,
+    onCurrentTime: (duration: Duration) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
@@ -73,6 +63,11 @@ fun ComposeYouTubePlayer(
                 val listener = object : AbstractYouTubePlayerListener() {
                     override fun onReady(player: YouTubePlayer) {
                         youTubePlayer = player
+                    }
+
+                    override fun onCurrentSecond(youTubePlayer: YouTubePlayer, second: Float) {
+                        super.onCurrentSecond(youTubePlayer, second)
+                        onCurrentTime(second.toDouble().toDuration(DurationUnit.SECONDS))
                     }
                 }
 
@@ -120,6 +115,20 @@ fun ComposeYouTubePlayer(
             fullScreenView = null
             playerView?.release()
             playerView = null
+        }
+    }
+}
+
+class ComposeExampleActivity : ComponentActivity() {
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        setContent {
+            var videoId by remember { mutableStateOf("tQDO-uVCl40") }
+            Column {
+                ComposeYouTubePlayer(videoId = videoId, onCurrentTime = {})
+
+            }
         }
     }
 }

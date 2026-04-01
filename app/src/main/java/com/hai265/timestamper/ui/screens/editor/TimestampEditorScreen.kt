@@ -32,7 +32,6 @@ import kotlin.time.Duration.Companion.milliseconds
 
 /*
 TODO:
-1. When add timestamp add from current time
 2. Sort by time
 3. When tap timestamp move player to that time
  */
@@ -44,7 +43,7 @@ fun TimestampEditorScreen() {
     val videoId = state.video?.videoId
     Scaffold(
         floatingActionButton = {
-            FloatingActionButton(onClick = { viewmodel.addTimestamp(0L) }) {
+            FloatingActionButton(onClick = { viewmodel.addTimestamp() }) {
                 Icon(Icons.Filled.Add, "Add")
             }
         },
@@ -52,7 +51,10 @@ fun TimestampEditorScreen() {
     ) { innerPadding ->
         if (videoId != null) {
             Column(modifier = Modifier.padding(innerPadding)) {
-                ComposeYouTubePlayer(videoId)
+                ComposeYouTubePlayer(
+                    videoId = videoId,
+                    onCurrentTime = viewmodel::updateCurrentTime
+                )
                 TimestampList(timestamps = state.timestamps, onDelete = viewmodel::deleteTimestamp)
             }
         }
@@ -93,8 +95,11 @@ fun TimestampItem(timestamp: Timestamp, onClickDelete: () -> Unit, modifier: Mod
 fun formatMilisToHHMMSS(millis: Long): String {
     val duration = millis.milliseconds
     return duration.toComponents { hours, minutes, seconds, _ ->
-        val format = if (hours >= 1L) "%02d:%02d:%02d" else "%02d:%02d"
-        String.format(Locale.US, format, hours, minutes, seconds)
+        if (hours >= 1L) {
+            String.format(Locale.US, "%02d:%02d:%02d", hours, minutes, seconds)
+        } else {
+            String.format(Locale.US, "%02d:%02d", minutes, seconds)
+        }
     }
 }
 
