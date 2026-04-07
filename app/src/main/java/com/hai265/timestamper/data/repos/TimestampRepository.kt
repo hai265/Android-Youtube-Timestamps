@@ -1,5 +1,6 @@
 package com.hai265.timestamper.data.repos
 
+import android.util.Log
 import com.hai265.timestamper.data.database.Timestamp
 import com.hai265.timestamper.data.database.TimestampDao
 import kotlinx.coroutines.Dispatchers
@@ -15,8 +16,11 @@ class TimestampRepository @Inject constructor(
         return timestampDao.getTimestamps(videoId)
     }
 
-    fun addOrUpdateTimestamp(timestamp: Timestamp) {
-        timestampDao.upsertTimestamp(timestamp)
+    suspend fun addOrUpdateTimestamp(timestamp: Timestamp) {
+        withContext(Dispatchers.IO) {
+            Log.d("TimestampRepository", "addOrUpdateTimestamp: ")
+            timestampDao.upsertTimestamp(timestamp)
+        }
     }
 
     suspend fun deleteTimestamp(timestamp: Timestamp) {

@@ -8,6 +8,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.FabPosition
@@ -17,9 +19,11 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -28,6 +32,7 @@ import com.hai265.timestamper.R
 import com.hai265.timestamper.data.database.Timestamp
 import com.hai265.timestamper.ui.screens.youtubeplayer.ComposeYouTubePlayer
 import com.hai265.timestamper.ui.screens.youtubeplayer.YouTubePlayerController
+import kotlinx.coroutines.flow.distinctUntilChanged
 import java.util.Locale
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
@@ -39,6 +44,7 @@ import kotlin.time.toDuration
 /*
 TODO:
 2. Sort by time
+3. Add ability to edit text
  */
 @Composable
 fun TimestampEditorScreen() {
@@ -67,6 +73,7 @@ fun TimestampEditorScreen() {
                     timestamps = state.timestamps,
                     onDelete = viewmodel::deleteTimestamp,
                     onTimestampClick = { duration -> controller.seekTo(duration) },
+                    updateDescription = viewmodel::updateDescription
                 )
             }
         }
@@ -81,14 +88,21 @@ fun TimestampList(
     timestamps: List<Timestamp>,
     onDelete: (timestamp: Timestamp) -> Unit,
     onTimestampClick: (Duration) -> Unit,
+    updateDescription: (Timestamp, String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     LazyColumn(modifier = modifier) {
-        items(timestamps) { timestamp ->
+        items(timestamps, key = { it.id }) { timestamp ->
             TimestampItem(
                 timestamp,
                 onClickDelete = { onDelete(timestamp) },
-                onTimestampClick = onTimestampClick
+                onTimestampClick = onTimestampClick,
+                onTimestampDescriptionUpdate = { newDescription ->
+                    updateDescription(
+                        timestamp,
+                        newDescription
+                    )
+                }
             )
         }
     }
@@ -99,8 +113,18 @@ fun TimestampItem(
     timestamp: Timestamp,
     onClickDelete: () -> Unit,
     onTimestampClick: (Duration) -> Unit,
+    onTimestampDescriptionUpdate: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val textFieldState = rememberTextFieldState(initialText = timestamp.description)
+
+    LaunchedEffect(textFieldState) {
+        snapshotFlow { textFieldState.text }
+            .distinctUntilChanged()
+            .collect { newText ->
+                onTimestampDescriptionUpdate(newText.toString())
+            }
+    }
     Row(
         modifier = modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween
     ) {
@@ -111,7 +135,7 @@ fun TimestampItem(
                 onTimestampClick(timestamp.timeMs.toDuration(DurationUnit.MILLISECONDS))
             }
         )
-        Text("Description")
+        BasicTextField(state = textFieldState, modifier = Modifier.weight(1f))
         Icon(
             painter = painterResource(R.drawable.close),
             contentDescription = "Delete Timestamp",
@@ -142,6 +166,7 @@ fun TimestampItemPreview() {
             description = "timestamp description"
         ),
         onClickDelete = {},
-        onTimestampClick = {}
+        onTimestampClick = {},
+        onTimestampDescriptionUpdate = {},
     )
 }

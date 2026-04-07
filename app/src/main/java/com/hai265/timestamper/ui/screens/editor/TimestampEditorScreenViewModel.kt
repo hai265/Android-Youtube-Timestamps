@@ -11,9 +11,12 @@ import com.hai265.timestamper.data.repos.TimestampRepository
 import com.hai265.timestamper.data.repos.VideoRepository
 import com.hai265.timestamper.ui.Navigables
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -26,6 +29,7 @@ data class TimestampEditorState(
     val currentTime: Duration = Duration.ZERO
 )
 
+@OptIn(FlowPreview::class)
 @HiltViewModel
 class TimestampEditorViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
@@ -35,6 +39,18 @@ class TimestampEditorViewModel @Inject constructor(
     private val videoId = savedStateHandle.toRoute<Navigables.VideoScreen>().id
 
     private val _currentTime = MutableStateFlow(Duration.ZERO)
+    private val descriptionUpdates = MutableStateFlow<Pair<Timestamp, String>?>(null)
+
+    init {
+        viewModelScope.launch {
+            descriptionUpdates
+                .filterNotNull()
+                .debounce(500)
+                .collect { (timestamp, description) ->
+                    timestampRepo.addOrUpdateTimestamp(timestamp.copy(description = description))
+                }
+        }
+    }
 
     val state = combine(
         timestampRepo.getTimestamps(videoId),
@@ -65,5 +81,11 @@ class TimestampEditorViewModel @Inject constructor(
     fun updateCurrentTime(duration: Duration) {
         _currentTime.value = duration
         Log.d("TimestampEditorViewModel", "current time:${duration.inWholeSeconds} ")
+    }
+
+    fun updateDescription(timestamp: Timestamp, description: String) {
+        viewModelScope.launch {
+            descriptionUpdates.emit(timestamp to description)
+        }
     }
 }
