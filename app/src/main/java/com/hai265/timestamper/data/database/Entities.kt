@@ -32,7 +32,7 @@ data class Video(
 )
 data class Timestamp(
     @PrimaryKey(autoGenerate = true)
-    val id: Int = 0,
+    val id: Long = 0,
     val videoId: String,
     val timeMs: Long,
     val description: String

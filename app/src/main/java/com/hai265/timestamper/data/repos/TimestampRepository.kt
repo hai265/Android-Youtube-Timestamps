@@ -29,8 +29,8 @@ class TimestampRepository @Inject constructor(
         }
     }
 
-    suspend fun addEmptyTimestamp(videoId: String, duration: Duration) {
-        withContext(Dispatchers.IO) {
+    suspend fun addEmptyTimestamp(videoId: String, duration: Duration): Long {
+        return withContext(Dispatchers.IO) {
             timestampDao.upsertTimestamp(
                 Timestamp(
                     videoId = videoId,

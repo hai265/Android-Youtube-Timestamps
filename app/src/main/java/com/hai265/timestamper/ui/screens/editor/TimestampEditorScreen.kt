@@ -1,5 +1,9 @@
 package com.hai265.timestamper.ui.screens.editor
 
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -25,7 +29,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -41,6 +47,7 @@ import com.hai265.timestamper.data.database.Timestamp
 import com.hai265.timestamper.ui.fakes.fakeTimestampList
 import com.hai265.timestamper.ui.screens.youtubeplayer.ComposeYouTubePlayer
 import com.hai265.timestamper.ui.screens.youtubeplayer.YouTubePlayerController
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.distinctUntilChanged
 import java.util.Locale
 import kotlin.time.Duration
@@ -52,9 +59,9 @@ import kotlin.time.toDuration
 
 /*
 TODO:
-- Highlight newly added timestamp w/ a different color
 - Player Controls (Pause / Play), skip +/- 5 secs
 - phone horizontal mode (bug, config changes reloads video)
+- when add timestamp jump to timestamp and automatically open keyboard
  */
 @Composable
 fun TimestampEditorScreen() {
@@ -90,7 +97,8 @@ fun TimestampEditorScreen() {
                     timestamps = state.timestamps,
                     onDelete = viewmodel::deleteTimestamp,
                     onTimestampClick = { duration -> controller.seekTo(duration) },
-                    updateDescription = viewmodel::updateDescription
+                    updateDescription = viewmodel::updateDescription,
+                    highlightedId = state.newlyAddedTimestampId,
                 )
             }
         }
@@ -104,6 +112,7 @@ fun TimestampList(
     onDelete: (timestamp: Timestamp) -> Unit,
     onTimestampClick: (Duration) -> Unit,
     updateDescription: (Timestamp, String) -> Unit,
+    highlightedId: Long?,
     modifier: Modifier = Modifier
 ) {
     LazyColumn(modifier = modifier) {
@@ -117,7 +126,8 @@ fun TimestampList(
                         timestamp,
                         newDescription
                     )
-                }
+                },
+                isHighlighted = timestamp.id == highlightedId
             )
         }
     }
@@ -129,6 +139,7 @@ fun TimestampItem(
     onClickDelete: () -> Unit,
     onTimestampClick: (Duration) -> Unit,
     onTimestampDescriptionUpdate: (String) -> Unit,
+    isHighlighted: Boolean,
     modifier: Modifier = Modifier
 ) {
     val textFieldState = rememberTextFieldState(initialText = timestamp.description)
@@ -140,8 +151,26 @@ fun TimestampItem(
                 onTimestampDescriptionUpdate(newText.toString())
             }
     }
+    val highlight = MaterialTheme.colorScheme.primaryContainer
+    var targetColor by remember(isHighlighted) {
+        mutableStateOf(if (isHighlighted) highlight else Color.Transparent)
+    }
+
+    LaunchedEffect(isHighlighted) {
+        if (isHighlighted) {
+            delay(1000)
+            targetColor = Color.Transparent
+        }
+    }
+    val backgroundColor by animateColorAsState(
+        targetValue = targetColor,
+        animationSpec = tween(durationMillis = 500, easing = LinearEasing),
+        label = "highlight"
+    )
     Row(
-        modifier = modifier.fillMaxWidth(),
+        modifier = modifier
+            .fillMaxWidth()
+            .background(backgroundColor),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -196,6 +225,7 @@ fun TimestampListPreview() {
         onDelete = { },
         onTimestampClick = { },
         updateDescription = { _, _ -> },
+        highlightedId = null
     )
 }
 
@@ -212,5 +242,6 @@ fun TimestampItemPreview() {
         onClickDelete = {},
         onTimestampClick = {},
         onTimestampDescriptionUpdate = {},
+        isHighlighted = true
     )
 }
