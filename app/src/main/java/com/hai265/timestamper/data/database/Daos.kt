@@ -23,12 +23,12 @@ interface VideoDao {
 
 @Dao
 interface TimestampDao {
-    @Query("SELECT * from timestamps WHERE videoId = :videoId")
+    @Query("SELECT * from timestamps WHERE videoId = :videoId ORDER BY timeMs ASC")
     fun getTimestamps(videoId: String): Flow<List<Timestamp>>
 
     @Upsert
     fun upsertTimestamp(timestamp: Timestamp)
-    
+
     @Delete
     fun deleteTimestamp(timestamp: Timestamp)
 }
