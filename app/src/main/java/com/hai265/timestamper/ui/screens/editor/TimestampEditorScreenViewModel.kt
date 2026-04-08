@@ -16,8 +16,10 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.sample
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -26,7 +28,6 @@ import kotlin.time.Duration
 data class TimestampEditorState(
     val video: Video? = null,
     val timestamps: List<Timestamp> = listOf(),
-    val currentTime: Duration = Duration.ZERO
 )
 
 @OptIn(FlowPreview::class)
@@ -38,7 +39,7 @@ class TimestampEditorViewModel @Inject constructor(
 ) : ViewModel() {
     private val videoId = savedStateHandle.toRoute<Navigables.VideoScreen>().id
 
-    private val _currentTime = MutableStateFlow(Duration.ZERO)
+    private val currentTime = MutableStateFlow(Duration.ZERO)
     private val descriptionUpdates = MutableStateFlow<Pair<Timestamp, String>?>(null)
 
     init {
@@ -49,15 +50,26 @@ class TimestampEditorViewModel @Inject constructor(
                 .collect { (timestamp, description) ->
                     timestampRepo.addOrUpdateTimestamp(timestamp.copy(description = description))
                 }
+
+        }
+        viewModelScope.launch {
+            currentTime
+                .drop(1) //Drop default Duration.ZERO value
+                .sample(1000)
+                .collect { lastWatchedTimestamp ->
+                    state.value.video?.videoId?.let { videoId ->
+                        videoRepo.updateVideoLastWatched(videoId, lastWatchedTimestamp)
+                    }
+                }
+
         }
     }
 
     val state = combine(
         timestampRepo.getTimestamps(videoId),
         flow { emit(videoRepo.getVideoById(videoId)) },
-        _currentTime
-    ) { timestamps, video, currentTime ->
-        TimestampEditorState(video, timestamps, currentTime)
+    ) { timestamps, video ->
+        TimestampEditorState(video, timestamps)
     }.stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(5000L),
@@ -67,7 +79,9 @@ class TimestampEditorViewModel @Inject constructor(
     fun addTimestamp() {
         viewModelScope.launch {
             state.value.video?.videoId?.let {
-                timestampRepo.addEmptyTimestamp(it, state.value.currentTime)
+                timestampRepo.addEmptyTimestamp(
+                    it, currentTime.value
+                )
             }
         }
     }
@@ -79,7 +93,7 @@ class TimestampEditorViewModel @Inject constructor(
     }
 
     fun updateCurrentTime(duration: Duration) {
-        _currentTime.value = duration
+        currentTime.value = duration
         Log.d("TimestampEditorViewModel", "current time:${duration.inWholeSeconds} ")
     }
 

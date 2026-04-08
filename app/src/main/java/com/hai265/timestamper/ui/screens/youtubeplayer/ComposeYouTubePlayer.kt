@@ -18,6 +18,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.YouTubePlayer
@@ -35,7 +36,8 @@ fun ComposeYouTubePlayer(
     videoId: String,
     onCurrentTime: (duration: Duration) -> Unit,
     modifier: Modifier = Modifier,
-    controller: YouTubePlayerController
+    controller: YouTubePlayerController,
+    startingTime: Duration
 ) {
     val context = LocalContext.current
     val activity = remember(context) { context.findActivity() }
@@ -106,8 +108,13 @@ fun ComposeYouTubePlayer(
     )
 
     // Use LaunchedEffect to react to changes in videoId or the player instance
+    //TODO: Remove this from LaunchedEffect
     LaunchedEffect(youTubePlayer, videoId) {
-        youTubePlayer?.loadOrCueVideo(lifecycleOwner.lifecycle, videoId, 0f)
+        youTubePlayer?.loadOrCueVideo(
+            lifecycleOwner.lifecycle,
+            videoId,
+            startingTime.inWholeSeconds.toFloat()
+        )
     }
 
     DisposableEffect(lifecycleOwner, activity) {
@@ -131,11 +138,25 @@ class ComposeExampleActivity : ComponentActivity() {
                 ComposeYouTubePlayer(
                     videoId = videoId,
                     onCurrentTime = {},
-                    controller = YouTubePlayerController()
+                    controller = YouTubePlayerController(),
+                    startingTime = Duration.ZERO
                 )
 
             }
         }
+    }
+}
+
+@Preview
+@Composable
+fun ComposeYoutubePlayerPreview() {
+    Column {
+        ComposeYouTubePlayer(
+            videoId = "tQDO-uVCl40",
+            onCurrentTime = {},
+            controller = YouTubePlayerController(),
+            startingTime = 120.toDuration(DurationUnit.SECONDS)
+        )
     }
 }
 

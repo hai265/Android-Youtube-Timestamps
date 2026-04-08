@@ -4,6 +4,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
@@ -29,6 +30,7 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -50,16 +52,17 @@ import kotlin.time.toDuration
 
 /*
 TODO:
-- remember time left off
 - Highlight newly added timestamp w/ a different color
 - Player Controls (Pause / Play), skip +/- 5 secs
+- phone horizontal mode (bug, config changes reloads video)
  */
 @Composable
 fun TimestampEditorScreen() {
     val viewmodel = hiltViewModel<TimestampEditorViewModel>()
     val state by viewmodel.state.collectAsState()
+    val focusManager = LocalFocusManager.current
 
-    val videoId = state.video?.videoId
+    val video = state.video
     val controller = remember { YouTubePlayerController() }
 
     Scaffold(
@@ -70,12 +73,18 @@ fun TimestampEditorScreen() {
         },
         floatingActionButtonPosition = FabPosition.End,
     ) { innerPadding ->
-        if (videoId != null) {
-            Column(modifier = Modifier.padding(bottom = innerPadding.calculateBottomPadding())) {
+        if (video != null) {
+            Column(
+                modifier = Modifier
+                    .padding(bottom = innerPadding.calculateBottomPadding())
+                    .fillMaxSize()
+                    .clickable { focusManager.clearFocus() }) {
+                //TODO: skip to video left off time
                 ComposeYouTubePlayer(
-                    videoId = videoId,
+                    videoId = video.videoId,
                     onCurrentTime = viewmodel::updateCurrentTime,
-                    controller = controller
+                    controller = controller,
+                    startingTime = video.lastPlayed,
                 )
                 TimestampList(
                     timestamps = state.timestamps,
@@ -86,8 +95,6 @@ fun TimestampEditorScreen() {
             }
         }
     }
-
-
 }
 
 

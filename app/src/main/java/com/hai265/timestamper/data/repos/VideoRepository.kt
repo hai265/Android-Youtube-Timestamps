@@ -11,6 +11,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
+import kotlin.time.Duration
 
 sealed interface VideoResult {
     data object Success : VideoResult
@@ -48,7 +49,8 @@ class VideoRepository @Inject constructor(
                 videoId = videoId,
                 videoTitle = null,
                 thumbnail = getYoutubeThumbnail(videoId),
-                lastEdited = System.currentTimeMillis()
+                lastEdited = Duration.ZERO,
+                lastPlayed = Duration.ZERO,
             )
         )
         return VideoResult.Success
@@ -60,8 +62,14 @@ class VideoRepository @Inject constructor(
         }
     }
 
+    //TODO: Optimize so I don't write to db every second
+    //Performance profiling?
+    suspend fun updateVideoLastWatched(videoId: String, lastWatchedTimestamp: Duration) {
+        withContext(Dispatchers.IO) {
+            dao.updateLastPlayed(videoId, lastWatchedTimestamp.inWholeMilliseconds)
+        }
+    }
 
-    //TODO: Add delete video
 
     fun getVideoInfo(videoId: String): VideoInfo {
         TODO("Return videoInfo from youtube-api-v3")

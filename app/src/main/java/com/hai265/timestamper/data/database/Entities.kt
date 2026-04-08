@@ -4,6 +4,7 @@ import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Index
 import androidx.room.PrimaryKey
+import kotlin.time.Duration
 
 @Entity(tableName = "videos")
 data class Video(
@@ -11,7 +12,8 @@ data class Video(
     val videoId: String,
     val videoTitle: String?,
     val thumbnail: String,
-    val lastEdited: Long = 0
+    val lastEdited: Duration,
+    val lastPlayed: Duration,
 )
 
 @Entity(

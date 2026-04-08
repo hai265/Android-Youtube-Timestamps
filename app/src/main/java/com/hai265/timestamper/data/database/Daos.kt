@@ -14,6 +14,9 @@ interface VideoDao {
     @Query("SELECT * from videos WHERE videoId =:id")
     suspend fun getVideoById(id: String): Video
 
+    @Query("UPDATE videos SET lastPlayed = :timestamp WHERE videoId = :videoId")
+    suspend fun updateLastPlayed(videoId: String, timestamp: Long)
+
     @Upsert
     suspend fun addVideo(video: Video)
 
