@@ -6,9 +6,10 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -18,18 +19,25 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.snapshotFlow
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.hai265.timestamper.R
 import com.hai265.timestamper.data.database.Timestamp
+import com.hai265.timestamper.ui.fakes.fakeTimestampList
 import com.hai265.timestamper.ui.screens.youtubeplayer.ComposeYouTubePlayer
 import com.hai265.timestamper.ui.screens.youtubeplayer.YouTubePlayerController
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -43,8 +51,9 @@ import kotlin.time.toDuration
 
 /*
 TODO:
-2. Sort by time
-3. Add ability to edit text
+- remember time left off
+- Sort by time
+- Player Controls (Pause / Play), skip +/- 5 secs
  */
 @Composable
 fun TimestampEditorScreen() {
@@ -126,16 +135,33 @@ fun TimestampItem(
             }
     }
     Row(
-        modifier = modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween
+        modifier = modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
     ) {
         Text(
             text = formatMilisToHHMMSS(timestamp.timeMs),
             color = MaterialTheme.colorScheme.primary,
-            modifier = Modifier.clickable {
-                onTimestampClick(timestamp.timeMs.toDuration(DurationUnit.MILLISECONDS))
-            }
+            fontWeight = FontWeight.Bold,
+            maxLines = 1,
+            modifier = Modifier
+                .clickable {
+                    onTimestampClick(timestamp.timeMs.toDuration(DurationUnit.MILLISECONDS))
+                }
+                .padding(start = 16.dp)
+                .widthIn(min = 72.dp)
         )
-        BasicTextField(state = textFieldState, modifier = Modifier.weight(1f))
+
+        TextField(
+            state = textFieldState, colors = TextFieldDefaults.colors(
+                focusedContainerColor = Color.Transparent,
+                unfocusedContainerColor = Color.Transparent,
+                disabledContainerColor = Color.Transparent,
+                errorContainerColor = Color.Transparent
+            ),
+            placeholder = { Text("Enter Description") },
+            modifier = Modifier.weight(1f)
+        )
         Icon(
             painter = painterResource(R.drawable.close),
             contentDescription = "Delete Timestamp",
@@ -153,6 +179,18 @@ fun formatMilisToHHMMSS(millis: Long): String {
             String.format(Locale.US, "%02d:%02d", minutes, seconds)
         }
     }
+}
+
+
+@Preview
+@Composable
+fun TimestampListPreview() {
+    TimestampList(
+        timestamps = fakeTimestampList,
+        onDelete = { },
+        onTimestampClick = { },
+        updateDescription = { _, _ -> },
+    )
 }
 
 @Preview

@@ -1,5 +1,6 @@
 package com.hai265.timestamper.ui.fakes
 
+import com.hai265.timestamper.data.database.Timestamp
 import com.hai265.timestamper.data.database.Video
 
 val fakeVideo1 = Video(
@@ -17,3 +18,19 @@ val fakeVideo2 = Video(
 )
 
 val fakeVideoList = listOf(fakeVideo1, fakeVideo2)
+
+val fakeTimestamp1 = Timestamp(
+    id = 1,
+    videoId = "1",
+    timeMs = 0L,
+    description = "Description 1"
+)
+
+val fakeTimestamp2 = Timestamp(
+    id = 2,
+    videoId = "1",
+    timeMs = 10000000L,
+    description = "Description 2"
+)
+
+val fakeTimestampList = listOf(fakeTimestamp1, fakeTimestamp2)
