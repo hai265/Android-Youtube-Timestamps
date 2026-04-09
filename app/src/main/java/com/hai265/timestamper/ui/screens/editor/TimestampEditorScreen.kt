@@ -35,8 +35,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -59,9 +62,11 @@ import kotlin.time.toDuration
 
 /*
 TODO:
-- Player Controls (Pause / Play), skip +/- 5 secs
 - phone horizontal mode (bug, config changes reloads video)
+- Player Controls (Pause / Play), skip +/- 5 secs
 - when add timestamp jump to timestamp and automatically open keyboard
+- when press add timestamp add editor similar to Microsoft TO DO (probably better since can add stuff like tags, edit timestamp, color, etc)
+- when press add timestamp pause video, exit keyboard resume playback (configurable)
  */
 @Composable
 fun TimestampEditorScreen() {
@@ -127,7 +132,7 @@ fun TimestampList(
                         newDescription
                     )
                 },
-                isHighlighted = timestamp.id == highlightedId
+                newlyAdded = timestamp.id == highlightedId
             )
         }
     }
@@ -139,10 +144,11 @@ fun TimestampItem(
     onClickDelete: () -> Unit,
     onTimestampClick: (Duration) -> Unit,
     onTimestampDescriptionUpdate: (String) -> Unit,
-    isHighlighted: Boolean,
+    newlyAdded: Boolean,
     modifier: Modifier = Modifier
 ) {
     val textFieldState = rememberTextFieldState(initialText = timestamp.description)
+    val focusRequester = remember { FocusRequester() }
 
     LaunchedEffect(textFieldState) {
         snapshotFlow { textFieldState.text }
@@ -152,12 +158,15 @@ fun TimestampItem(
             }
     }
     val highlight = MaterialTheme.colorScheme.primaryContainer
-    var targetColor by remember(isHighlighted) {
-        mutableStateOf(if (isHighlighted) highlight else Color.Transparent)
+    val keyboardController = LocalSoftwareKeyboardController.current
+    var targetColor by remember(newlyAdded) {
+        mutableStateOf(if (newlyAdded) highlight else Color.Transparent)
     }
 
-    LaunchedEffect(isHighlighted) {
-        if (isHighlighted) {
+    LaunchedEffect(newlyAdded) {
+        if (newlyAdded) {
+            focusRequester.requestFocus()
+            keyboardController?.show()
             delay(1000)
             targetColor = Color.Transparent
         }
@@ -195,7 +204,9 @@ fun TimestampItem(
                 errorContainerColor = Color.Transparent
             ),
             placeholder = { Text("Enter Description") },
-            modifier = Modifier.weight(1f)
+            modifier = Modifier
+                .weight(1f)
+                .focusRequester(focusRequester)
         )
         Icon(
             painter = painterResource(R.drawable.close),
@@ -242,6 +253,6 @@ fun TimestampItemPreview() {
         onClickDelete = {},
         onTimestampClick = {},
         onTimestampDescriptionUpdate = {},
-        isHighlighted = true
+        newlyAdded = true
     )
 }
