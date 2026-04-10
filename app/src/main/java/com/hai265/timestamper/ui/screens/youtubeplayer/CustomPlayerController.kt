@@ -10,4 +10,12 @@ class YouTubePlayerController {
         player?.seekTo(duration.inWholeMilliseconds / 1000f)
         player?.play()
     }
+
+    fun pause() {
+        player?.pause()
+    }
+
+    fun play() {
+        player?.play()
+    }
 }

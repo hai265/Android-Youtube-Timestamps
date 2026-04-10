@@ -1,5 +1,6 @@
 package com.hai265.timestamper.ui.screens.editor
 
+import android.view.ViewTreeObserver
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.tween
@@ -26,11 +27,14 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
@@ -40,10 +44,14 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.platform.LocalView
+import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.hai265.timestamper.R
 import com.hai265.timestamper.data.database.Timestamp
@@ -76,7 +84,14 @@ fun TimestampEditorScreen() {
 
     val video = state.video
     val controller = remember { YouTubePlayerController() }
+    val isKeyboardOpen by keyboardAsState()
 
+    LaunchedEffect(isKeyboardOpen) {
+        when (isKeyboardOpen) {
+            true -> controller.pause()
+            false -> controller.play()
+        }
+    }
     Scaffold(
         floatingActionButton = {
             FloatingActionButton(onClick = { viewmodel.addTimestamp() }) {
@@ -90,7 +105,9 @@ fun TimestampEditorScreen() {
                 modifier = Modifier
                     .padding(bottom = innerPadding.calculateBottomPadding())
                     .fillMaxSize()
-                    .clickable { focusManager.clearFocus() }) {
+                    .clickable {
+                        focusManager.clearFocus()
+                    }) {
                 //TODO: skip to video left off time
                 ComposeYouTubePlayer(
                     videoId = video.videoId,
@@ -214,6 +231,25 @@ fun TimestampItem(
             modifier = Modifier.clickable(onClick = onClickDelete)
         )
     }
+}
+
+@Composable
+fun keyboardAsState(): State<Boolean> {
+    val view = LocalView.current
+    var isImeVisible by remember { mutableStateOf(false) }
+
+    DisposableEffect(LocalWindowInfo.current) {
+        val listener = ViewTreeObserver.OnPreDrawListener {
+            isImeVisible = ViewCompat.getRootWindowInsets(view)
+                ?.isVisible(WindowInsetsCompat.Type.ime()) == true
+            true
+        }
+        view.viewTreeObserver.addOnPreDrawListener(listener)
+        onDispose {
+            view.viewTreeObserver.removeOnPreDrawListener(listener)
+        }
+    }
+    return rememberUpdatedState(isImeVisible)
 }
 
 fun formatMilisToHHMMSS(millis: Long): String {
