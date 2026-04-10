@@ -66,7 +66,7 @@ dependencies {
     implementation(libs.androidx.material.icons.extended)
     implementation(libs.core.ktx)
     implementation(libs.androidx.junit.ktx)
-    implementation("androidx.fragment:fragment-ktx:1.8.2")
+    implementation(libs.androidx.fragment.ktx)
     implementation(libs.androidx.fragment.compose)
     implementation(libs.androidx.media3.exoplayer)
     implementation(libs.androidyoutubeplayer)
@@ -78,6 +78,8 @@ dependencies {
     implementation(libs.androidx.navigation.compose)
     implementation(libs.androidx.room.ktx)
     testImplementation(libs.junit)
+    implementation(libs.androidx.datastore.preferences)
+
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(platform(libs.androidx.compose.bom))

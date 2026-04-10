@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
 import com.hai265.timestamper.data.database.Timestamp
 import com.hai265.timestamper.data.database.Video
+import com.hai265.timestamper.data.repos.PreferencesRepository
 import com.hai265.timestamper.data.repos.TimestampRepository
 import com.hai265.timestamper.data.repos.VideoRepository
 import com.hai265.timestamper.ui.Navigables
@@ -32,12 +33,18 @@ data class TimestampEditorState(
     val newlyAddedTimestampId: Long? = null
 )
 
+data class Preferences(
+    val hideKeyboardOnScreenTap: Boolean = false,
+    val pauseAndResumeVideoOnEdit: Boolean = false,
+)
+
 @OptIn(FlowPreview::class)
 @HiltViewModel
 class TimestampEditorViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val videoRepo: VideoRepository,
-    private val timestampRepo: TimestampRepository
+    private val timestampRepo: TimestampRepository,
+    private val preferencesRepository: PreferencesRepository,
 ) : ViewModel() {
     private val videoId = savedStateHandle.toRoute<Navigables.VideoScreen>().id
 
@@ -79,6 +86,34 @@ class TimestampEditorViewModel @Inject constructor(
         started = SharingStarted.WhileSubscribed(5000L),
         initialValue = TimestampEditorState()
     )
+
+    val preferences = combine(
+        preferencesRepository.hideKeyboardOnScreenTap(),
+        preferencesRepository.pauseVideoOnKeyboardVisible()
+    )
+    { hideKeyboardOnScreenTap, pauseAndResumeVideoOnEdit ->
+        Preferences(
+            hideKeyboardOnScreenTap = hideKeyboardOnScreenTap,
+            pauseAndResumeVideoOnEdit = pauseAndResumeVideoOnEdit,
+        )
+    }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000L),
+            initialValue = Preferences()
+        )
+
+    fun updatePauseOnKeyboardVisible(enabled: Boolean) {
+        viewModelScope.launch {
+            preferencesRepository.updatePauseVideoOnKeyboardVisible(enabled)
+        }
+    }
+
+    fun updatePauseAndResumeOnEdit(enabled: Boolean) {
+        viewModelScope.launch {
+            preferencesRepository.updatePauseVideoOnKeyboardVisible(enabled)
+        }
+    }
 
     fun addTimestamp() {
         viewModelScope.launch {

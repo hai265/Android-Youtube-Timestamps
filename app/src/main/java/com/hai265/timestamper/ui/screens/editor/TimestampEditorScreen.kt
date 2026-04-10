@@ -23,6 +23,7 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
@@ -75,21 +76,27 @@ TODO:
 - when add timestamp jump to timestamp and automatically open keyboard
 - when press add timestamp add editor similar to Microsoft TO DO (probably better since can add stuff like tags, edit timestamp, color, etc)
 - when press add timestamp pause video, exit keyboard resume playback (configurable)
+- add separate settings / dialog for settings
+- when open keyboard allow scroll down to view timestamps below (BUG currently: when timestamp added keyboard doesn't appear until scroll down)
  */
 @Composable
 fun TimestampEditorScreen() {
     val viewmodel = hiltViewModel<TimestampEditorViewModel>()
     val state by viewmodel.state.collectAsState()
+    //TODO: can move to a different viewmodel
+    val preferences by viewmodel.preferences.collectAsState()
     val focusManager = LocalFocusManager.current
 
     val video = state.video
     val controller = remember { YouTubePlayerController() }
     val isKeyboardOpen by keyboardAsState()
 
-    LaunchedEffect(isKeyboardOpen) {
-        when (isKeyboardOpen) {
-            true -> controller.pause()
-            false -> controller.play()
+    if (preferences.pauseAndResumeVideoOnEdit) {
+        LaunchedEffect(isKeyboardOpen) {
+            when (isKeyboardOpen) {
+                true -> controller.pause()
+                false -> controller.play()
+            }
         }
     }
     Scaffold(
@@ -106,15 +113,35 @@ fun TimestampEditorScreen() {
                     .padding(bottom = innerPadding.calculateBottomPadding())
                     .fillMaxSize()
                     .clickable {
-                        focusManager.clearFocus()
+                        if (preferences.hideKeyboardOnScreenTap) {
+                            focusManager.clearFocus()
+                        }
                     }) {
-                //TODO: skip to video left off time
                 ComposeYouTubePlayer(
                     videoId = video.videoId,
                     onCurrentTime = viewmodel::updateCurrentTime,
                     controller = controller,
                     startingTime = video.lastPlayed,
                 )
+                Row {
+                    Text("Close keyboard tap screen")
+                    Switch(
+                        checked = preferences.hideKeyboardOnScreenTap,
+                        onCheckedChange = {
+                            viewmodel.updatePauseOnKeyboardVisible(it)
+                        }
+                    )
+                }
+                Row {
+                    Text("Pause video on edit")
+                    Switch(
+                        checked = preferences.pauseAndResumeVideoOnEdit,
+                        onCheckedChange = {
+                            viewmodel.updatePauseAndResumeOnEdit(it)
+                        }
+                    )
+                }
+
                 TimestampList(
                     timestamps = state.timestamps,
                     onDelete = viewmodel::deleteTimestamp,
@@ -261,6 +288,18 @@ fun formatMilisToHHMMSS(millis: Long): String {
             String.format(Locale.US, "%02d:%02d", minutes, seconds)
         }
     }
+}
+
+@Composable
+fun SwitchMinimalExample() {
+    var checked by remember { mutableStateOf(true) }
+
+    Switch(
+        checked = checked,
+        onCheckedChange = {
+            checked = it
+        }
+    )
 }
 
 
