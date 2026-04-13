@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
@@ -18,6 +19,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material3.Card
 import androidx.compose.material3.FabPosition
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
@@ -36,6 +38,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
@@ -51,6 +54,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
@@ -86,6 +90,7 @@ fun TimestampEditorScreen() {
     //TODO: can move to a different viewmodel
     val preferences by viewmodel.preferences.collectAsState()
     val focusManager = LocalFocusManager.current
+    var openDialog by rememberSaveable { mutableStateOf(false) }
 
     val video = state.video
     val controller = remember { YouTubePlayerController() }
@@ -123,24 +128,13 @@ fun TimestampEditorScreen() {
                     controller = controller,
                     startingTime = video.lastPlayed,
                 )
-                Row {
-                    Text("Close keyboard tap screen")
-                    Switch(
-                        checked = preferences.hideKeyboardOnScreenTap,
-                        onCheckedChange = {
-                            viewmodel.updatePauseOnKeyboardVisible(it)
-                        }
-                    )
-                }
-                Row {
-                    Text("Pause video on edit")
-                    Switch(
-                        checked = preferences.pauseAndResumeVideoOnEdit,
-                        onCheckedChange = {
-                            viewmodel.updatePauseAndResumeOnEdit(it)
-                        }
-                    )
-                }
+                Icon(
+                    painter = painterResource(R.drawable.settings),
+                    contentDescription = "Preferences",
+                    modifier = Modifier
+                        .clickable(onClick = { openDialog = true })
+                        .align(Alignment.End)
+                )
 
                 TimestampList(
                     timestamps = state.timestamps,
@@ -151,6 +145,14 @@ fun TimestampEditorScreen() {
                 )
             }
         }
+    }
+
+    if (openDialog) {
+        PreferencesDialog(
+            onDismiss = { openDialog = false },
+            preferences = preferences,
+            viewModel = viewmodel
+        )
     }
 }
 
@@ -261,6 +263,55 @@ fun TimestampItem(
 }
 
 @Composable
+fun PreferencesDialog(
+    onDismiss: () -> Unit,
+    preferences: Preferences,
+    viewModel: TimestampEditorViewModel
+) {
+    Dialog(onDismissRequest = onDismiss) {
+        Card(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(200.dp)
+                .padding(16.dp)
+        ) {
+            Column {
+                Row(
+                    modifier = Modifier
+                        .padding(16.dp)
+                        .fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text("Close keyboard tap screen")
+                    Switch(
+                        checked = preferences.hideKeyboardOnScreenTap,
+                        onCheckedChange = {
+                            viewModel.updateHideKeyboardOnScreenTap(it)
+                        }
+                    )
+                }
+                Row(
+                    modifier = Modifier
+                        .padding(16.dp)
+                        .fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text("Pause video on edit")
+                    Switch(
+                        checked = preferences.pauseAndResumeVideoOnEdit,
+                        onCheckedChange = {
+                            viewModel.updatePauseAndResumeOnEdit(it)
+                        }
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
 fun keyboardAsState(): State<Boolean> {
     val view = LocalView.current
     var isImeVisible by remember { mutableStateOf(false) }
@@ -289,19 +340,6 @@ fun formatMilisToHHMMSS(millis: Long): String {
         }
     }
 }
-
-@Composable
-fun SwitchMinimalExample() {
-    var checked by remember { mutableStateOf(true) }
-
-    Switch(
-        checked = checked,
-        onCheckedChange = {
-            checked = it
-        }
-    )
-}
-
 
 @Preview
 @Composable

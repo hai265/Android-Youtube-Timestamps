@@ -103,9 +103,9 @@ class TimestampEditorViewModel @Inject constructor(
             initialValue = Preferences()
         )
 
-    fun updatePauseOnKeyboardVisible(enabled: Boolean) {
+    fun updateHideKeyboardOnScreenTap(enabled: Boolean) {
         viewModelScope.launch {
-            preferencesRepository.updatePauseVideoOnKeyboardVisible(enabled)
+            preferencesRepository.updateHideKeyboardOnScreenTap(enabled)
         }
     }
 
