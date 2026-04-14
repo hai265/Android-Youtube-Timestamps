@@ -3,23 +3,34 @@ package com.hai265.timestamper.ui.screens.list
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.text.input.rememberTextFieldState
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.ExtendedFloatingActionButton
+import androidx.compose.material3.FabPosition
+import androidx.compose.material3.Icon
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
@@ -46,16 +57,30 @@ fun VideoListScreen(onTapVideo: (id: String) -> Unit) {
     val state by viewmodel.state.collectAsState()
     var openDialog by rememberSaveable { mutableStateOf(false) }
     val context = LocalContext.current
-
-    Column(modifier = Modifier.fillMaxSize()) {
+    val listState = rememberLazyListState()
+    val showButton by remember {
+        derivedStateOf {
+            listState.firstVisibleItemScrollOffset == 0
+        }
+    }
+    Scaffold(
+        floatingActionButton = {
+            ExtendedFloatingActionButton(
+                onClick = { openDialog = true },
+                icon = { Icon(Icons.Filled.Add, "Add Video") },
+                text = { Text("Add Video") },
+                expanded = showButton
+            )
+        },
+        floatingActionButtonPosition = FabPosition.End,
+    ) { innerPadding ->
         VideoListScreen(
             videoList = state.videos,
             onTapVideo = onTapVideo,
             onDeleteVideo = viewmodel::deleteVideo,
+            listState = listState,
+            modifier = Modifier.padding(bottom = innerPadding.calculateBottomPadding())
         )
-        Button(onClick = { openDialog = true }) {
-            Text("Add video")
-        }
     }
 
     if (openDialog) {
@@ -77,9 +102,16 @@ private fun VideoListScreen(
     videoList: List<Video>,
     onTapVideo: (id: String) -> Unit,
     onDeleteVideo: (video: Video) -> Unit,
+    listState: LazyListState,
     modifier: Modifier = Modifier
 ) {
-    LazyColumn(modifier = modifier) {
+    LazyColumn(
+        state = listState,
+        modifier = modifier,
+        contentPadding = PaddingValues(
+            bottom = 80.dp
+        )
+    ) {
         items(videoList) { video ->
             VideoItem(
                 video = video,
@@ -174,7 +206,8 @@ private fun VideoListPreview() {
     VideoListScreen(
         videoList = fakeVideoList,
         onTapVideo = {},
-        onDeleteVideo = {}
+        onDeleteVideo = {},
+        listState = LazyListState()
     )
 }
 

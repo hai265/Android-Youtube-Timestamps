@@ -71,13 +71,15 @@ private fun NavGraph(
         }
     ) {
         composable<Navigables.ListScreen> {
-            VideoListScreen(onTapVideo = { id ->
-                navController.navigateSingleTopTo(
-                    Navigables.VideoScreen(
-                        id
+            VideoListScreen(
+                onTapVideo = { id ->
+                    navController.navigateSingleTopTo(
+                        Navigables.VideoScreen(
+                            id
+                        )
                     )
-                )
-            })
+                },
+            )
         }
         composable<Navigables.VideoScreen> {
             TimestampEditorScreen()
