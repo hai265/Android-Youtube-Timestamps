@@ -9,10 +9,11 @@ import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyListState
-import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyGridState
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -57,7 +58,7 @@ fun VideoListScreen(onTapVideo: (id: String) -> Unit) {
     val state by viewmodel.state.collectAsState()
     var openDialog by rememberSaveable { mutableStateOf(false) }
     val context = LocalContext.current
-    val listState = rememberLazyListState()
+    val listState = rememberLazyGridState()
     val showButton by remember {
         derivedStateOf {
             listState.firstVisibleItemScrollOffset == 0
@@ -79,7 +80,9 @@ fun VideoListScreen(onTapVideo: (id: String) -> Unit) {
             onTapVideo = onTapVideo,
             onDeleteVideo = viewmodel::deleteVideo,
             listState = listState,
-            modifier = Modifier.padding(bottom = innerPadding.calculateBottomPadding())
+            modifier = Modifier.padding(
+                bottom = innerPadding.calculateBottomPadding(),
+            )
         )
     }
 
@@ -102,12 +105,15 @@ private fun VideoListScreen(
     videoList: List<Video>,
     onTapVideo: (id: String) -> Unit,
     onDeleteVideo: (video: Video) -> Unit,
-    listState: LazyListState,
+    listState: LazyGridState,
     modifier: Modifier = Modifier
 ) {
-    LazyColumn(
+    LazyVerticalGrid(
         state = listState,
         modifier = modifier,
+        columns = GridCells.Fixed(count = 2),
+        horizontalArrangement = Arrangement.spacedBy(16.dp),
+        verticalArrangement = Arrangement.spacedBy(4.dp),
         contentPadding = PaddingValues(
             bottom = 80.dp
         )
@@ -207,7 +213,7 @@ private fun VideoListPreview() {
         videoList = fakeVideoList,
         onTapVideo = {},
         onDeleteVideo = {},
-        listState = LazyListState()
+        listState = LazyGridState()
     )
 }
 
