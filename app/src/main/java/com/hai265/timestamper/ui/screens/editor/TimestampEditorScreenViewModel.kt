@@ -122,6 +122,7 @@ class TimestampEditorViewModel @Inject constructor(
                     it, currentTime.value
                 )
                 newlyAddedId.value = newTimestampId
+                //TODO: Remove this, add unhighlighting logic in composable
                 delay(5000)
                 newlyAddedId.value = null
             }
