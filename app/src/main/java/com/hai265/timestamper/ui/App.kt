@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
+import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -35,15 +36,17 @@ sealed class Navigables {
 }
 
 @Composable
-fun App(navController: NavHostController = rememberNavController()) {
-    Scaffold(
-    ) { innerPadding ->
+fun App(
+    windowSize: WindowWidthSizeClass,
+    navController: NavHostController = rememberNavController()
+) {
+    Scaffold { innerPadding ->
         Surface(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
         ) {
-            NavGraph(navController)
+            NavGraph(navController, windowSize)
         }
     }
 }
@@ -53,6 +56,7 @@ fun App(navController: NavHostController = rememberNavController()) {
 @Composable
 private fun NavGraph(
     navController: NavHostController,
+    windowSize: WindowWidthSizeClass,
 ) {
     NavHost(
         navController = navController,
@@ -71,15 +75,13 @@ private fun NavGraph(
         }
     ) {
         composable<Navigables.ListScreen> {
-            VideoListScreen(
-                onTapVideo = { id ->
-                    navController.navigateSingleTopTo(
-                        Navigables.VideoScreen(
-                            id
-                        )
+            VideoListScreen(onTapVideo = { id ->
+                navController.navigateSingleTopTo(
+                    Navigables.VideoScreen(
+                        id
                     )
-                },
-            )
+                )
+            }, windowSize = windowSize)
         }
         composable<Navigables.VideoScreen> {
             TimestampEditorScreen()

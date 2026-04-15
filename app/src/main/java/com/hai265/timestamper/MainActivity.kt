@@ -7,6 +7,8 @@ import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Surface
+import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
+import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
 import androidx.compose.ui.Modifier
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.lifecycleScope
@@ -22,6 +24,7 @@ import kotlinx.coroutines.withContext
 class MainActivity : FragmentActivity() {
     private val viewmodel: MainViewModel by viewModels()
 
+    @OptIn(ExperimentalMaterial3WindowSizeClassApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         handleIntent(intent)
@@ -33,7 +36,8 @@ class MainActivity : FragmentActivity() {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                 ) {
-                    App()
+                    val windowSize = calculateWindowSizeClass(this)
+                    App(windowSize.widthSizeClass)
                 }
             }
         }
