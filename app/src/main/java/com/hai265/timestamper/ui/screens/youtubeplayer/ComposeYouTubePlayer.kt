@@ -11,7 +11,6 @@ import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Column
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -46,8 +45,6 @@ fun ComposeYouTubePlayer(
     var playerView by remember { mutableStateOf<YouTubePlayerView?>(null) }
     var fullScreenView by remember { mutableStateOf<View?>(null) }
 
-    var youTubePlayer by remember { mutableStateOf<YouTubePlayer?>(null) }
-
     AndroidView(
         modifier = modifier,
         factory = { ctx ->
@@ -63,10 +60,15 @@ fun ComposeYouTubePlayer(
                     .ivLoadPolicy(3)
                     .build()
 
+                //TODO: Fix video not starting at starting time
                 val listener = object : AbstractYouTubePlayerListener() {
                     override fun onReady(player: YouTubePlayer) {
-                        youTubePlayer = player
                         controller.player = player
+                        player.loadOrCueVideo(
+                            lifecycleOwner.lifecycle,
+                            videoId,
+                            startingTime.inWholeSeconds.toFloat()
+                        )
                     }
 
                     override fun onCurrentSecond(youTubePlayer: YouTubePlayer, second: Float) {
@@ -106,16 +108,6 @@ fun ComposeYouTubePlayer(
             }
         }
     )
-
-    // Use LaunchedEffect to react to changes in videoId or the player instance
-    //TODO: Remove this from LaunchedEffect
-    LaunchedEffect(youTubePlayer, videoId) {
-        youTubePlayer?.loadOrCueVideo(
-            lifecycleOwner.lifecycle,
-            videoId,
-            startingTime.inWholeSeconds.toFloat()
-        )
-    }
 
     DisposableEffect(lifecycleOwner, activity) {
         onDispose {
