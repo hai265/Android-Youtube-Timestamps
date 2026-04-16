@@ -19,6 +19,7 @@ import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.text.input.TextFieldLineLimits
 import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -135,27 +136,28 @@ fun TimestampEditorScreen(windowSize: WindowWidthSizeClass) {
                         .clickable(onClick = { openDialog = true })
                 )
             }
-            val timestampsList = @Composable {
+            val timestampsList: @Composable (Boolean) -> Unit = { textSingleLine ->
                 TimestampList(
                     timestamps = state.timestamps,
                     onDelete = viewmodel::deleteTimestamp,
                     onTimestampClick = { duration -> controller.seekTo(duration) },
                     updateDescription = viewmodel::updateDescription,
                     highlightedId = state.newlyAddedTimestampId,
+                    textSingleLine = textSingleLine
                 )
             }
             if (windowSize == WindowWidthSizeClass.Medium || windowSize == WindowWidthSizeClass.Expanded) {
                 Row {
                     Box(
                         modifier = Modifier
-                            .weight(0.6f)
+                            .weight(0.7f)
                             .windowInsetsPadding(WindowInsets(0))
 
                     ) { videoPlayer() }
                     Box(
                         modifier = Modifier
-                            .weight(0.4f)
-                    ) { timestampsList() }
+                            .weight(0.3f)
+                    ) { timestampsList(true) }
                 }
             } else {
                 Column(
@@ -170,7 +172,7 @@ fun TimestampEditorScreen(windowSize: WindowWidthSizeClass) {
                     videoPlayer()
                     //TODO: Move preferencesIcon in to timestampsList
                     preferencesIcon(Modifier.align(Alignment.End))
-                    timestampsList()
+                    timestampsList(false)
                 }
             }
         }
@@ -193,6 +195,7 @@ fun TimestampList(
     onTimestampClick: (Duration) -> Unit,
     updateDescription: (Timestamp, String) -> Unit,
     highlightedId: Long?,
+    textSingleLine: Boolean,
     modifier: Modifier = Modifier
 ) {
     LazyColumn(modifier = modifier) {
@@ -207,7 +210,8 @@ fun TimestampList(
                         newDescription
                     )
                 },
-                newlyAdded = timestamp.id == highlightedId
+                newlyAdded = timestamp.id == highlightedId,
+                textSingleLine = textSingleLine
             )
         }
     }
@@ -220,6 +224,7 @@ fun TimestampItem(
     onTimestampClick: (Duration) -> Unit,
     onTimestampDescriptionUpdate: (String) -> Unit,
     newlyAdded: Boolean,
+    textSingleLine: Boolean,
     modifier: Modifier = Modifier
 ) {
     val textFieldState = rememberTextFieldState(initialText = timestamp.description)
@@ -278,7 +283,8 @@ fun TimestampItem(
                 disabledContainerColor = Color.Transparent,
                 errorContainerColor = Color.Transparent
             ),
-            placeholder = { Text("Enter Description") },
+            placeholder = { Text("Description") },
+            lineLimits = if (textSingleLine) TextFieldLineLimits.SingleLine else TextFieldLineLimits.Default,
             modifier = Modifier
                 .weight(1f)
                 .focusRequester(focusRequester)
@@ -378,7 +384,8 @@ fun TimestampListPreview() {
         onDelete = { },
         onTimestampClick = { },
         updateDescription = { _, _ -> },
-        highlightedId = null
+        highlightedId = null,
+        textSingleLine = false,
     )
 }
 
@@ -395,6 +402,8 @@ fun TimestampItemPreview() {
         onClickDelete = {},
         onTimestampClick = {},
         onTimestampDescriptionUpdate = {},
-        newlyAdded = true
-    )
+        newlyAdded = true,
+        textSingleLine = false,
+
+        )
 }
