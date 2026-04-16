@@ -10,11 +10,13 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -101,15 +103,17 @@ fun TimestampEditorScreen(windowSize: WindowWidthSizeClass) {
     val controller = remember { YouTubePlayerController() }
     val isKeyboardOpen by keyboardAsState()
 
-    val videoPlayer = remember (video) {
-        movableContentOf { if (video != null) {
-            ComposeYouTubePlayer(
-                videoId = video.videoId,
-                onCurrentTime = viewmodel::updateCurrentTime,
-                controller = controller,
-                startingTime = video.lastPlayed,
-            )
-        } }
+    val videoPlayer = remember(video) {
+        movableContentOf {
+            if (video != null) {
+                ComposeYouTubePlayer(
+                    videoId = video.videoId,
+                    onCurrentTime = viewmodel::updateCurrentTime,
+                    controller = controller,
+                    startingTime = video.lastPlayed,
+                )
+            }
+        }
     }
     if (preferences.pauseAndResumeVideoOnEdit) {
         LaunchedEffect(isKeyboardOpen) {
@@ -128,14 +132,6 @@ fun TimestampEditorScreen(windowSize: WindowWidthSizeClass) {
         floatingActionButtonPosition = FabPosition.End,
     ) { innerPadding ->
         if (video != null) {
-            val preferencesIcon: @Composable (Modifier) -> Unit = { modifier ->
-                Icon(
-                    painter = painterResource(R.drawable.settings),
-                    contentDescription = "Preferences",
-                    modifier = modifier
-                        .clickable(onClick = { openDialog = true })
-                )
-            }
             val timestampsList: @Composable (Boolean) -> Unit = { textSingleLine ->
                 TimestampList(
                     timestamps = state.timestamps,
@@ -143,7 +139,8 @@ fun TimestampEditorScreen(windowSize: WindowWidthSizeClass) {
                     onTimestampClick = { duration -> controller.seekTo(duration) },
                     updateDescription = viewmodel::updateDescription,
                     highlightedId = state.newlyAddedTimestampId,
-                    textSingleLine = textSingleLine
+                    textSingleLine = textSingleLine,
+                    onCLickSettings = { openDialog = true }
                 )
             }
             if (windowSize == WindowWidthSizeClass.Medium || windowSize == WindowWidthSizeClass.Expanded) {
@@ -170,8 +167,6 @@ fun TimestampEditorScreen(windowSize: WindowWidthSizeClass) {
                             }
                         }) {
                     videoPlayer()
-                    //TODO: Move preferencesIcon in to timestampsList
-                    preferencesIcon(Modifier.align(Alignment.End))
                     timestampsList(false)
                 }
             }
@@ -196,9 +191,28 @@ fun TimestampList(
     updateDescription: (Timestamp, String) -> Unit,
     highlightedId: Long?,
     textSingleLine: Boolean,
-    modifier: Modifier = Modifier
+    onCLickSettings: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     LazyColumn(modifier = modifier) {
+        item {
+            Box(modifier = Modifier.fillMaxWidth()) {
+                Row(
+                    horizontalArrangement = Arrangement.End,
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier
+                        .align(Alignment.TopEnd)
+                        .clickable(onClick = onCLickSettings),
+                ) {
+                    Text("Editor Settings")
+                    Spacer(modifier.size(4.dp))
+                    Icon(
+                        painter = painterResource(R.drawable.settings),
+                        contentDescription = "Preferences",
+                    )
+                }
+            }
+        }
         items(timestamps, key = { it.id }) { timestamp ->
             TimestampItem(
                 timestamp,
@@ -386,6 +400,7 @@ fun TimestampListPreview() {
         updateDescription = { _, _ -> },
         highlightedId = null,
         textSingleLine = false,
+        onCLickSettings = {},
     )
 }
 
