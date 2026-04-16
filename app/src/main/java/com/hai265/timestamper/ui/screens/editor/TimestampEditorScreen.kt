@@ -97,7 +97,7 @@ fun TimestampEditorScreen(windowSize: WindowWidthSizeClass) {
     val state by viewmodel.state.collectAsState()
     val preferences by viewmodel.preferences.collectAsState()
     val focusManager = LocalFocusManager.current
-    var openDialog by rememberSaveable { mutableStateOf(false) }
+    var showSettingsDialog by rememberSaveable { mutableStateOf(false) }
 
     val video = state.video
     val controller = remember { YouTubePlayerController() }
@@ -140,7 +140,7 @@ fun TimestampEditorScreen(windowSize: WindowWidthSizeClass) {
                     updateDescription = viewmodel::updateDescription,
                     highlightedId = state.newlyAddedTimestampId,
                     textSingleLine = textSingleLine,
-                    onCLickSettings = { openDialog = true }
+                    onCLickSettings = { showSettingsDialog = true }
                 )
             }
             if (windowSize == WindowWidthSizeClass.Medium || windowSize == WindowWidthSizeClass.Expanded) {
@@ -173,9 +173,9 @@ fun TimestampEditorScreen(windowSize: WindowWidthSizeClass) {
         }
     }
 
-    if (openDialog) {
+    if (showSettingsDialog) {
         PreferencesDialog(
-            onDismiss = { openDialog = false },
+            onDismiss = { showSettingsDialog = false },
             preferences = preferences,
             viewModel = viewmodel
         )
