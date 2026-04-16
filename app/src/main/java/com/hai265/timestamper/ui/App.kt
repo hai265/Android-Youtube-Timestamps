@@ -84,7 +84,7 @@ private fun NavGraph(
             }, windowSize = windowSize)
         }
         composable<Navigables.VideoScreen> {
-            TimestampEditorScreen()
+            TimestampEditorScreen(windowSize = windowSize)
         }
     }
 }

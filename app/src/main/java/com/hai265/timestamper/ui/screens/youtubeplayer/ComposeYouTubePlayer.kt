@@ -34,9 +34,9 @@ import kotlin.time.toDuration
 fun ComposeYouTubePlayer(
     videoId: String,
     onCurrentTime: (duration: Duration) -> Unit,
-    modifier: Modifier = Modifier,
     controller: YouTubePlayerController,
-    startingTime: Duration
+    startingTime: Duration,
+    modifier: Modifier = Modifier,
 ) {
     val context = LocalContext.current
     val activity = remember(context) { context.findActivity() }

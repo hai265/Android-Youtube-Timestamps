@@ -7,13 +7,16 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.text.input.rememberTextFieldState
@@ -29,12 +32,14 @@ import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
+import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.movableContentOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
@@ -84,10 +89,9 @@ TODO:
 - when open keyboard allow scroll down to view timestamps below (BUG currently: when timestamp added keyboard doesn't appear until scroll down)
  */
 @Composable
-fun TimestampEditorScreen() {
+fun TimestampEditorScreen(windowSize: WindowWidthSizeClass) {
     val viewmodel = hiltViewModel<TimestampEditorViewModel>()
     val state by viewmodel.state.collectAsState()
-    //TODO: can move to a different viewmodel
     val preferences by viewmodel.preferences.collectAsState()
     val focusManager = LocalFocusManager.current
     var openDialog by rememberSaveable { mutableStateOf(false) }
@@ -96,6 +100,16 @@ fun TimestampEditorScreen() {
     val controller = remember { YouTubePlayerController() }
     val isKeyboardOpen by keyboardAsState()
 
+    val videoPlayer = remember (video) {
+        movableContentOf { if (video != null) {
+            ComposeYouTubePlayer(
+                videoId = video.videoId,
+                onCurrentTime = viewmodel::updateCurrentTime,
+                controller = controller,
+                startingTime = video.lastPlayed,
+            )
+        } }
+    }
     if (preferences.pauseAndResumeVideoOnEdit) {
         LaunchedEffect(isKeyboardOpen) {
             when (isKeyboardOpen) {
@@ -113,29 +127,15 @@ fun TimestampEditorScreen() {
         floatingActionButtonPosition = FabPosition.End,
     ) { innerPadding ->
         if (video != null) {
-            Column(
-                modifier = Modifier
-                    .padding(bottom = innerPadding.calculateBottomPadding())
-                    .fillMaxSize()
-                    .clickable {
-                        if (preferences.hideKeyboardOnScreenTap) {
-                            focusManager.clearFocus()
-                        }
-                    }) {
-                ComposeYouTubePlayer(
-                    videoId = video.videoId,
-                    onCurrentTime = viewmodel::updateCurrentTime,
-                    controller = controller,
-                    startingTime = video.lastPlayed,
-                )
+            val preferencesIcon: @Composable (Modifier) -> Unit = { modifier ->
                 Icon(
                     painter = painterResource(R.drawable.settings),
                     contentDescription = "Preferences",
-                    modifier = Modifier
+                    modifier = modifier
                         .clickable(onClick = { openDialog = true })
-                        .align(Alignment.End)
                 )
-
+            }
+            val timestampsList = @Composable {
                 TimestampList(
                     timestamps = state.timestamps,
                     onDelete = viewmodel::deleteTimestamp,
@@ -143,6 +143,35 @@ fun TimestampEditorScreen() {
                     updateDescription = viewmodel::updateDescription,
                     highlightedId = state.newlyAddedTimestampId,
                 )
+            }
+            if (windowSize == WindowWidthSizeClass.Medium || windowSize == WindowWidthSizeClass.Expanded) {
+                Row {
+                    Box(
+                        modifier = Modifier
+                            .weight(0.6f)
+                            .windowInsetsPadding(WindowInsets(0))
+
+                    ) { videoPlayer() }
+                    Box(
+                        modifier = Modifier
+                            .weight(0.4f)
+                    ) { timestampsList() }
+                }
+            } else {
+                Column(
+                    modifier = Modifier
+                        .padding(bottom = innerPadding.calculateBottomPadding())
+                        .fillMaxSize()
+                        .clickable {
+                            if (preferences.hideKeyboardOnScreenTap) {
+                                focusManager.clearFocus()
+                            }
+                        }) {
+                    videoPlayer()
+                    //TODO: Move preferencesIcon in to timestampsList
+                    preferencesIcon(Modifier.align(Alignment.End))
+                    timestampsList()
+                }
             }
         }
     }
