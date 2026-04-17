@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
@@ -58,6 +59,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalView
@@ -188,10 +191,12 @@ fun TimestampEditorScreen(windowSize: WindowWidthSizeClass) {
     }
 
     if (showTimestampSheet) {
+        val emptyTimestamp = viewmodel.getEmptyTimestamp()
         TimestampEditorSheet(
             onDismiss = { showTimestampSheet = false },
+            onSave = { timestamp -> viewmodel.upsertTimestamp(timestamp) },
             sheetState = sheetState,
-            timestamp = fakeTimestamp1
+            timestamp = emptyTimestamp,
         )
     }
 }
@@ -390,8 +395,15 @@ fun keyboardAsState(): State<Boolean> {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TimestampEditorSheet(timestamp: Timestamp, onDismiss: () -> Unit, sheetState: SheetState) {
+fun TimestampEditorSheet(
+    timestamp: Timestamp,
+    onDismiss: () -> Unit,
+    onSave: (Timestamp) -> Unit,
+    sheetState: SheetState
+) {
     val scope = rememberCoroutineScope()
+    val focusRequester = remember { FocusRequester() }
+
     val hideSheet = {
         scope.launch { sheetState.hide() }.invokeOnCompletion {
             if (!sheetState.isVisible) {
@@ -401,29 +413,35 @@ fun TimestampEditorSheet(timestamp: Timestamp, onDismiss: () -> Unit, sheetState
     }
     val textFieldState = rememberTextFieldState(initialText = timestamp.description)
 
-    ModalBottomSheet(onDismissRequest = onDismiss, sheetState = sheetState) {
-        Column {
+    LaunchedEffect(Unit) {
+        focusRequester.requestFocus()
+    }
+
+    ModalBottomSheet(
+        onDismissRequest = onDismiss,
+        sheetState = sheetState,
+        modifier = Modifier.imePadding(),
+    ) {
+        Column(modifier = Modifier.padding(16.dp)) {
             Text(
-                text = formatMilisToHHMMSS(timestamp.timeMs),
+                text = "Timestamp: ${formatMilisToHHMMSS(timestamp.timeMs)}",
                 color = MaterialTheme.colorScheme.primary,
                 fontWeight = FontWeight.Bold,
                 maxLines = 1,
-                modifier = Modifier
-                    .padding(start = 16.dp)
-                    .widthIn(min = 72.dp)
             )
 
             TextField(
-                state = textFieldState, colors = TextFieldDefaults.colors(
-                    focusedContainerColor = Color.Transparent,
-                    unfocusedContainerColor = Color.Transparent,
-                    disabledContainerColor = Color.Transparent,
-                    errorContainerColor = Color.Transparent
-                ),
-                placeholder = { Text("Description") }
+                state = textFieldState,
+                placeholder = { Text("Description") },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .focusRequester(focusRequester),
             )
             Row {
-                Button(onClick = { hideSheet() }) {
+                Button(onClick = {
+                    onSave(timestamp.copy(description = textFieldState.text.toString()))
+                    hideSheet()
+                }) {
                     Text("Save")
                 }
                 Button(onClick = { hideSheet() }) {
@@ -481,5 +499,10 @@ fun TimestampItemPreview() {
 @Preview
 @Composable
 fun TimestampSheetPreview() {
-    TimestampEditorSheet(fakeTimestamp1, {}, rememberStandardBottomSheetState())
+    TimestampEditorSheet(
+        fakeTimestamp1,
+        {},
+        onSave = {},
+        sheetState = rememberStandardBottomSheetState()
+    )
 }

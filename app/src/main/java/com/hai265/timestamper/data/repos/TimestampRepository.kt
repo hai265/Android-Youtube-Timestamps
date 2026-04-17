@@ -16,8 +16,8 @@ class TimestampRepository @Inject constructor(
         return timestampDao.getTimestamps(videoId)
     }
 
-    suspend fun addOrUpdateTimestamp(timestamp: Timestamp) {
-        withContext(Dispatchers.IO) {
+    suspend fun addOrUpdateTimestamp(timestamp: Timestamp): Long {
+        return withContext(Dispatchers.IO) {
             Log.d("TimestampRepository", "addOrUpdateTimestamp: ")
             timestampDao.upsertTimestamp(timestamp)
         }

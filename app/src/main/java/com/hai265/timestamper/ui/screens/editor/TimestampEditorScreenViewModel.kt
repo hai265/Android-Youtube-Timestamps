@@ -125,6 +125,21 @@ class TimestampEditorViewModel @Inject constructor(
         }
     }
 
+    fun upsertTimestamp(timestamp: Timestamp) {
+        viewModelScope.launch {
+            newlyAddedId.value = timestampRepo.addOrUpdateTimestamp(timestamp)
+        }
+    }
+
+    fun getEmptyTimestamp(): Timestamp {
+        return Timestamp(
+            id = 0,
+            videoId = videoId,
+            timeMs = currentTime.value.inWholeMilliseconds,
+            description = "",
+        )
+    }
+
     fun deleteTimestamp(timestamp: Timestamp) {
         viewModelScope.launch {
             timestampRepo.deleteTimestamp(timestamp)

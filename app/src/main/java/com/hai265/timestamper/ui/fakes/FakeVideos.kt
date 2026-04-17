@@ -26,14 +26,14 @@ val fakeTimestamp1 = Timestamp(
     id = 1,
     videoId = "1",
     timeMs = 0L,
-    description = "Description 1"
+    description = "Sample Description"
 )
 
 val fakeTimestamp2 = Timestamp(
     id = 2,
     videoId = "1",
     timeMs = 10000000L,
-    description = "Description 2"
+    description = "Sample Description"
 )
 
 val fakeTimestampList = listOf(fakeTimestamp1, fakeTimestamp2)
