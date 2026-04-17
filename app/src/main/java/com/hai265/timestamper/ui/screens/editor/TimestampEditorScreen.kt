@@ -420,6 +420,7 @@ fun TimestampEditorSheet(
     ModalBottomSheet(
         onDismissRequest = onDismiss,
         sheetState = sheetState,
+        dragHandle = {},
         modifier = Modifier.imePadding(),
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
