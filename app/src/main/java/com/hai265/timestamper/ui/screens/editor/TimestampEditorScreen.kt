@@ -12,10 +12,10 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
@@ -23,6 +23,7 @@ import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.text.input.TextFieldLineLimits
+import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -79,6 +80,7 @@ import com.hai265.timestamper.ui.fakes.fakeTimestamp1
 import com.hai265.timestamper.ui.fakes.fakeTimestampList
 import com.hai265.timestamper.ui.screens.youtubeplayer.ComposeYouTubePlayer
 import com.hai265.timestamper.ui.screens.youtubeplayer.YouTubePlayerController
+import kotlinx.coroutines.DisposableHandle
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
@@ -112,7 +114,7 @@ fun TimestampEditorScreen(windowSize: WindowWidthSizeClass) {
 
     val video = state.video
     val controller = remember { YouTubePlayerController() }
-    val sheetState = rememberModalBottomSheetState()
+    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
     val videoPlayer = remember(video) {
         movableContentOf {
@@ -197,6 +199,7 @@ fun TimestampEditorScreen(windowSize: WindowWidthSizeClass) {
             onSave = { timestamp -> viewmodel.upsertTimestamp(timestamp) },
             sheetState = sheetState,
             timestamp = emptyTimestamp,
+            windowSize = windowSize,
         )
     }
 }
@@ -399,10 +402,12 @@ fun TimestampEditorSheet(
     timestamp: Timestamp,
     onDismiss: () -> Unit,
     onSave: (Timestamp) -> Unit,
-    sheetState: SheetState
+    sheetState: SheetState,
+    windowSize: WindowWidthSizeClass,
 ) {
     val scope = rememberCoroutineScope()
     val focusRequester = remember { FocusRequester() }
+    val isKeyboardVisible by keyboardAsState()
 
     val hideSheet = {
         scope.launch { sheetState.hide() }.invokeOnCompletion {
@@ -421,33 +426,77 @@ fun TimestampEditorSheet(
         onDismissRequest = onDismiss,
         sheetState = sheetState,
         dragHandle = {},
-        modifier = Modifier.imePadding(),
     ) {
-        Column(modifier = Modifier.padding(16.dp)) {
-            Text(
-                text = "Timestamp: ${formatMilisToHHMMSS(timestamp.timeMs)}",
-                color = MaterialTheme.colorScheme.primary,
-                fontWeight = FontWeight.Bold,
-                maxLines = 1,
-            )
+        if ((windowSize == WindowWidthSizeClass.Medium || windowSize == WindowWidthSizeClass.Expanded)
+        ) {
+            var textFieldOnly by remember { mutableStateOf(true) }
 
-            TextField(
-                state = textFieldState,
-                placeholder = { Text("Description") },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .focusRequester(focusRequester),
-            )
-            Row {
-                Button(onClick = {
-                    onSave(timestamp.copy(description = textFieldState.text.toString()))
-                    hideSheet()
-                }) {
-                    Text("Save")
+            if (textFieldOnly) {
+                Row(
+                    modifier = Modifier.fillMaxSize(),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    TextField(
+                        state = textFieldState,
+                        placeholder = { Text("Description") },
+                        modifier = Modifier
+                            .weight(1f)
+                            .fillMaxHeight()
+                            .focusRequester(focusRequester)
+                    )
+                    Button(
+                        onClick = { textFieldOnly = false },
+                        modifier = Modifier.padding(4.dp)
+                    ) { Text("Done") }
                 }
-                Button(onClick = { hideSheet() }) {
-                    Text("Cancel")
-                }
+            } else {
+                //TODO: When tap edit text set textFieldOnly true
+                TimestampEditorSheetColumn(
+                    timestamp,
+                    textFieldState,
+                    focusRequester,
+                    onSave,
+                    hideSheet
+                )
+            }
+        } else {
+            TimestampEditorSheetColumn(timestamp, textFieldState, focusRequester, onSave, hideSheet)
+        }
+    }
+}
+
+@Composable
+private fun TimestampEditorSheetColumn(
+    timestamp: Timestamp,
+    textFieldState: TextFieldState,
+    focusRequester: FocusRequester,
+    onSave: (Timestamp) -> Unit,
+    hideSheet: () -> DisposableHandle
+) {
+    Column(modifier = Modifier.padding(16.dp)) {
+        Text(
+            text = "Timestamp: ${formatMilisToHHMMSS(timestamp.timeMs)}",
+            color = MaterialTheme.colorScheme.primary,
+            fontWeight = FontWeight.Bold,
+            maxLines = 1,
+        )
+
+        TextField(
+            state = textFieldState,
+            placeholder = { Text("Description") },
+            modifier = Modifier
+                .fillMaxWidth()
+                .focusRequester(focusRequester),
+        )
+        Row {
+            Button(onClick = {
+                onSave(timestamp.copy(description = textFieldState.text.toString()))
+                hideSheet()
+            }) {
+                Text("Save")
+            }
+            Button(onClick = { hideSheet() }) {
+                Text("Cancel")
             }
         }
     }
@@ -499,11 +548,27 @@ fun TimestampItemPreview() {
 @OptIn(ExperimentalMaterial3Api::class)
 @Preview
 @Composable
-fun TimestampSheetPreview() {
+fun TimestampSheetPortraitPreview() {
     TimestampEditorSheet(
         fakeTimestamp1,
         {},
         onSave = {},
-        sheetState = rememberStandardBottomSheetState()
+        sheetState = rememberStandardBottomSheetState(),
+        windowSize = WindowWidthSizeClass.Compact,
+    )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Preview(
+    device = "spec:width=411dp,height=891dp,dpi=420,isRound=false,chinSize=0dp,orientation=landscape"
+)
+@Composable
+fun TimestampSheetLandscapePreview() {
+    TimestampEditorSheet(
+        fakeTimestamp1,
+        {},
+        onSave = {},
+        sheetState = rememberStandardBottomSheetState(),
+        windowSize = WindowWidthSizeClass.Medium,
     )
 }
