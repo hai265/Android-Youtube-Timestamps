@@ -25,16 +25,22 @@ import androidx.compose.foundation.text.input.TextFieldLineLimits
 import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FabPosition
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SheetState
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
+import androidx.compose.material3.rememberModalBottomSheetState
+import androidx.compose.material3.rememberStandardBottomSheetState
 import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -45,17 +51,15 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.movableContentOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
-import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.res.painterResource
@@ -68,11 +72,13 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.hai265.timestamper.R
 import com.hai265.timestamper.data.database.Timestamp
+import com.hai265.timestamper.ui.fakes.fakeTimestamp1
 import com.hai265.timestamper.ui.fakes.fakeTimestampList
 import com.hai265.timestamper.ui.screens.youtubeplayer.ComposeYouTubePlayer
 import com.hai265.timestamper.ui.screens.youtubeplayer.YouTubePlayerController
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.launch
 import java.util.Locale
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
@@ -91,17 +97,19 @@ TODO:
 - add separate settings / dialog for settings
 - when open keyboard allow scroll down to view timestamps below (BUG currently: when timestamp added keyboard doesn't appear until scroll down)
  */
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TimestampEditorScreen(windowSize: WindowWidthSizeClass) {
     val viewmodel = hiltViewModel<TimestampEditorViewModel>()
     val state by viewmodel.state.collectAsState()
     val preferences by viewmodel.preferences.collectAsState()
-    val focusManager = LocalFocusManager.current
+    LocalFocusManager.current
     var showSettingsDialog by rememberSaveable { mutableStateOf(false) }
+    var showTimestampSheet by rememberSaveable { mutableStateOf(false) }
 
     val video = state.video
     val controller = remember { YouTubePlayerController() }
-    val isKeyboardOpen by keyboardAsState()
+    val sheetState = rememberModalBottomSheetState()
 
     val videoPlayer = remember(video) {
         movableContentOf {
@@ -116,8 +124,8 @@ fun TimestampEditorScreen(windowSize: WindowWidthSizeClass) {
         }
     }
     if (preferences.pauseAndResumeVideoOnEdit) {
-        LaunchedEffect(isKeyboardOpen) {
-            when (isKeyboardOpen) {
+        LaunchedEffect(showTimestampSheet) {
+            when (showTimestampSheet) {
                 true -> controller.pause()
                 false -> controller.play()
             }
@@ -125,7 +133,9 @@ fun TimestampEditorScreen(windowSize: WindowWidthSizeClass) {
     }
     Scaffold(
         floatingActionButton = {
-            FloatingActionButton(onClick = { viewmodel.addTimestamp() }) {
+            FloatingActionButton(onClick = {
+                showTimestampSheet = true
+            }) {
                 Icon(Icons.Filled.Add, "Add")
             }
         },
@@ -161,11 +171,7 @@ fun TimestampEditorScreen(windowSize: WindowWidthSizeClass) {
                     modifier = Modifier
                         .padding(bottom = innerPadding.calculateBottomPadding())
                         .fillMaxSize()
-                        .clickable {
-                            if (preferences.hideKeyboardOnScreenTap) {
-                                focusManager.clearFocus()
-                            }
-                        }) {
+                ) {
                     videoPlayer()
                     timestampsList(false)
                 }
@@ -178,6 +184,14 @@ fun TimestampEditorScreen(windowSize: WindowWidthSizeClass) {
             onDismiss = { showSettingsDialog = false },
             preferences = preferences,
             viewModel = viewmodel
+        )
+    }
+
+    if (showTimestampSheet) {
+        TimestampEditorSheet(
+            onDismiss = { showTimestampSheet = false },
+            sheetState = sheetState,
+            timestamp = fakeTimestamp1
         )
     }
 }
@@ -242,7 +256,6 @@ fun TimestampItem(
     modifier: Modifier = Modifier
 ) {
     val textFieldState = rememberTextFieldState(initialText = timestamp.description)
-    val focusRequester = remember { FocusRequester() }
 
     LaunchedEffect(textFieldState) {
         snapshotFlow { textFieldState.text }
@@ -252,15 +265,12 @@ fun TimestampItem(
             }
     }
     val highlight = MaterialTheme.colorScheme.primaryContainer
-    val keyboardController = LocalSoftwareKeyboardController.current
     var targetColor by remember(newlyAdded) {
         mutableStateOf(if (newlyAdded) highlight else Color.Transparent)
     }
 
     LaunchedEffect(newlyAdded) {
         if (newlyAdded) {
-            focusRequester.requestFocus()
-            keyboardController?.show()
             delay(1000)
             targetColor = Color.Transparent
         }
@@ -301,7 +311,6 @@ fun TimestampItem(
             lineLimits = if (textSingleLine) TextFieldLineLimits.SingleLine else TextFieldLineLimits.Default,
             modifier = Modifier
                 .weight(1f)
-                .focusRequester(focusRequester)
         )
         Icon(
             painter = painterResource(R.drawable.close),
@@ -379,6 +388,52 @@ fun keyboardAsState(): State<Boolean> {
     return rememberUpdatedState(isImeVisible)
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun TimestampEditorSheet(timestamp: Timestamp, onDismiss: () -> Unit, sheetState: SheetState) {
+    val scope = rememberCoroutineScope()
+    val hideSheet = {
+        scope.launch { sheetState.hide() }.invokeOnCompletion {
+            if (!sheetState.isVisible) {
+                onDismiss()
+            }
+        }
+    }
+    val textFieldState = rememberTextFieldState(initialText = timestamp.description)
+
+    ModalBottomSheet(onDismissRequest = onDismiss, sheetState = sheetState) {
+        Column {
+            Text(
+                text = formatMilisToHHMMSS(timestamp.timeMs),
+                color = MaterialTheme.colorScheme.primary,
+                fontWeight = FontWeight.Bold,
+                maxLines = 1,
+                modifier = Modifier
+                    .padding(start = 16.dp)
+                    .widthIn(min = 72.dp)
+            )
+
+            TextField(
+                state = textFieldState, colors = TextFieldDefaults.colors(
+                    focusedContainerColor = Color.Transparent,
+                    unfocusedContainerColor = Color.Transparent,
+                    disabledContainerColor = Color.Transparent,
+                    errorContainerColor = Color.Transparent
+                ),
+                placeholder = { Text("Description") }
+            )
+            Row {
+                Button(onClick = { hideSheet() }) {
+                    Text("Save")
+                }
+                Button(onClick = { hideSheet() }) {
+                    Text("Cancel")
+                }
+            }
+        }
+    }
+}
+
 fun formatMilisToHHMMSS(millis: Long): String {
     val duration = millis.milliseconds
     return duration.toComponents { hours, minutes, seconds, _ ->
@@ -419,6 +474,12 @@ fun TimestampItemPreview() {
         onTimestampDescriptionUpdate = {},
         newlyAdded = true,
         textSingleLine = false,
+    )
+}
 
-        )
+@OptIn(ExperimentalMaterial3Api::class)
+@Preview
+@Composable
+fun TimestampSheetPreview() {
+    TimestampEditorSheet(fakeTimestamp1, {}, rememberStandardBottomSheetState())
 }
