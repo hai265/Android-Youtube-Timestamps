@@ -18,17 +18,7 @@ fun getYouTubeId(url: String): String? {
             uri.lastPathSegment
         }
 
-        // https://www.youtube.com/embed/VIDEO_ID
-        uri.path?.startsWith("/embed/") == true -> {
-            uri.pathSegments.getOrNull(1)
-        }
-
-        // https://www.youtube.com/shorts/VIDEO_ID
-        uri.path?.startsWith("/shorts/") == true -> {
-            uri.pathSegments.getOrNull(1)
-        }
-
-        else -> null
+        else -> uri.pathSegments.getOrNull(1)
     }
 }
 
