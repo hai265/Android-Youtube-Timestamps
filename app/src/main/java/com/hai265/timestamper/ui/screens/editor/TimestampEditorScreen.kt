@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -27,10 +26,11 @@ import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material3.Button
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FabPosition
+import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -64,6 +64,7 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.res.painterResource
@@ -84,6 +85,7 @@ import kotlinx.coroutines.DisposableHandle
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import java.util.Locale
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
@@ -112,9 +114,11 @@ fun TimestampEditorScreen(windowSize: WindowWidthSizeClass) {
     var showSettingsDialog by rememberSaveable { mutableStateOf(false) }
     var showTimestampSheet by rememberSaveable { mutableStateOf(false) }
 
+    val keyboardController = LocalSoftwareKeyboardController.current
+
     val video = state.video
     val controller = remember { YouTubePlayerController() }
-    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    val sheetState = rememberModalBottomSheetState()
 
     val videoPlayer = remember(video) {
         movableContentOf {
@@ -199,7 +203,6 @@ fun TimestampEditorScreen(windowSize: WindowWidthSizeClass) {
             onSave = { timestamp -> viewmodel.upsertTimestamp(timestamp) },
             sheetState = sheetState,
             timestamp = emptyTimestamp,
-            windowSize = windowSize,
         )
     }
 }
@@ -403,11 +406,9 @@ fun TimestampEditorSheet(
     onDismiss: () -> Unit,
     onSave: (Timestamp) -> Unit,
     sheetState: SheetState,
-    windowSize: WindowWidthSizeClass,
 ) {
     val scope = rememberCoroutineScope()
     val focusRequester = remember { FocusRequester() }
-    val isKeyboardVisible by keyboardAsState()
 
     val hideSheet = {
         scope.launch { sheetState.hide() }.invokeOnCompletion {
@@ -427,41 +428,7 @@ fun TimestampEditorSheet(
         sheetState = sheetState,
         dragHandle = {},
     ) {
-        if ((windowSize == WindowWidthSizeClass.Medium || windowSize == WindowWidthSizeClass.Expanded)
-        ) {
-            var textFieldOnly by remember { mutableStateOf(true) }
-
-            if (textFieldOnly) {
-                Row(
-                    modifier = Modifier.fillMaxSize(),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    TextField(
-                        state = textFieldState,
-                        placeholder = { Text("Description") },
-                        modifier = Modifier
-                            .weight(1f)
-                            .fillMaxHeight()
-                            .focusRequester(focusRequester)
-                    )
-                    Button(
-                        onClick = { textFieldOnly = false },
-                        modifier = Modifier.padding(4.dp)
-                    ) { Text("Done") }
-                }
-            } else {
-                //TODO: When tap edit text set textFieldOnly true
-                TimestampEditorSheetColumn(
-                    timestamp,
-                    textFieldState,
-                    focusRequester,
-                    onSave,
-                    hideSheet
-                )
-            }
-        } else {
-            TimestampEditorSheetColumn(timestamp, textFieldState, focusRequester, onSave, hideSheet)
-        }
+        TimestampEditorSheetColumn(timestamp, textFieldState, focusRequester, onSave, hideSheet)
     }
 }
 
@@ -481,22 +448,19 @@ private fun TimestampEditorSheetColumn(
             maxLines = 1,
         )
 
-        TextField(
-            state = textFieldState,
-            placeholder = { Text("Description") },
-            modifier = Modifier
-                .fillMaxWidth()
-                .focusRequester(focusRequester),
-        )
         Row {
-            Button(onClick = {
+            TextField(
+                state = textFieldState,
+                placeholder = { Text("Description") },
+                modifier = Modifier
+                    .weight(1f)
+                    .focusRequester(focusRequester),
+            )
+            FilledIconButton(onClick = {
                 onSave(timestamp.copy(description = textFieldState.text.toString()))
                 hideSheet()
-            }) {
-                Text("Save")
-            }
-            Button(onClick = { hideSheet() }) {
-                Text("Cancel")
+            }, modifier = Modifier.padding(start = 16.dp)) {
+                Icon(Icons.Filled.Check, "Save")
             }
         }
     }
@@ -554,7 +518,6 @@ fun TimestampSheetPortraitPreview() {
         {},
         onSave = {},
         sheetState = rememberStandardBottomSheetState(),
-        windowSize = WindowWidthSizeClass.Compact,
     )
 }
 
@@ -569,6 +532,5 @@ fun TimestampSheetLandscapePreview() {
         {},
         onSave = {},
         sheetState = rememberStandardBottomSheetState(),
-        windowSize = WindowWidthSizeClass.Medium,
     )
 }
