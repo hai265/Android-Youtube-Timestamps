@@ -40,6 +40,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SheetState
+import androidx.compose.material3.SheetValue
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -410,8 +411,10 @@ fun TimestampEditorSheet(
     }
     val textFieldState = rememberTextFieldState(initialText = timestamp.description)
 
-    LaunchedEffect(Unit) {
-        focusRequester.requestFocus()
+    LaunchedEffect(sheetState.currentValue) {
+        if(!sheetState.isAnimationRunning && sheetState.currentValue == SheetValue.Expanded) {
+            focusRequester.requestFocus()
+        }
     }
 
     ModalBottomSheet(
