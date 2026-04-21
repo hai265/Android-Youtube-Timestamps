@@ -13,6 +13,7 @@ import com.hai265.timestamper.data.repos.VideoRepository
 import com.hai265.timestamper.ui.Navigables
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
@@ -114,20 +115,11 @@ class TimestampEditorViewModel @Inject constructor(
         }
     }
 
-    fun addTimestamp() {
-        viewModelScope.launch {
-            state.value.video?.videoId?.let {
-                val newTimestampId = timestampRepo.addEmptyTimestamp(
-                    it, currentTime.value
-                )
-                newlyAddedId.value = newTimestampId
-            }
-        }
-    }
-
     fun upsertTimestamp(timestamp: Timestamp) {
         viewModelScope.launch {
             newlyAddedId.value = timestampRepo.addOrUpdateTimestamp(timestamp)
+            delay(1000)
+            newlyAddedId.value = null
         }
     }
 

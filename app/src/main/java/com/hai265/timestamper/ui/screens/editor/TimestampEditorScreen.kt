@@ -21,6 +21,7 @@ import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.text.input.KeyboardActionHandler
 import androidx.compose.foundation.text.input.TextFieldLineLimits
@@ -86,7 +87,6 @@ import com.hai265.timestamper.ui.fakes.fakeTimestampList
 import com.hai265.timestamper.ui.screens.youtubeplayer.ComposeYouTubePlayer
 import com.hai265.timestamper.ui.screens.youtubeplayer.YouTubePlayerController
 import kotlinx.coroutines.DisposableHandle
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 import java.util.Locale
@@ -222,7 +222,16 @@ fun TimestampList(
     onCLickSettings: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    LazyColumn(modifier = modifier) {
+    val listState = rememberLazyListState()
+    LaunchedEffect(highlightedId) {
+        if (highlightedId != null) {
+            val index = timestamps.indexOfFirst { it.id == highlightedId }
+            if (index != -1) {
+                listState.animateScrollToItem(index + 1) // +1 for the settings header item
+            }
+        }
+    }
+    LazyColumn(state = listState, modifier = modifier) {
         item {
             Box(modifier = Modifier.fillMaxWidth()) {
                 Row(
@@ -279,16 +288,10 @@ fun TimestampItem(
             }
     }
     val highlight = MaterialTheme.colorScheme.primaryContainer
-    var targetColor by remember(newlyAdded) {
+    val targetColor by remember(newlyAdded) {
         mutableStateOf(if (newlyAdded) highlight else Color.Transparent)
     }
 
-    LaunchedEffect(newlyAdded) {
-        if (newlyAdded) {
-            delay(1000)
-            targetColor = Color.Transparent
-        }
-    }
     val backgroundColor by animateColorAsState(
         targetValue = targetColor,
         animationSpec = tween(durationMillis = 500, easing = LinearEasing),
