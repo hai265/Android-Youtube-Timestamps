@@ -21,6 +21,8 @@ import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.text.input.KeyboardActionHandler
 import androidx.compose.foundation.text.input.TextFieldLineLimits
 import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.foundation.text.input.rememberTextFieldState
@@ -69,6 +71,8 @@ import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
@@ -85,7 +89,6 @@ import kotlinx.coroutines.DisposableHandle
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import java.util.Locale
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
@@ -114,7 +117,7 @@ fun TimestampEditorScreen(windowSize: WindowWidthSizeClass) {
     var showSettingsDialog by rememberSaveable { mutableStateOf(false) }
     var showTimestampSheet by rememberSaveable { mutableStateOf(false) }
 
-    val keyboardController = LocalSoftwareKeyboardController.current
+    LocalSoftwareKeyboardController.current
 
     val video = state.video
     val controller = remember { YouTubePlayerController() }
@@ -440,6 +443,7 @@ private fun TimestampEditorSheetColumn(
     onSave: (Timestamp) -> Unit,
     hideSheet: () -> DisposableHandle
 ) {
+    var isMultiline by remember { mutableStateOf(false) }
     Column(modifier = Modifier.padding(16.dp)) {
         Text(
             text = "Timestamp: ${formatMilisToHHMMSS(timestamp.timeMs)}",
@@ -448,18 +452,32 @@ private fun TimestampEditorSheetColumn(
             maxLines = 1,
         )
 
-        Row {
+        Row(verticalAlignment = if (isMultiline) Alignment.Bottom else Alignment.CenterVertically) {
             TextField(
                 state = textFieldState,
                 placeholder = { Text("Description") },
+                keyboardOptions = KeyboardOptions.Default.copy(
+                    keyboardType = KeyboardType.Text,
+                    imeAction = ImeAction.Done
+                ),
+                onKeyboardAction = KeyboardActionHandler {
+                    onSave(timestamp.copy(description = textFieldState.text.toString()))
+                    hideSheet()
+                },
+                onTextLayout = { result ->
+                    isMultiline = (result.invoke()?.lineCount ?: 0) > 1
+                },
                 modifier = Modifier
                     .weight(1f)
-                    .focusRequester(focusRequester),
+                    .focusRequester(focusRequester)
             )
-            FilledIconButton(onClick = {
-                onSave(timestamp.copy(description = textFieldState.text.toString()))
-                hideSheet()
-            }, modifier = Modifier.padding(start = 16.dp)) {
+            FilledIconButton(
+                onClick = {
+                    onSave(timestamp.copy(description = textFieldState.text.toString()))
+                    hideSheet()
+                }, modifier = Modifier
+                    .padding(start = 16.dp)
+            ) {
                 Icon(Icons.Filled.Check, "Save")
             }
         }
