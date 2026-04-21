@@ -34,4 +34,7 @@ interface TimestampDao {
 
     @Delete
     fun deleteTimestamp(timestamp: Timestamp)
+
+    @Query("SELECT * from timestamps WHERE id = :id")
+    fun getTimestampById(id: Long): Timestamp
 }

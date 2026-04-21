@@ -50,7 +50,7 @@ class TimestampEditorViewModel @Inject constructor(
 
     private val currentTime = MutableStateFlow(Duration.ZERO)
     private val descriptionUpdates = MutableStateFlow<Pair<Timestamp, String>?>(null)
-    private val newlyAddedId = MutableStateFlow<Long?>(null)
+    private val _newlyAddedTimestampId = MutableStateFlow<Long?>(null)
 
     init {
         viewModelScope.launch {
@@ -78,7 +78,7 @@ class TimestampEditorViewModel @Inject constructor(
     val state = combine(
         timestampRepo.getTimestamps(videoId),
         flow { emit(videoRepo.getVideoById(videoId)) },
-        newlyAddedId
+        _newlyAddedTimestampId
     ) { timestamps, video, newlyAddedId ->
         TimestampEditorState(video, timestamps, newlyAddedId)
     }.stateIn(
@@ -117,9 +117,9 @@ class TimestampEditorViewModel @Inject constructor(
 
     fun upsertTimestamp(timestamp: Timestamp) {
         viewModelScope.launch {
-            newlyAddedId.value = timestampRepo.addOrUpdateTimestamp(timestamp)
+            _newlyAddedTimestampId.value = timestampRepo.addOrUpdateTimestamp(timestamp)
             delay(1000)
-            newlyAddedId.value = null
+            _newlyAddedTimestampId.value = null
         }
     }
 

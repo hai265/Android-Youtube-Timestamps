@@ -1,5 +1,6 @@
 package com.hai265.timestamper.ui.screens.editor
 
+import android.os.Parcelable
 import android.view.ViewTreeObserver
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.LinearEasing
@@ -24,7 +25,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.text.input.KeyboardActionHandler
-import androidx.compose.foundation.text.input.TextFieldLineLimits
 import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.material.icons.Icons
@@ -43,7 +43,6 @@ import androidx.compose.material3.SheetState
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.material3.rememberStandardBottomSheetState
 import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
@@ -60,7 +59,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
@@ -74,6 +72,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
@@ -87,8 +86,8 @@ import com.hai265.timestamper.ui.fakes.fakeTimestampList
 import com.hai265.timestamper.ui.screens.youtubeplayer.ComposeYouTubePlayer
 import com.hai265.timestamper.ui.screens.youtubeplayer.YouTubePlayerController
 import kotlinx.coroutines.DisposableHandle
-import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
+import kotlinx.parcelize.Parcelize
 import java.util.Locale
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
@@ -109,7 +108,7 @@ fun TimestampEditorScreen(windowSize: WindowWidthSizeClass) {
     val preferences by viewmodel.preferences.collectAsState()
     LocalFocusManager.current
     var showSettingsDialog by rememberSaveable { mutableStateOf(false) }
-    var showTimestampSheet by rememberSaveable { mutableStateOf(false) }
+    var bottomSheetState by rememberSaveable { mutableStateOf<BottomSheetState>(BottomSheetState.Hidden) }
 
     LocalSoftwareKeyboardController.current
 
@@ -130,17 +129,17 @@ fun TimestampEditorScreen(windowSize: WindowWidthSizeClass) {
         }
     }
     if (preferences.pauseAndResumeVideoOnEdit) {
-        LaunchedEffect(showTimestampSheet) {
-            when (showTimestampSheet) {
-                true -> controller.pause()
-                false -> controller.play()
+        LaunchedEffect(bottomSheetState) {
+            when (bottomSheetState) {
+                BottomSheetState.Hidden -> controller.play()
+                else -> controller.pause()
             }
         }
     }
     Scaffold(
         floatingActionButton = {
             FloatingActionButton(onClick = {
-                showTimestampSheet = true
+                bottomSheetState = BottomSheetState.NewTimestamp
             }) {
                 Icon(Icons.Filled.Add, "Add")
             }
@@ -153,7 +152,9 @@ fun TimestampEditorScreen(windowSize: WindowWidthSizeClass) {
                     timestamps = state.timestamps,
                     onDelete = viewmodel::deleteTimestamp,
                     onTimestampClick = { duration -> controller.seekTo(duration) },
-                    updateDescription = viewmodel::updateDescription,
+                    onDescriptionClick = {
+                        bottomSheetState = BottomSheetState.EditTimestamp(it)
+                    },
                     highlightedId = state.newlyAddedTimestampId,
                     textSingleLine = textSingleLine,
                     onCLickSettings = { showSettingsDialog = true }
@@ -193,14 +194,25 @@ fun TimestampEditorScreen(windowSize: WindowWidthSizeClass) {
         )
     }
 
-    if (showTimestampSheet) {
-        val emptyTimestamp = viewmodel.getEmptyTimestamp()
-        TimestampEditorSheet(
-            onDismiss = { showTimestampSheet = false },
-            onSave = { timestamp -> viewmodel.upsertTimestamp(timestamp) },
-            sheetState = sheetState,
-            timestamp = emptyTimestamp,
-        )
+    when (bottomSheetState) {
+        is BottomSheetState.Hidden -> {} // Don't show sheet
+        BottomSheetState.NewTimestamp ->
+            TimestampEditorSheet(
+                onDismiss = { bottomSheetState = BottomSheetState.Hidden },
+                onSave = { timestamp -> viewmodel.upsertTimestamp(timestamp) },
+                sheetState = sheetState,
+                timestamp = viewmodel.getEmptyTimestamp(),
+            )
+
+        is BottomSheetState.EditTimestamp -> {
+            val timestamp = (bottomSheetState as BottomSheetState.EditTimestamp).timestamp
+            TimestampEditorSheet(
+                onDismiss = { bottomSheetState = BottomSheetState.Hidden },
+                onSave = { timestamp -> viewmodel.upsertTimestamp(timestamp) },
+                sheetState = sheetState,
+                timestamp = timestamp,
+            )
+        }
     }
 }
 
@@ -210,7 +222,7 @@ fun TimestampList(
     timestamps: List<Timestamp>,
     onDelete: (timestamp: Timestamp) -> Unit,
     onTimestampClick: (Duration) -> Unit,
-    updateDescription: (Timestamp, String) -> Unit,
+    onDescriptionClick: (Timestamp) -> Unit,
     highlightedId: Long?,
     textSingleLine: Boolean,
     onCLickSettings: () -> Unit,
@@ -249,13 +261,8 @@ fun TimestampList(
                 timestamp,
                 onClickDelete = { onDelete(timestamp) },
                 onTimestampClick = onTimestampClick,
-                onTimestampDescriptionUpdate = { newDescription ->
-                    updateDescription(
-                        timestamp,
-                        newDescription
-                    )
-                },
-                newlyAdded = timestamp.id == highlightedId,
+                onTimestampDescriptionUpdate = { onDescriptionClick(timestamp) },
+                newlyAdded = timestamp.id == highlightedId, //TODO: debug edit timestamp not highlighting
                 textSingleLine = textSingleLine
             )
         }
@@ -267,20 +274,11 @@ fun TimestampItem(
     timestamp: Timestamp,
     onClickDelete: () -> Unit,
     onTimestampClick: (Duration) -> Unit,
-    onTimestampDescriptionUpdate: (String) -> Unit,
+    onTimestampDescriptionUpdate: () -> Unit,
     newlyAdded: Boolean,
     textSingleLine: Boolean,
     modifier: Modifier = Modifier
 ) {
-    val textFieldState = rememberTextFieldState(initialText = timestamp.description)
-
-    LaunchedEffect(textFieldState) {
-        snapshotFlow { textFieldState.text }
-            .distinctUntilChanged()
-            .collect { newText ->
-                onTimestampDescriptionUpdate(newText.toString())
-            }
-    }
     val highlight = MaterialTheme.colorScheme.primaryContainer
     val targetColor by remember(newlyAdded) {
         mutableStateOf(if (newlyAdded) highlight else Color.Transparent)
@@ -311,17 +309,13 @@ fun TimestampItem(
                 .widthIn(min = 72.dp)
         )
 
-        TextField(
-            state = textFieldState, colors = TextFieldDefaults.colors(
-                focusedContainerColor = Color.Transparent,
-                unfocusedContainerColor = Color.Transparent,
-                disabledContainerColor = Color.Transparent,
-                errorContainerColor = Color.Transparent
-            ),
-            placeholder = { Text("Description") },
-            lineLimits = if (textSingleLine) TextFieldLineLimits.SingleLine else TextFieldLineLimits.Default,
+        Text(
+            text = timestamp.description,
+            maxLines = if (textSingleLine) 1 else 50,
+            overflow = TextOverflow.Ellipsis,
             modifier = Modifier
                 .weight(1f)
+                .clickable(onClick = onTimestampDescriptionUpdate)
         )
         Icon(
             painter = painterResource(R.drawable.close),
@@ -492,6 +486,13 @@ fun formatMilisToHHMMSS(millis: Long): String {
     }
 }
 
+@Parcelize
+sealed interface BottomSheetState : Parcelable {
+    object Hidden : BottomSheetState
+    object NewTimestamp : BottomSheetState
+    data class EditTimestamp(val timestamp: Timestamp) : BottomSheetState
+}
+
 @Preview
 @Composable
 fun TimestampListPreview() {
@@ -499,7 +500,7 @@ fun TimestampListPreview() {
         timestamps = fakeTimestampList,
         onDelete = { },
         onTimestampClick = { },
-        updateDescription = { _, _ -> },
+        onDescriptionClick = { },
         highlightedId = null,
         textSingleLine = false,
         onCLickSettings = {},
