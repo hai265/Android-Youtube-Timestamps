@@ -99,13 +99,7 @@ import kotlin.time.toDuration
 
 /*
 TODO:
-- phone horizontal mode (bug, config changes reloads video)
 - Player Controls (Pause / Play), skip +/- 5 secs
-- when add timestamp jump to timestamp and automatically open keyboard
-- when press add timestamp add editor similar to Microsoft TO DO (probably better since can add stuff like tags, edit timestamp, color, etc)
-- when press add timestamp pause video, exit keyboard resume playback (configurable)
-- add separate settings / dialog for settings
-- when open keyboard allow scroll down to view timestamps below (BUG currently: when timestamp added keyboard doesn't appear until scroll down)
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
