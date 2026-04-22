@@ -1,6 +1,7 @@
 package com.hai265.timestamper.ui.screens.editor
 
 import android.os.Parcelable
+import android.util.Log
 import android.view.ViewTreeObserver
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.LinearEasing
@@ -16,6 +17,7 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.ime
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
@@ -65,6 +67,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.platform.LocalView
@@ -115,7 +118,7 @@ fun TimestampEditorScreen(windowSize: WindowWidthSizeClass) {
 
     val video = state.video
     val controller = remember { YouTubePlayerController() }
-    val sheetState = rememberModalBottomSheetState()
+    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
     val videoPlayer = remember(video) {
         movableContentOf {
@@ -434,8 +437,21 @@ private fun TimestampEditorSheetColumn(
     onSave: (Timestamp) -> Unit,
     hideSheet: () -> DisposableHandle
 ) {
+    val keyboardInset = WindowInsets.ime.getBottom(LocalDensity.current)
+    val toDP = with(LocalDensity.current) { keyboardInset.toDp() }
+    Log.d("few", "TimestampEditorSheetColumn: ${toDP}")
     var isMultiline by remember { mutableStateOf(false) }
-    Column(modifier = Modifier.padding(16.dp)) {
+    val isKeyboardVisible by keyboardAsState()
+
+    Column(
+        modifier = Modifier
+            .padding(
+                start = 16.dp,
+                top = 16.dp,
+                end = 16.dp,
+                bottom = if (!isKeyboardVisible) 346.2857.dp + 32.dp else 16.dp
+            )
+    ) {
         Text(
             text = "Timestamp: ${formatMilisToHHMMSS(timestamp.timeMs)}",
             color = MaterialTheme.colorScheme.primary,
