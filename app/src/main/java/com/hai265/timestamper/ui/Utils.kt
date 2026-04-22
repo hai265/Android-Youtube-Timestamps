@@ -22,5 +22,13 @@ fun handleVideoResult(context: Context, videoResult: VideoResult, onSuccess: () 
                 Toast.LENGTH_LONG
             ).show()
         }
+
+        is VideoResult.NetworkError -> {
+            Toast.makeText(
+                context,
+                "Network Error: ${videoResult.errorMessage}",
+                Toast.LENGTH_LONG
+            ).show()
+        }
     }
 }

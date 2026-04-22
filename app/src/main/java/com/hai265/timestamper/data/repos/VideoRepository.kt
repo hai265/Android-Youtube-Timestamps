@@ -5,19 +5,24 @@ import com.hai265.timestamper.data.database.VideoDao
 import com.hai265.timestamper.data.getYouTubeId
 import com.hai265.timestamper.data.getYoutubeThumbnail
 import com.hai265.timestamper.data.models.VideoInfo
+import com.hai265.timestamper.data.network.YoutubeMetadataApiService
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.withContext
+import retrofit2.HttpException
+import java.io.IOException
 import javax.inject.Inject
 import kotlin.time.Duration
 
 sealed interface VideoResult {
     data object Success : VideoResult
     data class InvalidUrl(val url: String) : VideoResult
+    data class NetworkError(val errorMessage: String?) : VideoResult
 }
 
 class VideoRepository @Inject constructor(
-    val dao: VideoDao
+    val dao: VideoDao,
+    val youtubeMetadataApi: YoutubeMetadataApiService,
 ) {
     fun getVideos(): Flow<List<Video>> {
         return dao.getAllVideos()
@@ -31,16 +36,24 @@ class VideoRepository @Inject constructor(
     // 1. url is invalid
     // 2. video already added
     suspend fun addVideo(url: String): VideoResult {
-        /*TODO: Get title by constructing url:
-        https://www.youtube.com/oembed?url=https%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3DdQw4w9WgXcQ
-        Source: https://abdus.dev/posts/youtube-oembed/
-        */
         val videoId = getYouTubeId(url) ?: return VideoResult.InvalidUrl(url)
 
+        val metadata = try {
+            youtubeMetadataApi.getYoutubeMetadata(url)
+        } catch (e: IOException) {
+            return VideoResult.NetworkError(e.message)
+        } catch (e: HttpException) {
+            val message = when (e.code()) {
+                400 -> "Video Doesn't Exist"
+                403 -> "Video Is Private"
+                else -> e.message
+            }
+            return VideoResult.NetworkError(message)
+        }
         dao.addVideo(
             Video(
                 videoId = videoId,
-                videoTitle = null,
+                videoTitle = metadata.title,
                 thumbnail = getYoutubeThumbnail(videoId),
                 lastEdited = Duration.ZERO,
                 lastPlayed = Duration.ZERO,

@@ -80,6 +80,7 @@ dependencies {
     implementation(libs.androidx.room.ktx)
     testImplementation(libs.junit)
     implementation(libs.androidx.datastore.preferences)
+    implementation(libs.logging.interceptor)
 
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
