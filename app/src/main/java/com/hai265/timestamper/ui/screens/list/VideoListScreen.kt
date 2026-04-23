@@ -1,7 +1,8 @@
 package com.hai265.timestamper.ui.screens.list
 
-import android.content.Intent
 import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -201,6 +202,15 @@ private fun VideoItem(
     modifier: Modifier = Modifier,
 ) {
     val context = LocalContext.current
+    val exportLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.CreateDocument("application/yaml")
+    ) { uri ->
+        uri?.let {
+            context.contentResolver.openOutputStream(it)?.use { writer ->
+                writer.write("hello".toByteArray())
+            }
+        }
+    }
     Column(modifier = modifier.clickable(onClick = onTap)) {
         AsyncImage(
             model = ImageRequest.Builder(LocalContext.current)
@@ -227,13 +237,7 @@ private fun VideoItem(
             MinimalDropdownMenu(
                 onTapDeleteVideo = { onTapDeleteVideo(video) },
                 onTapExportVideo = {
-                    val intent = Intent(Intent.ACTION_CREATE_DOCUMENT).apply {
-                        addCategory(Intent.CATEGORY_OPENABLE)
-                        type = "application-x/yaml"
-                        putExtra(Intent.EXTRA_TITLE, "invoice.pdf")
-                    }
-                    context.startActivity(intent)
-
+                    exportLauncher.launch("${video.videoTitle ?: video.videoId}.yaml")
                 },
             )
         }
