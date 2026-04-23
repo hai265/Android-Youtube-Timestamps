@@ -1,5 +1,6 @@
 package com.hai265.timestamper.ui.screens.list
 
+import android.net.Uri
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -68,6 +69,7 @@ import kotlinx.coroutines.launch
 
 //https://www.figma.com/design/9GKdOD5q3yAT0mKgrcGmpf/Android-Youtube-Timestamp-Tool?node-id=1-5026&t=xjloAEfEmnkGJuPR-0
 //TODO: write to download https://developer.android.com/training/data-storage/shared/documents-files
+//TODO: Duplicate file number append to extention e.g name.yaml(1) instead of name(1).yaml
 @Composable
 fun VideoListScreen(onTapVideo: (id: String) -> Unit, windowSize: WindowWidthSizeClass) {
     val viewmodel: VideoListScreenViewModel = hiltViewModel()
@@ -114,6 +116,13 @@ fun VideoListScreen(onTapVideo: (id: String) -> Unit, windowSize: WindowWidthSiz
             videoList = state.videos,
             onTapVideo = onTapVideo,
             onDeleteVideo = { video -> videoToDeleteDialog = video },
+            onExportVideo = { video, uri ->
+                viewmodel.exportVideo(
+                    video.videoId,
+                    uri,
+                    context.contentResolver
+                )
+            },
             listState = listState,
             gridNumCells = gridNumCells,
             modifier = Modifier.padding(
@@ -157,6 +166,7 @@ private fun VideoListScreen(
     videoList: List<Video>,
     onTapVideo: (id: String) -> Unit,
     onDeleteVideo: (video: Video) -> Unit,
+    onExportVideo: (video: Video, uri: Uri) -> Unit,
     listState: LazyGridState,
     gridNumCells: Int,
     modifier: Modifier = Modifier
@@ -186,7 +196,8 @@ private fun VideoListScreen(
                 VideoItem(
                     video = video,
                     onTap = { onTapVideo(video.videoId) },
-                    onTapDeleteVideo = onDeleteVideo,
+                    onTapDeleteVideo = { onDeleteVideo(video) },
+                    onTapExportVideo = { uri -> onExportVideo(video, uri) },
                     modifier = Modifier.fillMaxWidth()
                 )
             }
@@ -198,7 +209,8 @@ private fun VideoListScreen(
 private fun VideoItem(
     video: Video,
     onTap: () -> Unit,
-    onTapDeleteVideo: (Video) -> Unit,
+    onTapDeleteVideo: () -> Unit,
+    onTapExportVideo: (Uri) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val context = LocalContext.current
@@ -206,9 +218,7 @@ private fun VideoItem(
         contract = ActivityResultContracts.CreateDocument("application/yaml")
     ) { uri ->
         uri?.let {
-            context.contentResolver.openOutputStream(it)?.use { writer ->
-                writer.write("hello".toByteArray())
-            }
+            onTapExportVideo(uri)
         }
     }
     Column(modifier = modifier.clickable(onClick = onTap)) {
@@ -235,7 +245,7 @@ private fun VideoItem(
                 modifier = Modifier.weight(1f)
             )
             MinimalDropdownMenu(
-                onTapDeleteVideo = { onTapDeleteVideo(video) },
+                onTapDeleteVideo = onTapDeleteVideo,
                 onTapExportVideo = {
                     exportLauncher.launch("${video.videoTitle ?: video.videoId}.yaml")
                 },
@@ -356,13 +366,14 @@ private fun VideoListPreview() {
         onDeleteVideo = {},
         listState = LazyGridState(),
         gridNumCells = 1,
+        onExportVideo = { _, _ -> }
     )
 }
 
 @Preview
 @Composable
 private fun VideoItemPreview() {
-    VideoItem(video = fakeVideo1, onTap = {}, onTapDeleteVideo = {})
+    VideoItem(video = fakeVideo1, onTap = {}, onTapDeleteVideo = {}, onTapExportVideo = {})
 }
 
 
