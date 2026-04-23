@@ -213,7 +213,6 @@ private fun VideoItem(
     onTapExportVideo: (Uri) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val context = LocalContext.current
     val exportLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.CreateDocument("application/yaml")
     ) { uri ->
@@ -247,7 +246,7 @@ private fun VideoItem(
             MinimalDropdownMenu(
                 onTapDeleteVideo = onTapDeleteVideo,
                 onTapExportVideo = {
-                    exportLauncher.launch("${video.videoTitle ?: video.videoId}.yaml")
+                    exportLauncher.launch(video.videoTitle ?: video.videoId)
                 },
             )
         }
