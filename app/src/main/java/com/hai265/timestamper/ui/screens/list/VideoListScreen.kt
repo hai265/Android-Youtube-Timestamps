@@ -140,7 +140,8 @@ fun VideoListScreen(onTapVideo: (id: String) -> Unit, windowSize: WindowWidthSiz
                     val videoResult = viewmodel.addVideo(url)
                     handleVideoResult(context, videoResult, { addVideoDialog = false })
                 }
-            }
+            },
+            onImport = { uri -> TODO("Not Implemented") },
         )
     }
 
@@ -213,11 +214,17 @@ private fun VideoItem(
     onTapExportVideo: (Uri) -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val context = LocalContext.current
     val exportLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.CreateDocument("application/yaml")
     ) { uri ->
         uri?.let {
             onTapExportVideo(uri)
+            Toast.makeText(
+                context,
+                "Timestamps Successfully Exported",
+                Toast.LENGTH_LONG
+            ).show()
         }
     }
     Column(modifier = modifier.clickable(onClick = onTap)) {
@@ -286,8 +293,23 @@ fun MinimalDropdownMenu(
 fun AddVideoDialog(
     onDismissRequest: () -> Unit,
     onConfirmation: (url: String) -> Unit,
+    onImport: (uri: Uri) -> Unit,
 ) {
     val textFieldState = rememberTextFieldState()
+    val context = LocalContext.current
+    val importLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.OpenDocument()
+    ) { uri ->
+        uri?.let {
+            onImport(uri)
+            Toast.makeText(
+                context,
+                "Timestamps Successfully Imported",
+                Toast.LENGTH_LONG
+            ).show()
+        }
+    }
+
     AlertDialog(
         title = {
             Text(text = "Add Video")
@@ -302,12 +324,21 @@ fun AddVideoDialog(
             onDismissRequest()
         },
         confirmButton = {
-            TextButton(
-                onClick = {
-                    onConfirmation(textFieldState.text.toString())
+            Row {
+                TextButton(
+                    onClick = {
+                        onConfirmation(textFieldState.text.toString())
+                    }
+                ) {
+                    Text("Confirm")
                 }
-            ) {
-                Text("Confirm")
+                TextButton(
+                    onClick = {
+                        importLauncher.launch(arrayOf("*/*"))
+                    }
+                ) {
+                    Text("Import")
+                }
             }
         },
         dismissButton = {
