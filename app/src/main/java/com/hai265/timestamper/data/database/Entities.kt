@@ -18,6 +18,7 @@ data class Video(
     val lastPlayed: Duration,
 )
 
+@Parcelize
 @Entity(
     tableName = "timestamps",
     foreignKeys = [
@@ -32,12 +33,10 @@ data class Video(
         Index("videoId")
     ]
 )
-
-@Parcelize
 data class Timestamp(
     @PrimaryKey(autoGenerate = true)
     val id: Long = 0,
     val videoId: String,
-    val timeMs: Long,
+    val timeMs: Long, //TODO: Change to duration
     val description: String
 ) : Parcelable

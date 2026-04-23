@@ -81,7 +81,9 @@ dependencies {
     testImplementation(libs.junit)
     implementation(libs.androidx.datastore.preferences)
     implementation(libs.logging.interceptor)
+    implementation(libs.yamlkt)
 
+    implementation(libs.kotlinx.io.core)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(platform(libs.androidx.compose.bom))
@@ -91,4 +93,6 @@ dependencies {
     debugImplementation(libs.androidx.ui.test.manifest)
     testImplementation(libs.kotlinx.coroutines.test)
     testImplementation(libs.mockk)
+    testImplementation(libs.kotlin.test)
+    testImplementation(libs.kotlin.test.junit)
 }
