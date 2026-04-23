@@ -1,7 +1,6 @@
 package com.hai265.timestamper.ui.screens.list
 
 import android.widget.Toast
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -12,18 +11,18 @@ import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.FabPosition
 import androidx.compose.material3.Icon
@@ -45,12 +44,13 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
@@ -65,7 +65,7 @@ import com.hai265.timestamper.ui.handleVideoResult
 import kotlinx.coroutines.launch
 
 //https://www.figma.com/design/9GKdOD5q3yAT0mKgrcGmpf/Android-Youtube-Timestamp-Tool?node-id=1-5026&t=xjloAEfEmnkGJuPR-0
-//TODO: Floating action button
+//TODO: write to download https://developer.android.com/training/data-storage/shared/documents-files
 @Composable
 fun VideoListScreen(onTapVideo: (id: String) -> Unit, windowSize: WindowWidthSizeClass) {
     val viewmodel: VideoListScreenViewModel = hiltViewModel()
@@ -200,49 +200,61 @@ private fun VideoItem(
     modifier: Modifier = Modifier,
 ) {
     Column(modifier = modifier.clickable(onClick = onTap)) {
-        Box {
-            AsyncImage(
-                model = ImageRequest.Builder(LocalContext.current)
-                    .data(video.thumbnail)
-                    .crossfade(true)
-                    .build(),
-                contentDescription = null,
-                //TODO placeholder: grey thumbnail like youtube
-                placeholder = painterResource(R.drawable.loading_thumbnail),
-                error = painterResource(R.drawable.default_thumbnail),
-                modifier = Modifier
-                    .fillMaxSize()
-                    .aspectRatio(16f / 9f)
-            )
-            IconButton(
-                onClick = { onTapDeleteVideo(video) }, modifier = Modifier
-                    .align(Alignment.TopEnd)
-                    .padding(8.dp)
-            ) {
-                Box(
-                    modifier = Modifier
-                        .size(40.dp)
-                        .clip(CircleShape)
-                        .background(Color.White),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Delete,
-                        contentDescription = "Delete Video",
-                        tint = MaterialTheme.colorScheme.error
-                    )
-                }
-            }
-        }
+        AsyncImage(
+            model = ImageRequest.Builder(LocalContext.current)
+                .data(video.thumbnail)
+                .crossfade(true)
+                .build(),
+            contentDescription = null,
+            placeholder = painterResource(R.drawable.loading_thumbnail),
+            error = painterResource(R.drawable.default_thumbnail),
+            modifier = Modifier
+                .fillMaxSize()
+                .aspectRatio(16f / 9f)
+        )
         Row(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(8.dp),
-            horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            Column {
-                Text(video.videoTitle ?: "Video ID: ${video.videoId}", style = MaterialTheme.typography.titleMedium)
-            }
+            Text(
+                video.videoTitle ?: "Video ID: ${video.videoId}",
+                style = MaterialTheme.typography.titleMedium,
+                modifier = Modifier.weight(1f)
+            )
+            MinimalDropdownMenu(
+                onTapDeleteVideo = { onTapDeleteVideo(video) },
+                onTapExportVideo = { TODO("Unimplemented") },
+            )
+        }
+    }
+}
+
+@Composable
+fun MinimalDropdownMenu(
+    modifier: Modifier = Modifier,
+    onTapDeleteVideo: () -> Unit,
+    onTapExportVideo: () -> Unit
+) {
+    var expanded by remember { mutableStateOf(false) }
+    Box(
+        modifier = modifier
+    ) {
+        IconButton(onClick = { expanded = !expanded }) {
+            Icon(Icons.Default.MoreVert, contentDescription = "More options")
+        }
+        DropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = false }
+        ) {
+            DropdownMenuItem(
+                text = { Text("Delete", color = MaterialTheme.colorScheme.error) },
+                onClick = onTapDeleteVideo
+            )
+            DropdownMenuItem(
+                text = { Text("Export") },
+                onClick = onTapExportVideo
+            )
         }
     }
 }
@@ -298,7 +310,12 @@ fun DeleteConfirmationDialog(
         title = { Text("Delete video?") },
         text = {
             Text(
-                "${video.videoTitle ?: video.videoId} will be removed from your list."
+                text = buildAnnotatedString {
+                    withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
+                        append(video.videoTitle ?: video.videoId)
+                    }
+                    append("will be removed from your list.")
+                }
             )
         },
         onDismissRequest = onDismissRequest,
