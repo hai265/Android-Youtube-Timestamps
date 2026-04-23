@@ -1,5 +1,6 @@
 package com.hai265.timestamper.ui.screens.list
 
+import android.content.Intent
 import android.widget.Toast
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -199,6 +200,7 @@ private fun VideoItem(
     onTapDeleteVideo: (Video) -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val context = LocalContext.current
     Column(modifier = modifier.clickable(onClick = onTap)) {
         AsyncImage(
             model = ImageRequest.Builder(LocalContext.current)
@@ -224,7 +226,15 @@ private fun VideoItem(
             )
             MinimalDropdownMenu(
                 onTapDeleteVideo = { onTapDeleteVideo(video) },
-                onTapExportVideo = { TODO("Unimplemented") },
+                onTapExportVideo = {
+                    val intent = Intent(Intent.ACTION_CREATE_DOCUMENT).apply {
+                        addCategory(Intent.CATEGORY_OPENABLE)
+                        type = "application-x/yaml"
+                        putExtra(Intent.EXTRA_TITLE, "invoice.pdf")
+                    }
+                    context.startActivity(intent)
+
+                },
             )
         }
     }
