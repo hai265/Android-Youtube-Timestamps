@@ -9,6 +9,8 @@ import app.cash.turbine.test
 import com.hai265.timestamper.data.database.AppDatabase
 import com.hai265.timestamper.data.database.Timestamp
 import com.hai265.timestamper.data.database.Video
+import com.hai265.timestamper.data.network.YoutubeMetadata
+import com.hai265.timestamper.data.network.YoutubeMetadataApiService
 import com.hai265.timestamper.data.repos.PreferencesRepository
 import com.hai265.timestamper.data.repos.RepoModule.Companion.dataStore
 import com.hai265.timestamper.data.repos.TimestampRepository
@@ -47,7 +49,7 @@ class TimestampEditorViewModelTest {
         lastPlayed = 0.milliseconds
     )
     private val testTimestamps = listOf(
-        Timestamp(id = 1, videoId = videoId, timeMs = 1000, description = "First")
+        Timestamp(id = 1, videoId = videoId, time = 1000.milliseconds, description = "First")
     )
 
     @OptIn(ExperimentalCoroutinesApi::class)
@@ -60,7 +62,7 @@ class TimestampEditorViewModelTest {
             .allowMainThreadQueries()
             .build()
 
-        videoRepo = VideoRepository(db.videoDao())
+        videoRepo = VideoRepository(db.videoDao(), FakeYoutubeMetadata())
         timestampRepo = TimestampRepository(db.timestampDao())
         preferencesRepo = PreferencesRepository(context.dataStore)
         savedStateHandle = SavedStateHandle(mapOf("id" to videoId))
@@ -84,4 +86,11 @@ class TimestampEditorViewModelTest {
             assertEquals(TimestampEditorState(), awaitItem())
         }
     }
+}
+
+class FakeYoutubeMetadata : YoutubeMetadataApiService {
+    override suspend fun getYoutubeMetadata(videoUrl: String): YoutubeMetadata {
+        TODO("Not yet implemented")
+    }
+
 }

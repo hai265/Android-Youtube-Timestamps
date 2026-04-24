@@ -37,6 +37,6 @@ data class Timestamp(
     @PrimaryKey(autoGenerate = true)
     val id: Long = 0,
     val videoId: String,
-    val timeMs: Long, //TODO: Change to duration
+    val time: Duration,
     val description: String
 ) : Parcelable

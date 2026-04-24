@@ -26,7 +26,7 @@ interface VideoDao {
 
 @Dao
 interface TimestampDao {
-    @Query("SELECT * from timestamps WHERE videoId = :videoId ORDER BY timeMs ASC")
+    @Query("SELECT * from timestamps WHERE videoId = :videoId ORDER BY time ASC")
     fun getTimestamps(videoId: String): Flow<List<Timestamp>>
 
     @Upsert

@@ -127,7 +127,7 @@ class TimestampEditorViewModel @Inject constructor(
         return Timestamp(
             id = 0,
             videoId = videoId,
-            timeMs = currentTime.value.inWholeMilliseconds,
+            time = currentTime.value,
             description = "",
         )
     }

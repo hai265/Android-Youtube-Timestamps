@@ -5,7 +5,9 @@ import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.hai265.timestamper.data.database.AppDatabase
+import com.hai265.timestamper.data.repos.TimestampRepository
 import com.hai265.timestamper.data.repos.VideoRepository
+import com.hai265.timestamper.domain.TimestampsToYamlStringUseCase
 import com.hai265.timestamper.ui.screens.list.VideoListScreenViewModel
 import org.junit.After
 import org.junit.Before
@@ -17,7 +19,7 @@ class VideoListScreenViewModelTest {
     private lateinit var db: AppDatabase
 
     private lateinit var videoRepository: VideoRepository
-
+    private lateinit var timestampRepository: TimestampRepository
     private lateinit var subject: VideoListScreenViewModel
 
 
@@ -30,9 +32,14 @@ class VideoListScreenViewModelTest {
             .allowMainThreadQueries()
             .build()
 
-        videoRepository = VideoRepository(db.videoDao())
-
-        subject = VideoListScreenViewModel(videoRepository)
+        videoRepository = VideoRepository(db.videoDao(), youtubeMetadataApi = FakeYoutubeMetadata())
+        timestampRepository = TimestampRepository(
+            timestampDao = db.timestampDao()
+        )
+        subject = VideoListScreenViewModel(
+            videoRepository,
+            TimestampsToYamlStringUseCase(timestampRepository, videoRepository)
+        )
     }
 
     @After

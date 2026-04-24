@@ -40,7 +40,7 @@ class TimestampRepository @Inject constructor(
             timestampDao.upsertTimestamp(
                 Timestamp(
                     videoId = videoId,
-                    timeMs = duration.inWholeMilliseconds,
+                    time = duration,
                     description = "",
                 )
             )

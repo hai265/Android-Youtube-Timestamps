@@ -90,9 +90,6 @@ import kotlinx.coroutines.launch
 import kotlinx.parcelize.Parcelize
 import java.util.Locale
 import kotlin.time.Duration
-import kotlin.time.Duration.Companion.milliseconds
-import kotlin.time.DurationUnit
-import kotlin.time.toDuration
 
 //https://www.figma.com/design/9GKdOD5q3yAT0mKgrcGmpf/Android-Youtube-Timestamp-Tool?node-id=1-6261&t=xjloAEfEmnkGJuPR-0
 
@@ -294,13 +291,13 @@ fun TimestampItem(
         verticalAlignment = Alignment.CenterVertically
     ) {
         Text(
-            text = formatMilisToHHMMSS(timestamp.timeMs),
+            text = timestamp.time.formatDurationToHHMMSS(),
             color = MaterialTheme.colorScheme.primary,
             fontWeight = FontWeight.Bold,
             maxLines = 1,
             modifier = Modifier
                 .clickable {
-                    onTimestampClick(timestamp.timeMs.toDuration(DurationUnit.MILLISECONDS))
+                    onTimestampClick(timestamp.time)
                 }
                 .padding(start = 16.dp)
                 .widthIn(min = 72.dp)
@@ -434,7 +431,7 @@ private fun TimestampEditorSheetColumn(
     var isMultiline by remember { mutableStateOf(false) }
     Column(modifier = Modifier.padding(16.dp)) {
         Text(
-            text = "Timestamp: ${formatMilisToHHMMSS(timestamp.timeMs)}",
+            text = "Timestamp: ${timestamp.time.formatDurationToHHMMSS()}",
             color = MaterialTheme.colorScheme.primary,
             fontWeight = FontWeight.Bold,
             maxLines = 1,
@@ -472,16 +469,14 @@ private fun TimestampEditorSheetColumn(
     }
 }
 
-fun formatMilisToHHMMSS(millis: Long): String {
-    val duration = millis.milliseconds
-    return duration.toComponents { hours, minutes, seconds, _ ->
+fun Duration.formatDurationToHHMMSS(): String =
+    this.toComponents { hours, minutes, seconds, _ ->
         if (hours >= 1L) {
             String.format(Locale.US, "%02d:%02d:%02d", hours, minutes, seconds)
         } else {
             String.format(Locale.US, "%02d:%02d", minutes, seconds)
         }
     }
-}
 
 @Parcelize
 sealed interface BottomSheetState : Parcelable {
@@ -511,7 +506,7 @@ fun TimestampItemPreview() {
         timestamp = Timestamp(
             id = 0,
             videoId = "",
-            timeMs = 0L,
+            time = Duration.ZERO,
             description = "timestamp description"
         ),
         onClickDelete = {},

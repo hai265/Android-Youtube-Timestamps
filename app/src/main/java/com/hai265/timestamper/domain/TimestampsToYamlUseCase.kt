@@ -9,8 +9,6 @@ import com.hai265.timestamper.data.repos.VideoRepository
 import kotlinx.coroutines.flow.first
 import net.mamoe.yamlkt.Yaml
 import javax.inject.Inject
-import kotlin.time.Duration
-import kotlin.time.DurationUnit
 import kotlin.time.ExperimentalTime
 
 class TimestampsToYamlStringUseCase @Inject constructor(
@@ -39,10 +37,6 @@ fun Timestamp.toTag(): Tag {
     return Tag(
         description = this.description,
         id = this.id.toString(),
-        seconds = Duration.convert(
-            this.timeMs.toDouble(),
-            DurationUnit.MILLISECONDS,
-            DurationUnit.SECONDS
-        )
+        seconds = this.time.inWholeSeconds.toDouble()
     )
 }
