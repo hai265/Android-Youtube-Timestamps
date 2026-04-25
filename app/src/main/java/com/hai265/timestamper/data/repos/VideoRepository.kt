@@ -35,11 +35,10 @@ class VideoRepository @Inject constructor(
     //Two errors can occur
     // 1. url is invalid
     // 2. video already added
-    suspend fun addVideo(url: String): VideoResult {
-        val videoId = getYouTubeId(url) ?: return VideoResult.InvalidUrl(url)
-
+    suspend fun addVideo(videoId: String): VideoResult {
+        val videoId = getYouTubeId(videoId) ?: return VideoResult.InvalidUrl(videoId)
         val metadata = try {
-            youtubeMetadataApi.getYoutubeMetadata(url)
+            youtubeMetadataApi.getYoutubeMetadata("https://www.youtube.com/watch?v=$videoId")
         } catch (e: IOException) {
             return VideoResult.NetworkError(e.message)
         } catch (e: HttpException) {

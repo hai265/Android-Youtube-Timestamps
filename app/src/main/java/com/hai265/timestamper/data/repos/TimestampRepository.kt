@@ -46,4 +46,10 @@ class TimestampRepository @Inject constructor(
             )
         }
     }
+
+    suspend fun addTimestamps(timestamps: List<Timestamp>) {
+        return withContext(Dispatchers.IO) {
+            timestampDao.addTimestamps(timestamps)
+        }
+    }
 }

@@ -141,7 +141,10 @@ fun VideoListScreen(onTapVideo: (id: String) -> Unit, windowSize: WindowWidthSiz
                     handleVideoResult(context, videoResult, { addVideoDialog = false })
                 }
             },
-            onImport = { uri -> TODO("Not Implemented") },
+            onImport = { uri ->
+                viewmodel.importTimestamps(uri, context.contentResolver)
+                addVideoDialog = false
+            },
         )
     }
 
@@ -302,6 +305,7 @@ fun AddVideoDialog(
     ) { uri ->
         uri?.let {
             onImport(uri)
+            //TODO: SUbscribe to mutable shared flow to launch toast
             Toast.makeText(
                 context,
                 "Timestamps Successfully Imported",

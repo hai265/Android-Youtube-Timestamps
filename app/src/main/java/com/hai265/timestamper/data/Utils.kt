@@ -18,6 +18,9 @@ fun getYouTubeId(url: String): String? {
             uri.lastPathSegment
         }
 
+        // Not a YouTube URL — return the original string as-is
+        uri.host == null -> url
+
         else -> uri.pathSegments.getOrNull(1)
     }
 }

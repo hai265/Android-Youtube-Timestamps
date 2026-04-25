@@ -2,6 +2,7 @@ package com.hai265.timestamper.data.database
 
 import androidx.room.Dao
 import androidx.room.Delete
+import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Upsert
 import kotlinx.coroutines.flow.Flow
@@ -37,4 +38,7 @@ interface TimestampDao {
 
     @Query("SELECT * from timestamps WHERE id = :id")
     fun getTimestampById(id: Long): Timestamp
+
+    @Insert
+    fun addTimestamps(timestamps: List<Timestamp>)
 }
