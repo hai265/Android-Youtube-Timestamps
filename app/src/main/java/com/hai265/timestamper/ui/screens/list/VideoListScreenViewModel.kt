@@ -7,12 +7,15 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.hai265.timestamper.data.database.Video
 import com.hai265.timestamper.data.getYouTubeId
+import com.hai265.timestamper.data.repos.TimestampRepository
 import com.hai265.timestamper.data.repos.VideoRepository
 import com.hai265.timestamper.data.repos.VideoResult
 import com.hai265.timestamper.domain.TimestampsToYamlStringUseCase
 import com.hai265.timestamper.domain.YamlToTimestampsUseCase
+import com.hai265.timestamper.ui.screens.editor.formatDurationToHHMMSS
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -30,6 +33,7 @@ class VideoListScreenViewModel @Inject constructor(
     private val repo: VideoRepository,
     private val timestampsToYamlStringUseCase: TimestampsToYamlStringUseCase,
     private val yamlToTimestampsUseCase: YamlToTimestampsUseCase,
+    private val timestampRepo: TimestampRepository,
 ) : ViewModel() {
 
     val state = repo.getVideos()
@@ -73,6 +77,12 @@ class VideoListScreenViewModel @Inject constructor(
                 yamlToTimestampsUseCase.invoke(content)
             }
         }
+    }
+
+    suspend fun getTimestampsAsString(videoId: String): String {
+        val timestamps = timestampRepo.getTimestamps(videoId).first()
+        return timestamps.joinToString(separator = "\n")
+        { timestamp -> "${timestamp.time.formatDurationToHHMMSS()} ${timestamp.description}" }
     }
 
 }

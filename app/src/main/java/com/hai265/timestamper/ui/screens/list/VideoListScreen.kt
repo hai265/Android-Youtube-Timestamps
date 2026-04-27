@@ -1,5 +1,6 @@
 package com.hai265.timestamper.ui.screens.list
 
+import android.content.Intent
 import android.net.Uri
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -37,6 +38,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
@@ -68,7 +70,6 @@ import com.hai265.timestamper.ui.handleVideoResult
 import kotlinx.coroutines.launch
 
 //https://www.figma.com/design/9GKdOD5q3yAT0mKgrcGmpf/Android-Youtube-Timestamp-Tool?node-id=1-5026&t=xjloAEfEmnkGJuPR-0
-//TODO: write to download https://developer.android.com/training/data-storage/shared/documents-files
 //TODO: Duplicate file number append to extention e.g name.yaml(1) instead of name(1).yaml
 @Composable
 fun VideoListScreen(onTapVideo: (id: String) -> Unit, windowSize: WindowWidthSizeClass) {
@@ -84,6 +85,7 @@ fun VideoListScreen(onTapVideo: (id: String) -> Unit, windowSize: WindowWidthSiz
             listState.firstVisibleItemScrollOffset == 0
         }
     }
+    val coroutineScope = rememberCoroutineScope()
     val gridNumCells = when (windowSize) {
         WindowWidthSizeClass.Compact -> {
             1
@@ -123,6 +125,16 @@ fun VideoListScreen(onTapVideo: (id: String) -> Unit, windowSize: WindowWidthSiz
                     context.contentResolver
                 )
             },
+            onTapShareVideo = { video ->
+                coroutineScope.launch {
+                    val intent = Intent(Intent.ACTION_SEND).apply {
+                        action = Intent.ACTION_SEND
+                        putExtra(Intent.EXTRA_TEXT, viewmodel.getTimestampsAsString(video.videoId))
+                        type = "text/plain"
+                    }
+                    context.startActivity(Intent.createChooser(intent, null))
+                }
+            },
             listState = listState,
             gridNumCells = gridNumCells,
             modifier = Modifier.padding(
@@ -132,11 +144,10 @@ fun VideoListScreen(onTapVideo: (id: String) -> Unit, windowSize: WindowWidthSiz
     }
 
     if (addVideoDialog) {
-        val composableScope = rememberCoroutineScope()
         AddVideoDialog(
             onDismissRequest = { addVideoDialog = false },
             onConfirmation = { url ->
-                composableScope.launch {
+                coroutineScope.launch {
                     val videoResult = viewmodel.addVideo(url)
                     handleVideoResult(context, videoResult, { addVideoDialog = false })
                 }
@@ -171,6 +182,7 @@ private fun VideoListScreen(
     onTapVideo: (id: String) -> Unit,
     onDeleteVideo: (video: Video) -> Unit,
     onExportVideo: (video: Video, uri: Uri) -> Unit,
+    onTapShareVideo: (video: Video) -> Unit,
     listState: LazyGridState,
     gridNumCells: Int,
     modifier: Modifier = Modifier
@@ -202,6 +214,7 @@ private fun VideoListScreen(
                     onTap = { onTapVideo(video.videoId) },
                     onTapDeleteVideo = { onDeleteVideo(video) },
                     onTapExportVideo = { uri -> onExportVideo(video, uri) },
+                    onTapShareVideo = { onTapShareVideo(video) },
                     modifier = Modifier.fillMaxWidth()
                 )
             }
@@ -215,6 +228,7 @@ private fun VideoItem(
     onTap: () -> Unit,
     onTapDeleteVideo: () -> Unit,
     onTapExportVideo: (Uri) -> Unit,
+    onTapShareVideo: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val context = LocalContext.current
@@ -253,8 +267,9 @@ private fun VideoItem(
                 style = MaterialTheme.typography.titleMedium,
                 modifier = Modifier.weight(1f)
             )
-            MinimalDropdownMenu(
+            VideoDropdownMenu(
                 onTapDeleteVideo = onTapDeleteVideo,
+                onShareTimestamps = onTapShareVideo,
                 onTapExportVideo = {
                     exportLauncher.launch(video.videoTitle ?: video.videoId)
                 },
@@ -264,10 +279,11 @@ private fun VideoItem(
 }
 
 @Composable
-fun MinimalDropdownMenu(
-    modifier: Modifier = Modifier,
+fun VideoDropdownMenu(
     onTapDeleteVideo: () -> Unit,
-    onTapExportVideo: () -> Unit
+    onTapExportVideo: () -> Unit,
+    onShareTimestamps: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     var expanded by remember { mutableStateOf(false) }
     Box(
@@ -285,8 +301,38 @@ fun MinimalDropdownMenu(
                 onClick = onTapDeleteVideo
             )
             DropdownMenuItem(
-                text = { Text("Export") },
+                text = { Text("Share Timestamps") },
+                onClick = onShareTimestamps
+            )
+            DropdownMenuItem(
+                text = { Text("Download Backup") },
                 onClick = onTapExportVideo
+            )
+        }
+    }
+}
+
+@Composable
+fun ExportDropdownMenu(
+    onTapExportVideo: () -> Unit,
+    onTapShareVideo: () -> Unit,
+    expanded: MutableState<Boolean>,
+    modifier: Modifier = Modifier,
+) {
+    Box(
+        modifier = modifier
+    ) {
+        DropdownMenu(
+            expanded = expanded.value,
+            onDismissRequest = { expanded.value = false }
+        ) {
+            DropdownMenuItem(
+                text = { Text("Export Backup") },
+                onClick = onTapExportVideo
+            )
+            DropdownMenuItem(
+                text = { Text("Share Timestamps") },
+                onClick = onTapShareVideo
             )
         }
     }
@@ -400,14 +446,20 @@ private fun VideoListPreview() {
         onDeleteVideo = {},
         listState = LazyGridState(),
         gridNumCells = 1,
-        onExportVideo = { _, _ -> }
+        onExportVideo = { _, _ -> },
+        onTapShareVideo = {}
     )
 }
 
 @Preview
 @Composable
 private fun VideoItemPreview() {
-    VideoItem(video = fakeVideo1, onTap = {}, onTapDeleteVideo = {}, onTapExportVideo = {})
+    VideoItem(
+        video = fakeVideo1,
+        onTap = {},
+        onTapDeleteVideo = {},
+        onTapExportVideo = {},
+        onTapShareVideo = {})
 }
 
 

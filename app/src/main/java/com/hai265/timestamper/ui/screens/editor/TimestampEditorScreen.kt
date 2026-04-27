@@ -96,7 +96,9 @@ import kotlin.time.Duration
 /*
 TODO:
 - Player Controls (Pause / Play), skip +/- 5 secs
- */
+- Add share timestamps as string (same as video list screen)
+- Emtpy text default text (empty and light color)
+*/
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TimestampEditorScreen(windowSize: WindowWidthSizeClass) {
