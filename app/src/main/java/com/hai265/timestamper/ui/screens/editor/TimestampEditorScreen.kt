@@ -64,8 +64,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalFocusManager
-import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.res.painterResource
@@ -105,11 +103,9 @@ fun TimestampEditorScreen(windowSize: WindowWidthSizeClass) {
     val viewmodel = hiltViewModel<TimestampEditorViewModel>()
     val state by viewmodel.state.collectAsState()
     val preferences by viewmodel.preferences.collectAsState()
-    LocalFocusManager.current
     var showSettingsDialog by rememberSaveable { mutableStateOf(false) }
     var bottomSheetState by rememberSaveable { mutableStateOf<BottomSheetState>(BottomSheetState.Hidden) }
 
-    LocalSoftwareKeyboardController.current
 
     val video = state.video
     val controller = remember { YouTubePlayerController() }

@@ -3,6 +3,7 @@ package com.hai265.timestamper.ui.screens.youtubeplayer
 import android.app.Activity
 import android.content.Context
 import android.content.ContextWrapper
+import android.content.pm.ActivityInfo
 import android.os.Bundle
 import android.view.View
 import android.view.ViewGroup
@@ -19,6 +20,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.viewinterop.AndroidView
+import androidx.core.view.WindowCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.YouTubePlayer
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.listeners.AbstractYouTubePlayerListener
@@ -60,7 +64,6 @@ fun ComposeYouTubePlayer(
                     .ivLoadPolicy(3)
                     .build()
 
-                //TODO: Fix video not starting at starting time
                 val listener = object : AbstractYouTubePlayerListener() {
                     override fun onReady(player: YouTubePlayer) {
                         controller.player = player
@@ -80,6 +83,9 @@ fun ComposeYouTubePlayer(
                 initialize(listener, options)
 
                 addFullscreenListener(object : FullscreenListener {
+                    val windowInsetsController =
+                        activity?.window?.let { WindowCompat.getInsetsController(it, it.decorView) }
+
                     override fun onEnterFullscreen(
                         fullscreenView: View,
                         exitFullscreen: () -> Unit
@@ -93,12 +99,18 @@ fun ComposeYouTubePlayer(
                             )
                         )
                         fullScreenView = fullscreenView
+                        windowInsetsController?.systemBarsBehavior =
+                            WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+                        windowInsetsController?.hide(WindowInsetsCompat.Type.systemBars())
+                        activity?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
                     }
 
                     override fun onExitFullscreen() {
                         val decor = activity?.window?.decorView as? ViewGroup ?: return
                         fullScreenView?.let { decor.removeView(it) }
                         fullScreenView = null
+                        windowInsetsController?.show(WindowInsetsCompat.Type.systemBars())
+                        activity?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
                     }
                 })
 
