@@ -1,8 +1,6 @@
 package com.hai265.timestamper.ui.screens.list
 
-import android.content.ContentResolver
 import android.net.Uri
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.hai265.timestamper.data.database.Video
@@ -10,8 +8,8 @@ import com.hai265.timestamper.data.getYouTubeId
 import com.hai265.timestamper.data.repos.TimestampRepository
 import com.hai265.timestamper.data.repos.VideoRepository
 import com.hai265.timestamper.data.repos.VideoResult
-import com.hai265.timestamper.domain.TimestampsToYamlStringUseCase
-import com.hai265.timestamper.domain.YamlToTimestampsUseCase
+import com.hai265.timestamper.domain.ExportTimestampsToFileUseCase
+import com.hai265.timestamper.domain.ImportTimestampsFromFileUseCase
 import com.hai265.timestamper.ui.screens.editor.formatDurationToHHMMSS
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
@@ -31,9 +29,9 @@ data class ListScreenState(
 @HiltViewModel
 class VideoListScreenViewModel @Inject constructor(
     private val repo: VideoRepository,
-    private val timestampsToYamlStringUseCase: TimestampsToYamlStringUseCase,
-    private val yamlToTimestampsUseCase: YamlToTimestampsUseCase,
     private val timestampRepo: TimestampRepository,
+    private val importTimestampsFromFileUseCase: ImportTimestampsFromFileUseCase,
+    private val exportTimestampsToFileUseCase: ExportTimestampsToFileUseCase,
 ) : ViewModel() {
 
     val state = repo.getVideos()
@@ -58,24 +56,16 @@ class VideoListScreenViewModel @Inject constructor(
             repo.deleteVideo(video)
         }
 
-    fun exportVideo(videoId: String, uri: Uri, contentResolver: ContentResolver) {
+    fun exportVideo(videoId: String, uri: Uri) {
         viewModelScope.launch {
-            val content = timestampsToYamlStringUseCase.invoke(videoId)
-            contentResolver.openOutputStream(uri)?.use { writer ->
-                writer.write(content.toByteArray())
-            }
+            exportTimestampsToFileUseCase.invoke(videoId, uri)
         }
         return
     }
 
-    fun importTimestamps(uri: Uri, contentResolver: ContentResolver) {
+    fun importTimestamps(uri: Uri) {
         viewModelScope.launch {
-            //Android doesn't seem to support yaml types
-            Log.d(TAG, "import type: ${contentResolver.getType(uri)}")
-            contentResolver.openInputStream(uri)?.use { inputStream ->
-                val content = inputStream.bufferedReader().use { it.readText() }
-                yamlToTimestampsUseCase.invoke(content)
-            }
+            importTimestampsFromFileUseCase.invoke(uri)
         }
     }
 

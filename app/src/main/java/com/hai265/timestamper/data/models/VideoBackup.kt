@@ -1,6 +1,8 @@
 package com.hai265.timestamper.data.models
 
+import com.hai265.timestamper.data.database.Timestamp
 import kotlinx.serialization.Serializable
+import kotlin.time.ExperimentalTime
 
 data class VideoInfo(
     val videoId: String,
@@ -9,7 +11,7 @@ data class VideoInfo(
 )
 
 @Serializable
-data class YoutubeYaml(
+data class VideoBackup(
     val info: Info,
     val tags: List<Tag>
 ) {
@@ -30,3 +32,12 @@ data class Tag(
     val id: String,
     val seconds: Double,
 )
+
+@OptIn(ExperimentalTime::class)
+fun Timestamp.toTag(): Tag {
+    return Tag(
+        description = this.description,
+        id = this.id.toString(),
+        seconds = this.time.inWholeSeconds.toDouble()
+    )
+}

@@ -1,7 +1,9 @@
 package com.hai265.timestamper.domain
 
+import android.content.ContentResolver
+import android.net.Uri
 import com.hai265.timestamper.data.database.Timestamp
-import com.hai265.timestamper.data.models.YoutubeYaml
+import com.hai265.timestamper.data.models.VideoBackup
 import com.hai265.timestamper.data.repos.TimestampRepository
 import com.hai265.timestamper.data.repos.VideoRepository
 import com.hai265.timestamper.data.repos.VideoResult
@@ -9,12 +11,19 @@ import net.mamoe.yamlkt.Yaml
 import javax.inject.Inject
 import kotlin.time.Duration.Companion.seconds
 
-class YamlToTimestampsUseCase @Inject constructor(
-    private val timestampRepo: TimestampRepository,
-    private val videoRepository: VideoRepository,
+class ImportTimestampsFromFileUseCase @Inject constructor(
+    val timestampRepo: TimestampRepository,
+    val videoRepository: VideoRepository,
+    val contentResolver: ContentResolver,
 ) {
-    suspend operator fun invoke(yaml: String) {
-        val yaml = Yaml().decodeFromString(YoutubeYaml.serializer(), yaml)
+    suspend fun invoke(uri: Uri) {
+        contentResolver.openInputStream(uri)?.use { inputStream ->
+            inputStream.bufferedReader().use { import(it.readText()) }
+        }
+    }
+
+    private suspend fun import(yamlString: String) {
+        val yaml = Yaml().decodeFromString(VideoBackup.serializer(), yamlString)
 
         if (videoRepository.addVideo(yaml.info.videoId) != VideoResult.Success) //TODO: Handle error states
         {
@@ -31,3 +40,4 @@ class YamlToTimestampsUseCase @Inject constructor(
         timestampRepo.addTimestamps(timestamps)
     }
 }
+

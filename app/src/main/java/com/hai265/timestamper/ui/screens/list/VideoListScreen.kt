@@ -122,7 +122,6 @@ fun VideoListScreen(onTapVideo: (id: String) -> Unit, windowSize: WindowWidthSiz
                 viewmodel.exportVideo(
                     video.videoId,
                     uri,
-                    context.contentResolver
                 )
             },
             onTapShareVideo = { video ->
@@ -153,7 +152,7 @@ fun VideoListScreen(onTapVideo: (id: String) -> Unit, windowSize: WindowWidthSiz
                 }
             },
             onImport = { uri ->
-                viewmodel.importTimestamps(uri, context.contentResolver)
+                viewmodel.importTimestamps(uri)
                 addVideoDialog = false
             },
         )
