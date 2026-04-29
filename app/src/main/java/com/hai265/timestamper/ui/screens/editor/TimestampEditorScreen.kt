@@ -1,7 +1,9 @@
 package com.hai265.timestamper.ui.screens.editor
 
+import android.content.res.Configuration
 import android.os.Parcelable
 import android.view.ViewTreeObserver
+import androidx.activity.compose.LocalActivity
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.tween
@@ -64,6 +66,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.res.painterResource
@@ -75,7 +78,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.core.view.ViewCompat
+import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.WindowInsetsControllerCompat
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.hai265.timestamper.R
 import com.hai265.timestamper.data.database.Timestamp
@@ -106,11 +111,13 @@ fun TimestampEditorScreen(windowSize: WindowWidthSizeClass) {
     var showSettingsDialog by rememberSaveable { mutableStateOf(false) }
     var bottomSheetState by rememberSaveable { mutableStateOf<BottomSheetState>(BottomSheetState.Hidden) }
 
-
     val video = state.video
     val controller = remember { YouTubePlayerController() }
     val sheetState = rememberModalBottomSheetState()
 
+    val configuration = LocalConfiguration.current
+    val activity = LocalActivity.current
+    val isPortrait = configuration.orientation == Configuration.ORIENTATION_PORTRAIT
     val videoPlayer = remember(video) {
         movableContentOf {
             if (video != null) {
@@ -207,6 +214,23 @@ fun TimestampEditorScreen(windowSize: WindowWidthSizeClass) {
                 sheetState = sheetState,
                 timestamp = timestamp,
             )
+        }
+    }
+    val insetsController = remember {
+        activity?.window?.let {
+            WindowCompat.getInsetsController(it, it.decorView)
+        }
+    }
+
+    when (configuration.orientation) {
+        Configuration.ORIENTATION_LANDSCAPE -> {
+            insetsController?.systemBarsBehavior =
+                WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+            insetsController?.hide(WindowInsetsCompat.Type.systemBars())
+        }
+
+        else -> {
+            insetsController?.show(WindowInsetsCompat.Type.systemBars())
         }
     }
 }
