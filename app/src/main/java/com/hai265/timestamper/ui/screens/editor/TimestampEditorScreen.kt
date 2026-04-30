@@ -1,5 +1,6 @@
 package com.hai265.timestamper.ui.screens.editor
 
+import android.content.pm.ActivityInfo
 import android.content.res.Configuration
 import android.os.Parcelable
 import android.view.ViewTreeObserver
@@ -117,15 +118,25 @@ fun TimestampEditorScreen(windowSize: WindowWidthSizeClass) {
 
     val configuration = LocalConfiguration.current
     val activity = LocalActivity.current
-    val isPortrait = configuration.orientation == Configuration.ORIENTATION_PORTRAIT
+    val insetsController = remember {
+        activity?.window?.let {
+            WindowCompat.getInsetsController(it, it.decorView)
+        }
+    }
     val videoPlayer = remember(video) {
         movableContentOf {
-            if (video != null) {
+            video?.let {
                 ComposeYouTubePlayer(
                     videoId = video.videoId,
                     onCurrentTime = viewmodel::updateCurrentTime,
                     controller = controller,
                     startingTime = video.lastPlayed,
+                    onFullScreen = {
+                        activity?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
+                    },
+                    onExitFullScreen = {
+                        activity?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
+                    },
                 )
             }
         }
@@ -214,11 +225,6 @@ fun TimestampEditorScreen(windowSize: WindowWidthSizeClass) {
                 sheetState = sheetState,
                 timestamp = timestamp,
             )
-        }
-    }
-    val insetsController = remember {
-        activity?.window?.let {
-            WindowCompat.getInsetsController(it, it.decorView)
         }
     }
 

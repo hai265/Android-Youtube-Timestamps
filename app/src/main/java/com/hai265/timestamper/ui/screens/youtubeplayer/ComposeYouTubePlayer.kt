@@ -3,7 +3,6 @@ package com.hai265.timestamper.ui.screens.youtubeplayer
 import android.app.Activity
 import android.content.Context
 import android.content.ContextWrapper
-import android.content.pm.ActivityInfo
 import android.os.Bundle
 import android.view.View
 import android.view.ViewGroup
@@ -20,9 +19,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.viewinterop.AndroidView
-import androidx.core.view.WindowCompat
-import androidx.core.view.WindowInsetsCompat
-import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.YouTubePlayer
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.listeners.AbstractYouTubePlayerListener
@@ -34,12 +30,16 @@ import kotlin.time.Duration
 import kotlin.time.DurationUnit
 import kotlin.time.toDuration
 
+//I really  don't want to use android:configChanges="orientation"
+//Need a way to save the player on rotation
 @Composable
 fun ComposeYouTubePlayer(
     videoId: String,
     onCurrentTime: (duration: Duration) -> Unit,
     controller: YouTubePlayerController,
     startingTime: Duration,
+    onFullScreen: () -> Unit,
+    onExitFullScreen: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val context = LocalContext.current
@@ -83,9 +83,6 @@ fun ComposeYouTubePlayer(
                 initialize(listener, options)
 
                 addFullscreenListener(object : FullscreenListener {
-                    val windowInsetsController =
-                        activity?.window?.let { WindowCompat.getInsetsController(it, it.decorView) }
-
                     override fun onEnterFullscreen(
                         fullscreenView: View,
                         exitFullscreen: () -> Unit
@@ -99,18 +96,14 @@ fun ComposeYouTubePlayer(
                             )
                         )
                         fullScreenView = fullscreenView
-                        windowInsetsController?.systemBarsBehavior =
-                            WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
-                        windowInsetsController?.hide(WindowInsetsCompat.Type.systemBars())
-                        activity?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
+                        onFullScreen()
                     }
 
                     override fun onExitFullscreen() {
                         val decor = activity?.window?.decorView as? ViewGroup ?: return
                         fullScreenView?.let { decor.removeView(it) }
                         fullScreenView = null
-                        windowInsetsController?.show(WindowInsetsCompat.Type.systemBars())
-                        activity?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
+                        onExitFullScreen()
                     }
                 })
 
@@ -143,7 +136,9 @@ class ComposeExampleActivity : ComponentActivity() {
                     videoId = videoId,
                     onCurrentTime = {},
                     controller = YouTubePlayerController(),
-                    startingTime = Duration.ZERO
+                    startingTime = Duration.ZERO,
+                    onFullScreen = {},
+                    onExitFullScreen = {},
                 )
 
             }
@@ -159,7 +154,9 @@ fun ComposeYoutubePlayerPreview() {
             videoId = "tQDO-uVCl40",
             onCurrentTime = {},
             controller = YouTubePlayerController(),
-            startingTime = 120.toDuration(DurationUnit.SECONDS)
+            startingTime = 120.toDuration(DurationUnit.SECONDS),
+            onFullScreen = {},
+            onExitFullScreen = {},
         )
     }
 }
