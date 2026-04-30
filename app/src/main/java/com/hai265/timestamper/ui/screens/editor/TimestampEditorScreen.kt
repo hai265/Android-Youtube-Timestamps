@@ -13,6 +13,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
@@ -76,6 +77,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.core.view.ViewCompat
@@ -267,7 +269,7 @@ fun TimestampList(
             }
         }
     }
-    LazyColumn(state = listState, modifier = modifier) {
+    LazyColumn(state = listState, modifier = modifier, contentPadding = PaddingValues(bottom = 88.dp)) {
         item {
             Box(modifier = Modifier.fillMaxWidth()) {
                 Row(
