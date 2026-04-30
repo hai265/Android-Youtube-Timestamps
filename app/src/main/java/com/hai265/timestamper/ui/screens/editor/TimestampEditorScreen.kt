@@ -174,16 +174,20 @@ fun TimestampEditorScreen(windowSize: WindowWidthSizeClass) {
                 )
             }
             if (windowSize == WindowWidthSizeClass.Medium || windowSize == WindowWidthSizeClass.Expanded) {
-                Row {
+                Row(verticalAlignment = Alignment.CenterVertically) {
                     Box(
                         modifier = Modifier
                             .weight(0.7f)
                             .windowInsetsPadding(WindowInsets(0))
+                            .fillMaxSize()
+                            .background(Color.Black),
+                        contentAlignment = Alignment.Center
 
                     ) { videoPlayer() }
                     Box(
                         modifier = Modifier
                             .weight(0.3f)
+                            .fillMaxSize()
                     ) { timestampsList(true) }
                 }
             } else {
