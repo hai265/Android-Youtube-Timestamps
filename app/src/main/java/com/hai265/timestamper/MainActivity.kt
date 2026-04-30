@@ -5,11 +5,8 @@ import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.Surface
 import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
 import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
-import androidx.compose.ui.Modifier
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.lifecycleScope
 import com.hai265.timestamper.ui.App
@@ -33,12 +30,8 @@ class MainActivity : FragmentActivity() {
 
         setContent {
             AppTheme {
-                Surface(
-                    modifier = Modifier.fillMaxSize(),
-                ) {
-                    val windowSize = calculateWindowSizeClass(this)
-                    App(windowSize.widthSizeClass)
-                }
+                val windowSize = calculateWindowSizeClass(this)
+                App(windowSize.widthSizeClass)
             }
         }
     }

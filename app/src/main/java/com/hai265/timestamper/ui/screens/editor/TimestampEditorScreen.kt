@@ -188,6 +188,7 @@ fun TimestampEditorScreen(windowSize: WindowWidthSizeClass) {
                         modifier = Modifier
                             .weight(0.3f)
                             .fillMaxSize()
+                            .padding(top = 4.dp, bottom = 4.dp)
                     ) { timestampsList(true) }
                 }
             } else {
