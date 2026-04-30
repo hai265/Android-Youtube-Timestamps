@@ -96,7 +96,7 @@ fun VideoListScreen(onTapVideo: (id: String) -> Unit, windowSize: WindowWidthSiz
         }
 
         WindowWidthSizeClass.Expanded -> {
-            3
+            3 //TODO: Fix grid size uneven when 3
         }
 
         else -> {
@@ -136,9 +136,7 @@ fun VideoListScreen(onTapVideo: (id: String) -> Unit, windowSize: WindowWidthSiz
             },
             listState = listState,
             gridNumCells = gridNumCells,
-            modifier = Modifier.padding(
-                bottom = innerPadding.calculateBottomPadding(),
-            )
+            paddingValues = innerPadding,
         )
     }
 
@@ -184,6 +182,7 @@ private fun VideoListScreen(
     onTapShareVideo: (video: Video) -> Unit,
     listState: LazyGridState,
     gridNumCells: Int,
+    paddingValues: PaddingValues,
     modifier: Modifier = Modifier
 ) {
     if (videoList.isEmpty()) {
@@ -204,7 +203,8 @@ private fun VideoListScreen(
             horizontalArrangement = Arrangement.spacedBy(16.dp),
             verticalArrangement = Arrangement.spacedBy(4.dp),
             contentPadding = PaddingValues(
-                bottom = 80.dp
+                top = paddingValues.calculateTopPadding(),
+                bottom = paddingValues.calculateBottomPadding() + 88.dp,
             )
         ) {
             items(videoList) { video ->
@@ -446,6 +446,7 @@ private fun VideoListPreview() {
         listState = LazyGridState(),
         gridNumCells = 1,
         onExportVideo = { _, _ -> },
+        paddingValues = PaddingValues.Zero,
         onTapShareVideo = {}
     )
 }

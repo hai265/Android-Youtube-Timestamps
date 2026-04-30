@@ -10,10 +10,6 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Surface
 import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -40,15 +36,7 @@ fun App(
     windowSize: WindowWidthSizeClass,
     navController: NavHostController = rememberNavController()
 ) {
-    Scaffold { innerPadding ->
-        Surface(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(innerPadding)
-        ) {
-            NavGraph(navController, windowSize)
-        }
-    }
+    NavGraph(navController, windowSize)
 }
 
 //TODO: Introduct multiple back stacks for the character list and support list
