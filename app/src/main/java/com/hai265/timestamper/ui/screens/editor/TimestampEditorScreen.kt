@@ -65,6 +65,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.MotionDurationScale
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
@@ -87,6 +88,7 @@ import androidx.core.view.WindowInsetsControllerCompat
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.hai265.timestamper.R
 import com.hai265.timestamper.data.database.Timestamp
+import com.hai265.timestamper.ui.components.BottomSheet
 import com.hai265.timestamper.ui.fakes.fakeTimestamp1
 import com.hai265.timestamper.ui.fakes.fakeTimestampList
 import com.hai265.timestamper.ui.screens.youtubeplayer.ComposeYouTubePlayer
@@ -457,29 +459,30 @@ fun TimestampEditorSheet(
     onSave: (Timestamp) -> Unit,
     sheetState: SheetState,
 ) {
-    val scope = rememberCoroutineScope()
-    val focusRequester = remember { FocusRequester() }
-
-    val hideSheet = {
-        scope.launch { sheetState.hide() }.invokeOnCompletion {
-            if (!sheetState.isVisible) {
-                onDismiss()
-            }
-        }
-    }
-    val textFieldState = rememberTextFieldState(initialText = timestamp.description)
-
-    LaunchedEffect(Unit) {
-        focusRequester.requestFocus()
-    }
-
-    ModalBottomSheet(
-        onDismissRequest = onDismiss,
-        sheetState = sheetState,
-        dragHandle = {},
-    ) {
-        TimestampEditorSheetColumn(timestamp, textFieldState, focusRequester, onSave, hideSheet)
-    }
+    BottomSheet()
+//    val scope = rememberCoroutineScope()
+//    val focusRequester = remember { FocusRequester() }
+//
+//    val hideSheet = {
+//        scope.launch { sheetState.hide() }.invokeOnCompletion {
+//            if (!sheetState.isVisible) {
+//                onDismiss()
+//            }
+//        }
+//    }
+//    val textFieldState = rememberTextFieldState(initialText = timestamp.description)
+//
+//    LaunchedEffect(Unit) {
+//        focusRequester.requestFocus()
+//    }
+//
+//    ModalBottomSheet(
+//        onDismissRequest = onDismiss,
+//        sheetState = sheetState,
+//        dragHandle = {},
+//    ) {
+//        TimestampEditorSheetColumn(timestamp, textFieldState, focusRequester, onSave, hideSheet)
+//    }
 }
 
 @Composable

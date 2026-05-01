@@ -82,6 +82,7 @@ dependencies {
     implementation(libs.androidx.datastore.preferences)
     implementation(libs.logging.interceptor)
     implementation(libs.yamlkt)
+    implementation(libs.material)
 
     implementation(libs.kotlinx.io.core)
     androidTestImplementation(libs.androidx.junit)
