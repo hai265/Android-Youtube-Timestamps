@@ -7,7 +7,8 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.hai265.timestamper.data.database.AppDatabase
 import com.hai265.timestamper.data.repos.TimestampRepository
 import com.hai265.timestamper.data.repos.VideoRepository
-import com.hai265.timestamper.domain.TimestampsToYamlStringUseCase
+import com.hai265.timestamper.domain.ExportTimestampsToFileUseCase
+import com.hai265.timestamper.domain.ImportTimestampsFromFileUseCase
 import com.hai265.timestamper.ui.screens.list.VideoListScreenViewModel
 import org.junit.After
 import org.junit.Before
@@ -38,7 +39,17 @@ class VideoListScreenViewModelTest {
         )
         subject = VideoListScreenViewModel(
             videoRepository,
-            TimestampsToYamlStringUseCase(timestampRepository, videoRepository)
+            timestampRepository,
+            ImportTimestampsFromFileUseCase(
+                timestampRepository,
+                videoRepository,
+                context.contentResolver
+            ),
+            ExportTimestampsToFileUseCase(
+                timestampRepository,
+                videoRepository,
+                context.contentResolver
+            ),
         )
     }
 
