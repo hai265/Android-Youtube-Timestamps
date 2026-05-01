@@ -22,6 +22,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -176,19 +177,31 @@ fun TimestampEditorScreen(windowSize: WindowWidthSizeClass) {
         if (windowSize == WindowWidthSizeClass.Medium || windowSize == WindowWidthSizeClass.Expanded) {
             val layoutDirection = LocalLayoutDirection.current
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Box(
+                Row(
                     modifier = Modifier
                         .background(Color.Black)
                         .weight(0.7f)
-                        .padding(start = innerPadding.calculateLeftPadding(layoutDirection))
                         .fillMaxSize(),
-                    contentAlignment = Alignment.Center
-                ) { videoPlayer() }
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Spacer(
+                        modifier = Modifier.width(
+                            innerPadding.calculateLeftPadding(
+                                layoutDirection
+                            )
+                        )
+                    )
+                    videoPlayer()
+                }
                 Box(
                     modifier = Modifier
                         .weight(0.3f)
                         .fillMaxSize()
-                        .padding(top = 4.dp, bottom = 4.dp, end = innerPadding.calculateEndPadding(layoutDirection))
+                        .padding(
+                            top = 4.dp,
+                            bottom = 4.dp,
+                            end = innerPadding.calculateEndPadding(layoutDirection)
+                        )
                 ) { timestampsList(true) }
             }
         } else {
@@ -200,6 +213,7 @@ fun TimestampEditorScreen(windowSize: WindowWidthSizeClass) {
                 Box(
                     modifier = Modifier
                         .background(Color.Black)
+                        .fillMaxWidth()
                         .padding(top = innerPadding.calculateTopPadding())
                 ) {
                     videoPlayer()
