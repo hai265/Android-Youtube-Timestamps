@@ -77,7 +77,6 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.core.view.ViewCompat
@@ -161,47 +160,51 @@ fun TimestampEditorScreen(windowSize: WindowWidthSizeClass) {
         },
         floatingActionButtonPosition = FabPosition.End,
     ) { innerPadding ->
-        if (video != null) {
-            val timestampsList: @Composable (Boolean) -> Unit = { textSingleLine ->
-                TimestampList(
-                    timestamps = state.timestamps,
-                    onDelete = viewmodel::deleteTimestamp,
-                    onTimestampClick = { duration -> controller.seekTo(duration) },
-                    onDescriptionClick = {
-                        bottomSheetState = BottomSheetState.EditTimestamp(it)
-                    },
-                    highlightedId = state.newlyAddedTimestampId,
-                    textSingleLine = textSingleLine,
-                    onCLickSettings = { showSettingsDialog = true }
-                )
-            }
-            if (windowSize == WindowWidthSizeClass.Medium || windowSize == WindowWidthSizeClass.Expanded) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Box(
-                        modifier = Modifier
-                            .weight(0.7f)
-                            .windowInsetsPadding(WindowInsets(0))
-                            .fillMaxSize()
-                            .background(Color.Black),
-                        contentAlignment = Alignment.Center
-
-                    ) { videoPlayer() }
-                    Box(
-                        modifier = Modifier
-                            .weight(0.3f)
-                            .fillMaxSize()
-                            .padding(top = 4.dp, bottom = 4.dp)
-                    ) { timestampsList(true) }
-                }
-            } else {
-                Column(
+        val timestampsList: @Composable (Boolean) -> Unit = { textSingleLine ->
+            TimestampList(
+                timestamps = state.timestamps,
+                onDelete = viewmodel::deleteTimestamp,
+                onTimestampClick = { duration -> controller.seekTo(duration) },
+                onDescriptionClick = {
+                    bottomSheetState = BottomSheetState.EditTimestamp(it)
+                },
+                highlightedId = state.newlyAddedTimestampId,
+                textSingleLine = textSingleLine,
+                onCLickSettings = { showSettingsDialog = true }
+            )
+        }
+        if (windowSize == WindowWidthSizeClass.Medium || windowSize == WindowWidthSizeClass.Expanded) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Box(
                     modifier = Modifier
-                        .padding(bottom = innerPadding.calculateBottomPadding())
+                        .weight(0.7f)
+                        .windowInsetsPadding(WindowInsets(0))
                         .fillMaxSize()
+                        .background(Color.Black),
+                    contentAlignment = Alignment.Center
+
+                ) { videoPlayer() }
+                Box(
+                    modifier = Modifier
+                        .weight(0.3f)
+                        .fillMaxSize()
+                        .padding(top = 4.dp, bottom = 4.dp)
+                ) { timestampsList(true) }
+            }
+        } else {
+            Column(
+                modifier = Modifier
+                    .padding(bottom = innerPadding.calculateBottomPadding())
+                    .fillMaxSize()
+            ) {
+                Box(
+                    modifier = Modifier
+                        .background(Color.Black)
+                        .padding(top = innerPadding.calculateTopPadding())
                 ) {
                     videoPlayer()
-                    timestampsList(false)
                 }
+                timestampsList(false)
             }
         }
     }
@@ -244,6 +247,12 @@ fun TimestampEditorScreen(windowSize: WindowWidthSizeClass) {
 
         else -> {
             insetsController?.show(WindowInsetsCompat.Type.systemBars())
+            insetsController?.isAppearanceLightStatusBars = false
+        }
+    }
+    DisposableEffect(Unit) {
+        onDispose {
+            insetsController?.isAppearanceLightStatusBars = true
         }
     }
 }
@@ -269,7 +278,11 @@ fun TimestampList(
             }
         }
     }
-    LazyColumn(state = listState, modifier = modifier, contentPadding = PaddingValues(bottom = 88.dp)) {
+    LazyColumn(
+        state = listState,
+        modifier = modifier,
+        contentPadding = PaddingValues(bottom = 88.dp)
+    ) {
         item {
             Box(modifier = Modifier.fillMaxWidth()) {
                 Row(
