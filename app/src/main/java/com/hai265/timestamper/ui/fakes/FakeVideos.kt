@@ -11,7 +11,7 @@ val fakeVideo1 = Video(
     videoId = "tQDO-uVCl40",
     videoTitle = "【みんなのGOLF WORLD】メジロ家のパーマー、ライアン、アルダン、ブライトの4人でゲーム実況だ！【前編】",
     thumbnail = "https://img.youtube.com/vi/tQDO-uVCl40/maxresdefault.jpg",
-    lastEdited = Instant.ZERO,
+    lastEdited = Instant.fromEpochSeconds(1777855059),
     lastPlayed = Duration.ZERO,
 )
 

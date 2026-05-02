@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -68,6 +69,14 @@ import com.hai265.timestamper.ui.fakes.fakeVideo1
 import com.hai265.timestamper.ui.fakes.fakeVideoList
 import com.hai265.timestamper.ui.handleVideoResult
 import kotlinx.coroutines.launch
+import kotlinx.datetime.LocalDateTime
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.format.MonthNames
+import kotlinx.datetime.format.Padding
+import kotlinx.datetime.format.char
+import kotlinx.datetime.toLocalDateTime
+import kotlin.time.Clock
+import kotlin.time.Instant
 
 //https://www.figma.com/design/9GKdOD5q3yAT0mKgrcGmpf/Android-Youtube-Timestamp-Tool?node-id=1-5026&t=xjloAEfEmnkGJuPR-0
 //TODO: Duplicate file number append to extention e.g name.yaml(1) instead of name(1).yaml
@@ -261,11 +270,18 @@ private fun VideoItem(
                 .fillMaxWidth()
                 .padding(8.dp),
         ) {
-            Text(
-                video.videoTitle ?: "Video ID: ${video.videoId}",
-                style = MaterialTheme.typography.titleMedium,
-                modifier = Modifier.weight(1f)
-            )
+            val timezoneId = android.icu.util.TimeZone.getDefault().id
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    video.videoTitle ?: "Video ID: ${video.videoId}",
+                    style = MaterialTheme.typography.titleMedium,
+                )
+                Text(
+                    "Last Edited: ${video.lastEdited.toFormattedString(timezoneId)}",
+                    style = MaterialTheme.typography.bodySmall
+                )
+            }
+
             VideoDropdownMenu(
                 onTapDeleteVideo = onTapDeleteVideo,
                 onShareTimestamps = onTapShareVideo,
@@ -275,6 +291,37 @@ private fun VideoItem(
             )
         }
     }
+}
+
+private fun Instant.toFormattedString(
+    timezoneId: String?,
+): String {
+    val timezone = timezoneId ?: TimeZone.UTC.id
+    val localDateTime = this.toLocalDateTime(TimeZone.of(timezone))
+    val currentTime = Clock.System.now().toLocalDateTime(TimeZone.of(timezone))
+    val format = if (localDateTime.day != currentTime.day) {
+        DATE_FORMAT
+    } else {
+        TIME_FORMAT
+    }
+    return format.format(localDateTime)
+}
+
+private val DATE_FORMAT = LocalDateTime.Format {
+    monthName(MonthNames.ENGLISH_ABBREVIATED)
+    char(' ')
+    day()
+    char(',')
+    char(' ')
+    year()
+}
+
+private val TIME_FORMAT = LocalDateTime.Format {
+    amPmHour(Padding.ZERO)
+    char(':')
+    minute()
+    char(' ')
+    amPmMarker("AM", "PM")
 }
 
 @Composable

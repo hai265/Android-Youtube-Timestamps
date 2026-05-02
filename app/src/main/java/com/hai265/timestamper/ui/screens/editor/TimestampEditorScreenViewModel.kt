@@ -10,6 +10,7 @@ import com.hai265.timestamper.data.database.Video
 import com.hai265.timestamper.data.repos.PreferencesRepository
 import com.hai265.timestamper.data.repos.TimestampRepository
 import com.hai265.timestamper.data.repos.VideoRepository
+import com.hai265.timestamper.domain.UpsertTimestampUseCase
 import com.hai265.timestamper.ui.Navigables
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.FlowPreview
@@ -45,6 +46,7 @@ class TimestampEditorViewModel @Inject constructor(
     private val videoRepo: VideoRepository,
     private val timestampRepo: TimestampRepository,
     private val preferencesRepository: PreferencesRepository,
+    private val upsertTimestampUseCase: UpsertTimestampUseCase,
 ) : ViewModel() {
     private val videoId = savedStateHandle.toRoute<Navigables.VideoScreen>().id
 
@@ -58,7 +60,7 @@ class TimestampEditorViewModel @Inject constructor(
                 .filterNotNull()
                 .debounce(500)
                 .collect { (timestamp, description) ->
-                    timestampRepo.addOrUpdateTimestamp(timestamp.copy(description = description))
+                    upsertTimestampUseCase.invoke(timestamp.copy(description = description))
                 }
 
         }
@@ -117,8 +119,8 @@ class TimestampEditorViewModel @Inject constructor(
 
     fun upsertTimestamp(timestamp: Timestamp) {
         viewModelScope.launch {
-            videoRepo.updateLastEdited(timestamp.videoId)
-            _newlyAddedTimestampId.value = timestampRepo.addOrUpdateTimestamp(timestamp)
+            val addedTimestampId = upsertTimestampUseCase.invoke(timestamp)
+            _newlyAddedTimestampId.value = addedTimestampId
             delay(1000)
             _newlyAddedTimestampId.value = null
         }
