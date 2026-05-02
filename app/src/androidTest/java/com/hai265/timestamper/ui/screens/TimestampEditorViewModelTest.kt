@@ -6,6 +6,7 @@ import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import app.cash.turbine.test
+import com.hai265.timestamper.common.ZERO
 import com.hai265.timestamper.data.database.AppDatabase
 import com.hai265.timestamper.data.database.Timestamp
 import com.hai265.timestamper.data.database.Video
@@ -26,6 +27,7 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Instant
 
 @RunWith(AndroidJUnit4::class)
 class TimestampEditorViewModelTest {
@@ -36,16 +38,16 @@ class TimestampEditorViewModelTest {
     private lateinit var preferencesRepo: PreferencesRepository
     private lateinit var savedStateHandle: SavedStateHandle
 
-    private lateinit var viewModel: TimestampEditorViewModel
+    private lateinit var subject: TimestampEditorViewModel
 
     private lateinit var db: AppDatabase
 
-    private val videoId = "test_video_id"
+    private val videoId = "videoId"
     private val testVideo = Video(
         videoId = videoId,
         videoTitle = "Test Video",
         thumbnail = "thumb",
-        lastEdited = 0.milliseconds,
+        lastEdited = Instant.ZERO,
         lastPlayed = 0.milliseconds
     )
     private val testTimestamps = listOf(
@@ -66,7 +68,7 @@ class TimestampEditorViewModelTest {
         timestampRepo = TimestampRepository(db.timestampDao())
         preferencesRepo = PreferencesRepository(context.dataStore)
         savedStateHandle = SavedStateHandle(mapOf("id" to videoId))
-        viewModel = TimestampEditorViewModel(
+        subject = TimestampEditorViewModel(
             savedStateHandle = savedStateHandle,
             videoRepo = videoRepo,
             timestampRepo = timestampRepo,
@@ -82,7 +84,7 @@ class TimestampEditorViewModelTest {
     @OptIn(ExperimentalCoroutinesApi::class)
     @Test
     fun init_test() = runTest {
-        viewModel.state.test {
+        subject.state.test {
             assertEquals(TimestampEditorState(), awaitItem())
         }
     }
@@ -90,7 +92,7 @@ class TimestampEditorViewModelTest {
 
 class FakeYoutubeMetadata : YoutubeMetadataApiService {
     override suspend fun getYoutubeMetadata(videoUrl: String): YoutubeMetadata {
-        TODO("Not yet implemented")
+        return YoutubeMetadata(title = "Title", thumbnail = "thumbnail")
     }
 
 }

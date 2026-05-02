@@ -35,8 +35,8 @@ class VideoListScreenViewModel @Inject constructor(
 ) : ViewModel() {
 
     val state = repo.getVideos()
-        .map {
-            ListScreenState(videos = it, syncing = false)
+        .map { videos ->
+            ListScreenState(videos = videos.sortedByDescending { it.lastEdited }, syncing = false)
         }
         .stateIn(
             scope = viewModelScope,

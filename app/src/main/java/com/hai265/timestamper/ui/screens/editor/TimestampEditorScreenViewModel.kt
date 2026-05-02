@@ -117,6 +117,7 @@ class TimestampEditorViewModel @Inject constructor(
 
     fun upsertTimestamp(timestamp: Timestamp) {
         viewModelScope.launch {
+            videoRepo.updateLastEdited(timestamp.videoId)
             _newlyAddedTimestampId.value = timestampRepo.addOrUpdateTimestamp(timestamp)
             delay(1000)
             _newlyAddedTimestampId.value = null

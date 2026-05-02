@@ -7,6 +7,7 @@ import androidx.room.Index
 import androidx.room.PrimaryKey
 import kotlinx.parcelize.Parcelize
 import kotlin.time.Duration
+import kotlin.time.Instant
 
 @Entity(tableName = "videos")
 data class Video(
@@ -14,7 +15,8 @@ data class Video(
     val videoId: String,
     val videoTitle: String?,
     val thumbnail: String,
-    val lastEdited: Duration,
+    val lastEdited: Instant,
+    //TODO: Rename to lastPlayedPosition
     val lastPlayed: Duration,
 )
 

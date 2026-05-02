@@ -6,6 +6,7 @@ import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Upsert
 import kotlinx.coroutines.flow.Flow
+import kotlin.time.Instant
 
 @Dao
 interface VideoDao {
@@ -23,6 +24,9 @@ interface VideoDao {
 
     @Delete
     fun deleteVideo(id: Video)
+
+    @Query("UPDATE videos SET lastEdited = :now WHERE videoId =:videoId")
+    fun updateLastEdited(videoId: String, now: Instant)
 }
 
 @Dao

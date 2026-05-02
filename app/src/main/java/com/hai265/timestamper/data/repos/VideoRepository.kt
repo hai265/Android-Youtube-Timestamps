@@ -12,6 +12,7 @@ import kotlinx.coroutines.withContext
 import retrofit2.HttpException
 import java.io.IOException
 import javax.inject.Inject
+import kotlin.time.Clock
 import kotlin.time.Duration
 
 sealed interface VideoResult {
@@ -54,7 +55,7 @@ class VideoRepository @Inject constructor(
                 videoId = videoId,
                 videoTitle = metadata.title,
                 thumbnail = getYoutubeThumbnail(videoId),
-                lastEdited = Duration.ZERO,
+                lastEdited = Clock.System.now(),
                 lastPlayed = Duration.ZERO,
             )
         )
@@ -78,6 +79,12 @@ class VideoRepository @Inject constructor(
 
     fun getVideoInfo(videoId: String): VideoInfo {
         TODO("Return videoInfo from youtube-api-v3")
+    }
+
+    suspend fun updateLastEdited(videoId: String) {
+        withContext(Dispatchers.IO) {
+            dao.updateLastEdited(videoId, Clock.System.now())
+        }
     }
 
 }

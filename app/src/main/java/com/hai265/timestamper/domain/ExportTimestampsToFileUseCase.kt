@@ -29,7 +29,7 @@ class ExportTimestampsToFileUseCase @Inject constructor(
 
         val videoBackup = VideoBackup(
             info = Info(
-                lastUpdated = video.lastEdited.inWholeMilliseconds,
+                lastUpdated = video.lastEdited.epochSeconds,
                 title = video.videoTitle ?: "",
                 videoId = videoId
             ),

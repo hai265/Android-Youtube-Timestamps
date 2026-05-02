@@ -6,9 +6,10 @@ import androidx.room.TypeConverter
 import androidx.room.TypeConverters
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Instant
 
 @Database(entities = [Video::class, Timestamp::class], version = 1, exportSchema = false)
-@TypeConverters(DurationConverter::class)
+@TypeConverters(DurationConverter::class, InstantConverter::class)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun videoDao(): VideoDao
 
@@ -25,5 +26,17 @@ class DurationConverter {
     @TypeConverter
     fun toDuration(value: Long?): Duration? {
         return value?.milliseconds
+    }
+}
+
+class InstantConverter {
+    @TypeConverter
+    fun fromInstant(instant: Instant?): Long? {
+        return instant?.epochSeconds
+    }
+
+    @TypeConverter
+    fun toInstant(value: Long?): Instant {
+        return Instant.fromEpochSeconds(value ?: 0L)
     }
 }
