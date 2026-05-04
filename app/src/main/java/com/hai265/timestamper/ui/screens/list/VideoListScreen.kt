@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -24,10 +23,12 @@ import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.FabPosition
 import androidx.compose.material3.Icon
@@ -37,6 +38,9 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
@@ -50,6 +54,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.SpanStyle
@@ -80,6 +85,7 @@ import kotlin.time.Instant
 
 //https://www.figma.com/design/9GKdOD5q3yAT0mKgrcGmpf/Android-Youtube-Timestamp-Tool?node-id=1-5026&t=xjloAEfEmnkGJuPR-0
 //TODO: Duplicate file number append to extention e.g name.yaml(1) instead of name(1).yaml
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun VideoListScreen(onTapVideo: (id: String) -> Unit, windowSize: WindowWidthSizeClass) {
     val viewmodel: VideoListScreenViewModel = hiltViewModel()
@@ -112,7 +118,53 @@ fun VideoListScreen(onTapVideo: (id: String) -> Unit, windowSize: WindowWidthSiz
             1
         }
     }
+    val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
+    val exportLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.CreateDocument("application/yaml")
+    ) { uri ->
+        uri?.let {
+            viewmodel.exportVideo(uri)
+            Toast.makeText(
+                context,
+                "Timestamps Successfully Exported",
+                Toast.LENGTH_LONG
+            ).show()
+        }
+    }
+    val importLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.OpenDocument()
+    ) { uri ->
+        uri?.let {
+            viewmodel.importTimestamps(uri)
+            //TODO: SUbscribe to mutable shared flow to launch toast
+            Toast.makeText(
+                context,
+                "Timestamps Successfully Imported",
+                Toast.LENGTH_LONG
+            ).show()
+        }
+    }
     Scaffold(
+        modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
+        topBar = {
+            TopAppBar(
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.background,
+                    scrolledContainerColor = MaterialTheme.colorScheme.background
+                ),
+                title = {
+                    Text("Videos")
+                },
+                actions = {
+                    MenuDropDown(onTapExportVideo = {
+                        exportLauncher.launch("timestamps-${Clock.System.now()}")
+                    }, onTapImportVideo = {
+                        importLauncher.launch(arrayOf("*/*"))
+                    })
+                },
+                scrollBehavior = scrollBehavior
+            )
+        },
         floatingActionButton = {
             ExtendedFloatingActionButton(
                 onClick = { addVideoDialog = true },
@@ -157,10 +209,6 @@ fun VideoListScreen(onTapVideo: (id: String) -> Unit, windowSize: WindowWidthSiz
                     val videoResult = viewmodel.addVideo(url)
                     handleVideoResult(context, videoResult, { addVideoDialog = false })
                 }
-            },
-            onImport = { uri ->
-                viewmodel.importTimestamps(uri)
-                addVideoDialog = false
             },
         )
     }
@@ -285,9 +333,6 @@ private fun VideoItem(
             VideoDropdownMenu(
                 onTapDeleteVideo = onTapDeleteVideo,
                 onShareTimestamps = onTapShareVideo,
-                onTapExportVideo = {
-                    exportLauncher.launch(video.videoTitle ?: video.videoId)
-                },
             )
         }
     }
@@ -327,7 +372,6 @@ private val TIME_FORMAT = LocalDateTime.Format {
 @Composable
 fun VideoDropdownMenu(
     onTapDeleteVideo: () -> Unit,
-    onTapExportVideo: () -> Unit,
     onShareTimestamps: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -350,8 +394,33 @@ fun VideoDropdownMenu(
                 text = { Text("Share Timestamps") },
                 onClick = onShareTimestamps
             )
+        }
+    }
+}
+
+@Composable
+fun MenuDropDown(
+    onTapExportVideo: () -> Unit,
+    onTapImportVideo: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    var expanded by remember { mutableStateOf(false) }
+    Box(
+        modifier = modifier
+    ) {
+        IconButton(onClick = { expanded = !expanded }) {
+            Icon(Icons.Default.Menu, contentDescription = "Menu")
+        }
+        DropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = false }
+        ) {
             DropdownMenuItem(
-                text = { Text("Download Backup") },
+                text = { Text("Import") },
+                onClick = onTapImportVideo
+            )
+            DropdownMenuItem(
+                text = { Text("Export") },
                 onClick = onTapExportVideo
             )
         }
@@ -388,23 +457,8 @@ fun ExportDropdownMenu(
 fun AddVideoDialog(
     onDismissRequest: () -> Unit,
     onConfirmation: (url: String) -> Unit,
-    onImport: (uri: Uri) -> Unit,
 ) {
     val textFieldState = rememberTextFieldState()
-    val context = LocalContext.current
-    val importLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.OpenDocument()
-    ) { uri ->
-        uri?.let {
-            onImport(uri)
-            //TODO: SUbscribe to mutable shared flow to launch toast
-            Toast.makeText(
-                context,
-                "Timestamps Successfully Imported",
-                Toast.LENGTH_LONG
-            ).show()
-        }
-    }
 
     AlertDialog(
         title = {
@@ -420,21 +474,12 @@ fun AddVideoDialog(
             onDismissRequest()
         },
         confirmButton = {
-            Row {
-                TextButton(
-                    onClick = {
-                        onConfirmation(textFieldState.text.toString())
-                    }
-                ) {
-                    Text("Confirm")
+            TextButton(
+                onClick = {
+                    onConfirmation(textFieldState.text.toString())
                 }
-                TextButton(
-                    onClick = {
-                        importLauncher.launch(arrayOf("*/*"))
-                    }
-                ) {
-                    Text("Import")
-                }
+            ) {
+                Text("Confirm")
             }
         },
         dismissButton = {

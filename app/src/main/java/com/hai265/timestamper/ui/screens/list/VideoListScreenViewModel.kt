@@ -63,6 +63,14 @@ class VideoListScreenViewModel @Inject constructor(
         return
     }
 
+    fun exportVideo(uri: Uri) {
+        //TODO: Export all subtitles
+        viewModelScope.launch {
+            exportTimestampsToFileUseCase.invoke("videoId", uri)
+        }
+        return
+    }
+
     fun importTimestamps(uri: Uri) {
         viewModelScope.launch {
             importTimestampsFromFileUseCase.invoke(uri)
