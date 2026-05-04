@@ -1,28 +1,10 @@
 package com.hai265.timestamper.data
 
-import androidx.core.net.toUri
 
-//TODO: I might not need this if I'm just calling the youtube api directly
 fun getYouTubeId(url: String): String? {
-    val uri = url.toUri()
-
-    return when {
-        // https://www.youtube.com/watch?v=VIDEO_ID
-        uri.host?.contains("youtube.com") == true &&
-                uri.path == "/watch" -> {
-            uri.getQueryParameter("v")
-        }
-
-        // https://youtu.be/VIDEO_ID
-        uri.host?.contains("youtu.be") == true -> {
-            uri.lastPathSegment
-        }
-
-        // Not a YouTube URL — return the original string as-is
-        uri.host == null -> url
-
-        else -> uri.pathSegments.getOrNull(1)
-    }
+    val pattern = Regex("(youtu.*be.*)/(watch\\?v=|embed/|v|shorts|)(.*?((?=[&#?])|$))")
+    val matches = pattern.find(url)
+    return matches?.destructured?.component3()
 }
 
 fun getYoutubeThumbnail(videoId: String): String {
