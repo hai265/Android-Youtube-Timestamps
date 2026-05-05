@@ -17,6 +17,8 @@ import kotlin.time.Duration
 
 sealed interface VideoResult {
     data object Success : VideoResult
+    object VideoAlreadyExists : VideoResult
+
     data class InvalidUrl(val url: String) : VideoResult
     data class NetworkError(val errorMessage: String?) : VideoResult
 }
@@ -33,7 +35,7 @@ class VideoRepository @Inject constructor(
         return dao.getAllVideosAndTimestamps()
     }
 
-    suspend fun getVideoById(id: String): Video {
+    suspend fun getVideoById(id: String): Video? {
         return dao.getVideoById(id)
     }
 
@@ -53,6 +55,10 @@ class VideoRepository @Inject constructor(
             }
             return VideoResult.NetworkError(message)
         }
+
+        if (dao.getVideoById(videoId) != null) {
+            return VideoResult.VideoAlreadyExists
+        }
         dao.addVideo(
             Video(
                 videoId = videoId,
@@ -63,6 +69,10 @@ class VideoRepository @Inject constructor(
             )
         )
         return VideoResult.Success
+    }
+
+    suspend fun addVideoWithTimestamps(videoWithTimestamps: List<VideoWithTimestamps>) {
+        dao.addVideosWithTimestamps(videoWithTimestamps)
     }
 
     suspend fun deleteVideo(video: Video) {

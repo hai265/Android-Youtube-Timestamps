@@ -5,7 +5,6 @@ import android.net.Uri
 import com.hai265.timestamper.data.database.VideoWithTimestamps
 import com.hai265.timestamper.data.repos.TimestampRepository
 import com.hai265.timestamper.data.repos.VideoRepository
-import com.hai265.timestamper.data.repos.VideoResult
 import kotlinx.serialization.json.Json
 import javax.inject.Inject
 
@@ -25,13 +24,7 @@ class ImportTimestampsFromFileUseCase @Inject constructor(
     }
 
     private suspend fun addTimestamps(videoWithTimestamps: List<VideoWithTimestamps>) {
-        videoWithTimestamps.forEach { videoWithTimestamp ->
-            if (videoRepository.addVideo(videoWithTimestamp.video.videoId) != VideoResult.Success) //TODO: Handle error states
-            {
-                return@forEach
-            }
-            timestampRepo.addTimestamps(videoWithTimestamp.timestamps)
-        }
+        videoRepository.addVideoWithTimestamps(videoWithTimestamps)
     }
 }
 

@@ -18,8 +18,23 @@ interface VideoDao {
     @Query("SELECT * from videos")
     suspend fun getAllVideosAndTimestamps(): List<VideoWithTimestamps>
 
+    @Transaction
+    suspend fun addVideosWithTimestamps(videoWithTimestamps: List<VideoWithTimestamps>) {
+        videoWithTimestamps.forEach { (video, timestamps) ->
+            if (getVideoById(video.videoId) == null) {
+                addVideo(video)
+            }
+            timestamps.forEach {
+                upsertTimestamp(it)
+            }
+        }
+    }
+
+    @Upsert
+    suspend fun upsertTimestamp(timestamp: Timestamp)
+
     @Query("SELECT * from videos WHERE videoId =:id")
-    suspend fun getVideoById(id: String): Video
+    suspend fun getVideoById(id: String): Video?
 
     @Query("UPDATE videos SET lastPlayed = :timestamp WHERE videoId = :videoId")
     suspend fun updateLastPlayed(videoId: String, timestamp: Long)

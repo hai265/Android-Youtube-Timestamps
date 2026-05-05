@@ -30,5 +30,13 @@ fun handleVideoResult(context: Context, videoResult: VideoResult, onSuccess: () 
                 Toast.LENGTH_LONG
             ).show()
         }
+
+        VideoResult.VideoAlreadyExists -> {
+            Toast.makeText(
+                context,
+                "Video already exists",
+                Toast.LENGTH_LONG
+            ).show()
+        }
     }
 }
