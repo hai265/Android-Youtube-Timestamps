@@ -83,6 +83,7 @@ dependencies {
     implementation(libs.logging.interceptor)
     implementation(libs.yamlkt)
     implementation(libs.kotlinx.datetime)
+    implementation(libs.kotlinx.serialization.core)
 
     implementation(libs.kotlinx.io.core)
     androidTestImplementation(libs.androidx.junit)

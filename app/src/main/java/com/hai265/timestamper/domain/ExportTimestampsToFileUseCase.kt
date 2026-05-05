@@ -6,6 +6,8 @@ import com.hai265.timestamper.data.models.Backup
 import com.hai265.timestamper.data.models.TimestampBackup
 import com.hai265.timestamper.data.models.VideoBackup
 import com.hai265.timestamper.data.repos.VideoRepository
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 import net.mamoe.yamlkt.Yaml
 import javax.inject.Inject
 
@@ -13,9 +15,9 @@ class ExportTimestampsToFileUseCase @Inject constructor(
     val videoRepository: VideoRepository,
     val contentResolver: ContentResolver,
 ) {
-    suspend fun invoke(uri: Uri) {
+    suspend operator fun invoke(uri: Uri) {
         contentResolver.openOutputStream(uri)?.use { writer ->
-            writer.write(timestampsToYaml().toByteArray())
+            writer.write(invokeJson().toByteArray())
         }
     }
 
@@ -41,6 +43,11 @@ class ExportTimestampsToFileUseCase @Inject constructor(
         })
 
         return yaml.encodeToString(Backup.serializer(), backup)
+    }
+
+    suspend fun invokeJson(): String {
+        val videosAndTimestamps = videoRepository.getVideosWithTimestamps()
+        return Json.encodeToString(videosAndTimestamps)
     }
 }
 

@@ -8,10 +8,12 @@ import androidx.room.Index
 import androidx.room.PrimaryKey
 import androidx.room.Relation
 import kotlinx.parcelize.Parcelize
+import kotlinx.serialization.Serializable
 import kotlin.time.Duration
 import kotlin.time.Instant
 
 @Entity(tableName = "videos")
+@Serializable
 data class Video(
     @PrimaryKey
     val videoId: String,
@@ -23,6 +25,7 @@ data class Video(
 )
 
 @Parcelize
+@Serializable
 @Entity(
     tableName = "timestamps",
     foreignKeys = [
@@ -45,11 +48,12 @@ data class Timestamp(
     val description: String
 ) : Parcelable
 
+@Serializable
 data class VideoWithTimestamps(
     @Embedded val video: Video,
     @Relation(
-                parentColumn = "videoId",
-                entityColumn = "videoId",
-            )
+        parentColumn = "videoId",
+        entityColumn = "videoId",
+    )
     val timestamps: List<Timestamp>
 )
