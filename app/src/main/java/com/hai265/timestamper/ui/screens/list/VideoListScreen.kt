@@ -120,7 +120,7 @@ fun VideoListScreen(onTapVideo: (id: String) -> Unit, windowSize: WindowWidthSiz
     }
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
     val exportLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.CreateDocument("application/yaml")
+        contract = ActivityResultContracts.CreateDocument("application/json")
     ) { uri ->
         uri?.let {
             viewmodel.exportVideo(uri)
@@ -288,7 +288,7 @@ private fun VideoItem(
 ) {
     val context = LocalContext.current
     val exportLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.CreateDocument("application/yaml")
+        contract = ActivityResultContracts.CreateDocument("application/json")
     ) { uri ->
         uri?.let {
             onTapExportVideo(uri)

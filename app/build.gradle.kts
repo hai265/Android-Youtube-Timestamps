@@ -81,7 +81,6 @@ dependencies {
     testImplementation(libs.junit)
     implementation(libs.androidx.datastore.preferences)
     implementation(libs.logging.interceptor)
-    implementation(libs.yamlkt)
     implementation(libs.kotlinx.datetime)
     implementation(libs.kotlinx.serialization.core)
 
