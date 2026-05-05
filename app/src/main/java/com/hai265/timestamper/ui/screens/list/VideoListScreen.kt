@@ -181,7 +181,6 @@ fun VideoListScreen(onTapVideo: (id: String) -> Unit, windowSize: WindowWidthSiz
             onDeleteVideo = { video -> videoToDeleteDialog = video },
             onExportVideo = { video, uri ->
                 viewmodel.exportVideo(
-                    video.videoId,
                     uri,
                 )
             },

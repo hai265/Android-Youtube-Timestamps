@@ -3,7 +3,7 @@ package com.hai265.timestamper.domain
 import android.content.ContentResolver
 import android.net.Uri
 import com.hai265.timestamper.data.database.Timestamp
-import com.hai265.timestamper.data.models.VideoBackup
+import com.hai265.timestamper.data.models.Backup
 import com.hai265.timestamper.data.repos.TimestampRepository
 import com.hai265.timestamper.data.repos.VideoRepository
 import com.hai265.timestamper.data.repos.VideoResult
@@ -23,21 +23,23 @@ class ImportTimestampsFromFileUseCase @Inject constructor(
     }
 
     private suspend fun import(yamlString: String) {
-        val yaml = Yaml().decodeFromString(VideoBackup.serializer(), yamlString)
-
-        if (videoRepository.addVideo(yaml.info.videoId) != VideoResult.Success) //TODO: Handle error states
-        {
-            return
+        val backup = Yaml().decodeFromString(Backup.serializer(), yamlString)
+        //TODO: Make add video and add timestamp one transaction
+        backup.videos.forEach { video ->
+            if (videoRepository.addVideo(video.videoId) != VideoResult.Success) //TODO: Handle error states
+            {
+                return@forEach
+            }
+            val timestamps: List<Timestamp> = video.timestamps.map {
+                Timestamp(
+                    id = it.id.toLong(), //In firebase / extention, id is string "video_id+id"
+                    videoId = video.videoId,
+                    time = it.seconds.seconds,
+                    description = it.description
+                )
+            }
+            timestampRepo.addTimestamps(timestamps)
         }
-        val timestamps: List<Timestamp> = yaml.tags.map {
-            Timestamp(
-                id = 0, //In firebase / extention, id is string "video_id+id"
-                videoId = yaml.info.videoId,
-                time = it.seconds.seconds,
-                description = it.description
-            )
-        }
-        timestampRepo.addTimestamps(timestamps)
     }
 }
 

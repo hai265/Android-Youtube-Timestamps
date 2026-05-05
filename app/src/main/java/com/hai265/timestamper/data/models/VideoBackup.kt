@@ -11,31 +11,28 @@ data class VideoInfo(
 )
 
 @Serializable
-data class VideoBackup(
-    val info: Info,
-    val tags: List<Tag>
-) {
-
-
-}
-
-@Serializable
-data class Info(
-    val lastUpdated: Long,
-    val title: String,
-    val videoId: String,
+data class Backup(
+    val videos: List<VideoBackup>
 )
 
 @Serializable
-data class Tag(
+data class VideoBackup(
+    val lastUpdated: Long,
+    val title: String,
+    val videoId: String,
+    val timestamps: List<TimestampBackup>,
+)
+
+@Serializable
+data class TimestampBackup(
     val description: String,
     val id: String,
     val seconds: Double,
 )
 
 @OptIn(ExperimentalTime::class)
-fun Timestamp.toTag(): Tag {
-    return Tag(
+fun Timestamp.toTimestampBackup(): TimestampBackup {
+    return TimestampBackup(
         description = this.description,
         id = this.id.toString(),
         seconds = this.time.inWholeSeconds.toDouble()

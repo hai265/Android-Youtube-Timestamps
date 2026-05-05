@@ -1,10 +1,12 @@
 package com.hai265.timestamper.data.database
 
 import android.os.Parcelable
+import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Index
 import androidx.room.PrimaryKey
+import androidx.room.Relation
 import kotlinx.parcelize.Parcelize
 import kotlin.time.Duration
 import kotlin.time.Instant
@@ -42,3 +44,12 @@ data class Timestamp(
     val time: Duration,
     val description: String
 ) : Parcelable
+
+data class VideoWithTimestamps(
+    @Embedded val video: Video,
+    @Relation(
+                parentColumn = "videoId",
+                entityColumn = "videoId",
+            )
+    val timestamps: List<Timestamp>
+)

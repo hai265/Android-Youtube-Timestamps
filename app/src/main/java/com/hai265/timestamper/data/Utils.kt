@@ -1,7 +1,7 @@
 package com.hai265.timestamper.data
 
 
-fun getYouTubeId(url: String): String? {
+fun getYouTubeIdFromUrl(url: String): String? {
     val pattern = Regex("(youtu.*be.*)/(watch\\?v=|embed/|v|shorts|)(.*?((?=[&#?])|$))")
     val matches = pattern.find(url)
     return matches?.destructured?.component3()

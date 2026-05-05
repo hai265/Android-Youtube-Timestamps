@@ -4,6 +4,7 @@ import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.Query
+import androidx.room.Transaction
 import androidx.room.Upsert
 import kotlinx.coroutines.flow.Flow
 import kotlin.time.Instant
@@ -12,6 +13,10 @@ import kotlin.time.Instant
 interface VideoDao {
     @Query("SELECT * from videos ORDER BY lastEdited DESC")
     fun getAllVideos(): Flow<List<Video>>
+
+    @Transaction
+    @Query("SELECT * from videos")
+    suspend fun getAllVideosAndTimestamps(): List<VideoWithTimestamps>
 
     @Query("SELECT * from videos WHERE videoId =:id")
     suspend fun getVideoById(id: String): Video

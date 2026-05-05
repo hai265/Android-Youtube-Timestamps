@@ -2,7 +2,7 @@ package com.hai265.timestamper.data.repos
 
 import com.hai265.timestamper.data.database.Video
 import com.hai265.timestamper.data.database.VideoDao
-import com.hai265.timestamper.data.getYouTubeId
+import com.hai265.timestamper.data.database.VideoWithTimestamps
 import com.hai265.timestamper.data.getYoutubeThumbnail
 import com.hai265.timestamper.data.models.VideoInfo
 import com.hai265.timestamper.data.network.YoutubeMetadataApiService
@@ -29,6 +29,10 @@ class VideoRepository @Inject constructor(
         return dao.getAllVideos()
     }
 
+    suspend fun getVideosWithTimestamps(): List<VideoWithTimestamps> {
+        return dao.getAllVideosAndTimestamps()
+    }
+
     suspend fun getVideoById(id: String): Video {
         return dao.getVideoById(id)
     }
@@ -37,7 +41,6 @@ class VideoRepository @Inject constructor(
     // 1. url is invalid
     // 2. video already added
     suspend fun addVideo(videoId: String): VideoResult {
-        val videoId = getYouTubeId(videoId) ?: return VideoResult.InvalidUrl(videoId)
         val metadata = try {
             youtubeMetadataApi.getYoutubeMetadata("https://www.youtube.com/watch?v=$videoId")
         } catch (e: IOException) {
