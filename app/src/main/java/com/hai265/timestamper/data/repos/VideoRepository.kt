@@ -1,5 +1,8 @@
 package com.hai265.timestamper.data.repos
 
+import androidx.room.withTransaction
+import com.hai265.timestamper.data.database.AppDatabase
+import com.hai265.timestamper.data.database.TimestampDao
 import com.hai265.timestamper.data.database.Video
 import com.hai265.timestamper.data.database.VideoDao
 import com.hai265.timestamper.data.database.VideoWithTimestamps
@@ -24,19 +27,21 @@ sealed interface VideoResult {
 }
 
 class VideoRepository @Inject constructor(
-    val dao: VideoDao,
+    val videoDao: VideoDao,
+    val timestmapDao: TimestampDao,
     val youtubeMetadataApi: YoutubeMetadataApiService,
+    val database: AppDatabase,
 ) {
     fun getVideos(): Flow<List<Video>> {
-        return dao.getAllVideos()
+        return videoDao.getAllVideos()
     }
 
     suspend fun getVideosWithTimestamps(): List<VideoWithTimestamps> {
-        return dao.getAllVideosAndTimestamps()
+        return videoDao.getAllVideosAndTimestamps()
     }
 
     suspend fun getVideoById(id: String): Video? {
-        return dao.getVideoById(id)
+        return videoDao.getVideoById(id)
     }
 
     //Two errors can occur
@@ -56,10 +61,10 @@ class VideoRepository @Inject constructor(
             return VideoResult.NetworkError(message)
         }
 
-        if (dao.getVideoById(videoId) != null) {
+        if (videoDao.getVideoById(videoId) != null) {
             return VideoResult.VideoAlreadyExists
         }
-        dao.addVideo(
+        videoDao.addVideo(
             Video(
                 videoId = videoId,
                 videoTitle = metadata.title,
@@ -72,12 +77,21 @@ class VideoRepository @Inject constructor(
     }
 
     suspend fun addVideoWithTimestamps(videoWithTimestamps: List<VideoWithTimestamps>) {
-        dao.addVideosWithTimestamps(videoWithTimestamps)
+        database.withTransaction {
+            videoWithTimestamps.forEach { (video, timestamps) ->
+                if (videoDao.getVideoById(video.videoId) == null) {
+                    videoDao.addVideo(video)
+                }
+                timestamps.forEach {
+                    timestmapDao.upsertTimestamp(it)
+                }
+            }
+        }
     }
 
     suspend fun deleteVideo(video: Video) {
         withContext(Dispatchers.IO) {
-            dao.deleteVideo(video)
+            videoDao.deleteVideo(video)
         }
     }
 
@@ -85,7 +99,7 @@ class VideoRepository @Inject constructor(
     //Performance profiling?
     suspend fun updateVideoLastWatched(videoId: String, lastWatchedTimestamp: Duration) {
         withContext(Dispatchers.IO) {
-            dao.updateLastPlayed(videoId, lastWatchedTimestamp.inWholeMilliseconds)
+            videoDao.updateLastPlayed(videoId, lastWatchedTimestamp.inWholeMilliseconds)
         }
     }
 
@@ -96,7 +110,7 @@ class VideoRepository @Inject constructor(
 
     suspend fun updateLastEdited(videoId: String) {
         withContext(Dispatchers.IO) {
-            dao.updateLastEdited(videoId, Clock.System.now())
+            videoDao.updateLastEdited(videoId, Clock.System.now())
         }
     }
 
