@@ -1,7 +1,7 @@
 # TODO: Clean up unusued deps inherited from Uma app
 [versions]
 activityKtx = "1.13.0"
-agp = "9.1.1"
+agp = "9.2.1"
 coilCompose = "3.4.0"
 composeBomVersion = "2026.03.01"
 converterGson = "3.0.0"
