@@ -6,8 +6,6 @@ import com.hai265.timestamper.data.database.TimestampDao
 import com.hai265.timestamper.data.database.Video
 import com.hai265.timestamper.data.database.VideoDao
 import com.hai265.timestamper.data.database.VideoWithTimestamps
-import com.hai265.timestamper.data.getYoutubeThumbnail
-import com.hai265.timestamper.data.models.VideoInfo
 import com.hai265.timestamper.data.network.YoutubeMetadataApiService
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -61,14 +59,14 @@ class VideoRepository @Inject constructor(
             return VideoResult.NetworkError(message)
         }
 
-        if (videoDao.getVideoById(videoId) != null) {
+        if (getVideoById(videoId) != null) {
             return VideoResult.VideoAlreadyExists
         }
         videoDao.addVideo(
             Video(
                 videoId = videoId,
                 videoTitle = metadata.title,
-                thumbnail = getYoutubeThumbnail(videoId),
+                thumbnail = metadata.thumbnail,
                 lastEdited = Clock.System.now(),
                 lastPlayed = Duration.ZERO,
             )
@@ -76,7 +74,7 @@ class VideoRepository @Inject constructor(
         return VideoResult.Success
     }
 
-    suspend fun addVideoWithTimestamps(videoWithTimestamps: List<VideoWithTimestamps>) {
+    suspend fun importVideosWithTimestamps(videoWithTimestamps: List<VideoWithTimestamps>) {
         database.withTransaction {
             videoWithTimestamps.forEach { (video, timestamps) ->
                 if (videoDao.getVideoById(video.videoId) == null) {
@@ -103,10 +101,6 @@ class VideoRepository @Inject constructor(
         }
     }
 
-
-    fun getVideoInfo(videoId: String): VideoInfo {
-        TODO("Return videoInfo from youtube-api-v3")
-    }
 
     suspend fun updateLastEdited(videoId: String) {
         withContext(Dispatchers.IO) {

@@ -1,5 +1,7 @@
 package com.hai265.timestamper.data.network
 
+import com.hai265.timestamper.data.getYouTubeIdFromUrl
+import com.hai265.timestamper.data.getYoutubeThumbnail
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import dagger.Module
 import dagger.Provides
@@ -20,14 +22,36 @@ import javax.inject.Singleton
 //test url: https://www.youtube.com/oembed?url=https%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3DdQw4w9WgXcQ
 private const val BASE_URL = "https://www.youtube.com/"
 
-private val retroJson = Json { ignoreUnknownKeys = true }
-
 interface YoutubeMetadataApiService {
-    @GET("oembed")
     suspend fun getYoutubeMetadata(
-        @Query("url") videoUrl: String,
+        videoUrl: String,
     ): YoutubeMetadata
 }
+
+class YoutubeMetadataApiServiceImpl private constructor(private val api: YoutubeMetadataApi) :
+    YoutubeMetadataApiService {
+    private interface YoutubeMetadataApi {
+        @GET("oembed")
+        suspend fun getYoutubeMetadata(
+            @Query("url") videoUrl: String,
+        ): YoutubeMetadata
+    }
+
+    override suspend fun getYoutubeMetadata(videoUrl: String): YoutubeMetadata {
+        return api.getYoutubeMetadata(videoUrl).copy(
+            thumbnail = getYoutubeThumbnail(
+                getYouTubeIdFromUrl(videoUrl) ?: ""
+            )
+        )
+    }
+
+    companion object {
+        fun create(retrofit: Retrofit): YoutubeMetadataApiServiceImpl {
+            return YoutubeMetadataApiServiceImpl(retrofit.create(YoutubeMetadataApi::class.java))
+        }
+    }
+}
+
 
 @Serializable
 data class YoutubeMetadata(
@@ -67,7 +91,7 @@ abstract class NetworkModule {
 
         @Provides
         fun providesYoutubeMetadataApiService(retrofit: Retrofit): YoutubeMetadataApiService {
-            return retrofit.create(YoutubeMetadataApiService::class.java)
+            return YoutubeMetadataApiServiceImpl.create(retrofit)
         }
     }
 }

@@ -39,4 +39,11 @@ val fakeTimestamp2 = Timestamp(
     description = "Sample Description"
 )
 
+val fakeTimestamp3 = Timestamp(
+    id = 3,
+    videoId = "1",
+    time = 10000000.milliseconds,
+    description = "Sample Description"
+)
+
 val fakeTimestampList = listOf(fakeTimestamp1, fakeTimestamp2)

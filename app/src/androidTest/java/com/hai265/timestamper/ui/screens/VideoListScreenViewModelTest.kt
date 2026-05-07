@@ -33,7 +33,11 @@ class VideoListScreenViewModelTest {
             .allowMainThreadQueries()
             .build()
 
-        videoRepository = VideoRepository(db.videoDao(), youtubeMetadataApi = FakeYoutubeMetadata())
+        videoRepository = VideoRepository(
+            db.videoDao(), youtubeMetadataApi = FakeYoutubeMetadata(),
+            timestmapDao = db.timestampDao(),
+            database = db,
+        )
         timestampRepository = TimestampRepository(
             timestampDao = db.timestampDao()
         )
@@ -46,7 +50,6 @@ class VideoListScreenViewModelTest {
                 context.contentResolver
             ),
             ExportTimestampsToFileUseCase(
-                timestampRepository,
                 videoRepository,
                 context.contentResolver
             ),

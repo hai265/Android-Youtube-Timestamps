@@ -16,6 +16,7 @@ import com.hai265.timestamper.data.repos.PreferencesRepository
 import com.hai265.timestamper.data.repos.RepoModule.Companion.dataStore
 import com.hai265.timestamper.data.repos.TimestampRepository
 import com.hai265.timestamper.data.repos.VideoRepository
+import com.hai265.timestamper.domain.UpsertTimestampUseCase
 import com.hai265.timestamper.ui.screens.editor.TimestampEditorState
 import com.hai265.timestamper.ui.screens.editor.TimestampEditorViewModel
 import junit.framework.TestCase.assertEquals
@@ -64,7 +65,7 @@ class TimestampEditorViewModelTest {
             .allowMainThreadQueries()
             .build()
 
-        videoRepo = VideoRepository(db.videoDao(), FakeYoutubeMetadata())
+        videoRepo = VideoRepository(db.videoDao(), db.timestampDao(), FakeYoutubeMetadata(), db)
         timestampRepo = TimestampRepository(db.timestampDao())
         preferencesRepo = PreferencesRepository(context.dataStore)
         savedStateHandle = SavedStateHandle(mapOf("id" to videoId))
@@ -72,7 +73,8 @@ class TimestampEditorViewModelTest {
             savedStateHandle = savedStateHandle,
             videoRepo = videoRepo,
             timestampRepo = timestampRepo,
-            preferencesRepository = preferencesRepo
+            preferencesRepository = preferencesRepo,
+            upsertTimestampUseCase = UpsertTimestampUseCase(timestampRepo, videoRepo)
         )
     }
 

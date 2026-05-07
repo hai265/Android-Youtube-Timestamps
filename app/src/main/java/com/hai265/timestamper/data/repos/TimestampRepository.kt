@@ -7,7 +7,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
-import kotlin.time.Duration
 
 class TimestampRepository @Inject constructor(
     private val timestampDao: TimestampDao
@@ -35,21 +34,4 @@ class TimestampRepository @Inject constructor(
         }
     }
 
-    suspend fun addEmptyTimestamp(videoId: String, duration: Duration): Long {
-        return withContext(Dispatchers.IO) {
-            timestampDao.upsertTimestamp(
-                Timestamp(
-                    videoId = videoId,
-                    time = duration,
-                    description = "",
-                )
-            )
-        }
-    }
-
-    suspend fun addTimestamps(timestamps: List<Timestamp>) {
-        return withContext(Dispatchers.IO) {
-            timestampDao.addTimestamps(timestamps)
-        }
-    }
 }
