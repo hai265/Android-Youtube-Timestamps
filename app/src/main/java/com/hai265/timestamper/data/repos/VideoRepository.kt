@@ -6,6 +6,7 @@ import com.hai265.timestamper.data.database.TimestampDao
 import com.hai265.timestamper.data.database.Video
 import com.hai265.timestamper.data.database.VideoDao
 import com.hai265.timestamper.data.database.VideoWithTimestamps
+import com.hai265.timestamper.data.getYouTubeIdFromUrl
 import com.hai265.timestamper.data.network.YoutubeMetadataApiService
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -45,9 +46,10 @@ class VideoRepository @Inject constructor(
     //Two errors can occur
     // 1. url is invalid
     // 2. video already added
-    suspend fun addVideo(videoId: String): VideoResult {
+    suspend fun addVideo(url: String): VideoResult {
+        val videoId = getYouTubeIdFromUrl(url) ?: return VideoResult.InvalidUrl(url)
         val metadata = try {
-            youtubeMetadataApi.getYoutubeMetadata("https://www.youtube.com/watch?v=$videoId")
+            youtubeMetadataApi.getYoutubeMetadata(url)
         } catch (e: IOException) {
             return VideoResult.NetworkError(e.message)
         } catch (e: HttpException) {

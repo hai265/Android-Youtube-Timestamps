@@ -4,7 +4,6 @@ import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.hai265.timestamper.data.database.Video
-import com.hai265.timestamper.data.getYouTubeIdFromUrl
 import com.hai265.timestamper.data.repos.TimestampRepository
 import com.hai265.timestamper.data.repos.VideoRepository
 import com.hai265.timestamper.data.repos.VideoResult
@@ -47,8 +46,7 @@ class VideoListScreenViewModel @Inject constructor(
         )
 
     suspend fun addVideo(url: String): VideoResult {
-        val videoId = getYouTubeIdFromUrl(url) ?: return VideoResult.InvalidUrl(url)
-        return repo.addVideo(videoId)
+        return repo.addVideo(url)
     }
 
     fun deleteVideo(video: Video) =

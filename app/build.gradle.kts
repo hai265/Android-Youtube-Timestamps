@@ -33,6 +33,10 @@ extensions.configure<ApplicationExtension> {
             )
             signingConfig = signingConfigs.getByName("debug")
         }
+        debug {
+            enableUnitTestCoverage = true
+            enableAndroidTestCoverage = true
+        }
     }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_21

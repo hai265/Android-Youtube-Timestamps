@@ -1,6 +1,7 @@
 package com.hai265.timestamper.data
 
 import android.content.Context
+import android.database.sqlite.SQLiteConstraintException
 import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -21,11 +22,15 @@ import okhttp3.ResponseBody.Companion.toResponseBody
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotEquals
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import retrofit2.HttpException
 import retrofit2.Response
+
+
+const val VIDEO_URL = "https://www.youtube.com/watch?v=videoid"
 
 @RunWith(AndroidJUnit4::class)
 class VideoRepositoryTest {
@@ -60,22 +65,31 @@ class VideoRepositoryTest {
 
     @Test
     fun testAddVideo_Success() = runTest {
-        val result = subject.addVideo("videoId")
+        val result = subject.addVideo(VIDEO_URL)
         val video = subject.getVideos().first().first()
         assert(result is VideoResult.Success)
         assertEquals("title", video.videoTitle)
         assertEquals("thumbnail", video.thumbnail)
-
     }
 
     @Test
     fun testAddVideo_IoExceptionReturnsNetworkError() = runTest {
         youtubeMetaApi.shouldThrow = kotlinx.io.IOException("error message")
 
-        val result = subject.addVideo("videoId")
+        val result = subject.addVideo(VIDEO_URL)
 
         assert(result is VideoResult.NetworkError)
         assertEquals("error message", (result as VideoResult.NetworkError).errorMessage)
+    }
+
+    @Test
+    fun testAddVideo_InvalidUrl() = runTest {
+        youtubeMetaApi.shouldThrow = kotlinx.io.IOException("error message")
+
+        val result = subject.addVideo("invalid_url")
+
+        assert(result is VideoResult.InvalidUrl)
+        assertEquals("invalid_url", (result as VideoResult.InvalidUrl).url)
     }
 
     @Test
@@ -87,7 +101,7 @@ class VideoRepositoryTest {
             )
         )
 
-        val result = subject.addVideo("videoId")
+        val result = subject.addVideo(VIDEO_URL)
 
         assert(result is VideoResult.NetworkError)
         assertEquals("HTTP 404 Response.error()", (result as VideoResult.NetworkError).errorMessage)
@@ -102,7 +116,7 @@ class VideoRepositoryTest {
             )
         )
 
-        val result = subject.addVideo("videoId")
+        val result = subject.addVideo(VIDEO_URL)
 
         assert(result is VideoResult.NetworkError)
         assertEquals("Video Doesn't Exist", (result as VideoResult.NetworkError).errorMessage)
@@ -117,7 +131,7 @@ class VideoRepositoryTest {
             )
         )
 
-        val result = subject.addVideo("videoId")
+        val result = subject.addVideo(VIDEO_URL)
 
         assert(result is VideoResult.NetworkError)
         assertEquals("Video Is Private", (result as VideoResult.NetworkError).errorMessage)
@@ -125,8 +139,8 @@ class VideoRepositoryTest {
 
     @Test
     fun testAddVideo_videoAlreadyExists_returnsVideoAlreadyExists() = runTest {
-        subject.addVideo("videoId")
-        val result = subject.addVideo("videoId")
+        subject.addVideo(VIDEO_URL)
+        val result = subject.addVideo(VIDEO_URL)
 
         assert(result is VideoResult.VideoAlreadyExists)
     }
@@ -142,7 +156,7 @@ class VideoRepositoryTest {
     fun testImportVideosExistingVideoAlreadyExistNotReplaced() = runTest {
         // Add video1 via network — its metadata comes from FakeYoutubeMetadataApiService,
         // so the stored version will differ from fakeVideo1's hardcoded fields.
-        subject.addVideo(fakeVideo1.videoId)
+        subject.addVideo(youtubeUrlFromId(fakeVideo1.videoId))
         val networkFetchedVideo1 = subject.getVideoById(fakeVideo1.videoId)
 
         // Sanity check: confirm the stored video differs from the fakeVideo1 fixture,
@@ -170,6 +184,28 @@ class VideoRepositoryTest {
             fakeVideo2,
             subject.getVideoById(fakeVideo2.videoId)
         )
+    }
+
+    @Test(expected = SQLiteConstraintException::class)
+    fun timestampDaoExceptionNothingImported() = runTest {
+        val invalidTimestamp = fakeTimestamp1.copy(
+            videoId = "nonexistent-video-id"
+        )
+
+        val data = listOf(
+            VideoWithTimestamps(
+                video = fakeVideo1,
+                timestamps = listOf(invalidTimestamp)
+            )
+        )
+
+        subject.importVideosWithTimestamps(data)
+
+
+        val videoWithTimestamps = subject.getVideosWithTimestamps()
+
+        assertTrue(videoWithTimestamps.isEmpty())
+
     }
 
     companion object {
@@ -202,4 +238,9 @@ class FakeYoutubeMetadataApiService : YoutubeMetadataApiService {
         shouldThrow?.let { throw it }
         return response
     }
+}
+
+
+fun youtubeUrlFromId(videoId: String): String {
+    return "https://www.youtube.com/watch?v=$videoId"
 }

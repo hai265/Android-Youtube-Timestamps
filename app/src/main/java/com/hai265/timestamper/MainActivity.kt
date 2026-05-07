@@ -9,8 +9,6 @@ import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSiz
 import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.lifecycleScope
-import com.hai265.timestamper.data.getYouTubeIdFromUrl
-import com.hai265.timestamper.data.repos.VideoResult
 import com.hai265.timestamper.ui.App
 import com.hai265.timestamper.ui.handleVideoResult
 import com.hai265.timestamper.ui.theme.AppTheme
@@ -42,9 +40,7 @@ class MainActivity : FragmentActivity() {
         if (intent.action == Intent.ACTION_SEND) {
             intent.getStringExtra(Intent.EXTRA_TEXT)?.let {
                 lifecycleScope.launch(Dispatchers.IO) {
-                    val videoResult = getYouTubeIdFromUrl(it)?.let {
-                        viewmodel.addVideo(it)
-                    } ?: VideoResult.InvalidUrl(it)
+                    val videoResult = viewmodel.addVideo(it)
                     withContext(Dispatchers.Main) {
                         handleVideoResult(this@MainActivity, videoResult, {})
                     }
