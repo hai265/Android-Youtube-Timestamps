@@ -142,7 +142,12 @@ fun TimestampViewerScreen(windowSize: WindowWidthSizeClass) {
         floatingActionButton = {
             FloatingActionButton(onClick = {
                 video?.videoId?.let {
-                    bottomSheetState = BottomSheetState.EditTimestamp(Timestamp(videoId = it))
+                    bottomSheetState = BottomSheetState.EditTimestamp(
+                        Timestamp(
+                            videoId = it,
+                            time = state.playerTime
+                        )
+                    )
 
                 }
             }) {

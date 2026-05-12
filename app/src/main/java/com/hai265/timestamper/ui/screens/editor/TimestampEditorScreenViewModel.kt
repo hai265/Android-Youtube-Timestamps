@@ -10,16 +10,13 @@ import com.hai265.timestamper.data.database.Video
 import com.hai265.timestamper.data.repos.PreferencesRepository
 import com.hai265.timestamper.data.repos.TimestampRepository
 import com.hai265.timestamper.data.repos.VideoRepository
-import com.hai265.timestamper.domain.UpsertTimestampUseCase
 import com.hai265.timestamper.ui.Navigables
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.drop
-import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.sample
 import kotlinx.coroutines.flow.stateIn
@@ -30,6 +27,7 @@ import kotlin.time.Duration
 data class TimestampEditorState(
     val video: Video? = null,
     val timestamps: List<Timestamp> = listOf(),
+    val playerTime: Duration = Duration.ZERO,
 )
 
 data class Preferences(
@@ -44,25 +42,14 @@ class TimestampViewerViewModel @Inject constructor(
     private val videoRepo: VideoRepository,
     private val timestampRepo: TimestampRepository,
     private val preferencesRepository: PreferencesRepository,
-    private val upsertTimestampUseCase: UpsertTimestampUseCase,
 ) : ViewModel() {
     private val videoId = savedStateHandle.toRoute<Navigables.VideoScreen>().id
 
-    private val currentTime = MutableStateFlow(Duration.ZERO)
-    private val descriptionUpdates = MutableStateFlow<Pair<Timestamp, String>?>(null)
+    private val _currentTime = MutableStateFlow(Duration.ZERO)
 
     init {
         viewModelScope.launch {
-            descriptionUpdates
-                .filterNotNull()
-                .debounce(500)
-                .collect { (timestamp, description) ->
-                    upsertTimestampUseCase.invoke(timestamp.copy(description = description))
-                }
-
-        }
-        viewModelScope.launch {
-            currentTime
+            _currentTime
                 .drop(1) //Drop default Duration.ZERO value
                 .sample(1000)
                 .collect { lastWatchedTimestamp ->
@@ -70,15 +57,15 @@ class TimestampViewerViewModel @Inject constructor(
                         videoRepo.updateVideoLastWatched(videoId, lastWatchedTimestamp)
                     }
                 }
-
         }
     }
 
     val state = combine(
         timestampRepo.getTimestamps(videoId),
         flow { emit(videoRepo.getVideoById(videoId)) },
-    ) { timestamps, video ->
-        TimestampEditorState(video, timestamps)
+        _currentTime
+    ) { timestamps, video, currentTime ->
+        TimestampEditorState(video, timestamps, currentTime)
     }.stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(5000L),
@@ -120,7 +107,7 @@ class TimestampViewerViewModel @Inject constructor(
     }
 
     fun updateCurrentTime(duration: Duration) {
-        currentTime.value = duration
+        _currentTime.value = duration
         Log.d("TimestampEditorViewModel", "current time:${duration.inWholeSeconds} ")
     }
 }
