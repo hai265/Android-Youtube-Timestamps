@@ -37,6 +37,7 @@ class TimestampDialogActivity : FragmentActivity() {
                                 time = (state as State.AddTimestamp).time
                             ),
                             onDismiss = { finish() },
+                            onAddTimestamp = {}
                         )
                     }
 

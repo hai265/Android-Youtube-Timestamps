@@ -43,6 +43,7 @@ import kotlinx.coroutines.launch
 fun TimestampEditorSheet(
     timestamp: Timestamp,
     onDismiss: () -> Unit,
+    onAddTimestamp: (Long) -> Unit,
 ) {
     val viewmodel = hiltViewModel<TimestampEditorViewModel>()
     val sheetState = rememberModalBottomSheetState()
@@ -67,7 +68,12 @@ fun TimestampEditorSheet(
             timestamp,
             textFieldState,
             focusRequester,
-            viewmodel::upsertTimestamp,
+            { timestamp ->
+                scope.launch {
+                    val savedId = viewmodel.upsertTimestamp(timestamp)
+                    onAddTimestamp(savedId)
+                }
+            },
             hideSheet
         )
     }

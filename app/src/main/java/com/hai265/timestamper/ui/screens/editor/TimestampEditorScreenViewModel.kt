@@ -14,7 +14,6 @@ import com.hai265.timestamper.domain.UpsertTimestampUseCase
 import com.hai265.timestamper.ui.Navigables
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.FlowPreview
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
@@ -31,7 +30,6 @@ import kotlin.time.Duration
 data class TimestampEditorState(
     val video: Video? = null,
     val timestamps: List<Timestamp> = listOf(),
-    val newlyAddedTimestampId: Long? = null
 )
 
 data class Preferences(
@@ -52,7 +50,6 @@ class TimestampViewerViewModel @Inject constructor(
 
     private val currentTime = MutableStateFlow(Duration.ZERO)
     private val descriptionUpdates = MutableStateFlow<Pair<Timestamp, String>?>(null)
-    private val _newlyAddedTimestampId = MutableStateFlow<Long?>(null)
 
     init {
         viewModelScope.launch {
@@ -80,9 +77,8 @@ class TimestampViewerViewModel @Inject constructor(
     val state = combine(
         timestampRepo.getTimestamps(videoId),
         flow { emit(videoRepo.getVideoById(videoId)) },
-        _newlyAddedTimestampId
-    ) { timestamps, video, newlyAddedId ->
-        TimestampEditorState(video, timestamps, newlyAddedId)
+    ) { timestamps, video ->
+        TimestampEditorState(video, timestamps)
     }.stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(5000L),
@@ -117,24 +113,6 @@ class TimestampViewerViewModel @Inject constructor(
         }
     }
 
-    fun upsertTimestamp(timestamp: Timestamp) {
-        viewModelScope.launch {
-            val addedTimestampId = upsertTimestampUseCase.invoke(timestamp)
-            _newlyAddedTimestampId.value = addedTimestampId
-            delay(1000)
-            _newlyAddedTimestampId.value = null
-        }
-    }
-
-    fun getEmptyTimestamp(): Timestamp {
-        return Timestamp(
-            id = 0,
-            videoId = videoId,
-            time = currentTime.value,
-            description = "",
-        )
-    }
-
     fun deleteTimestamp(timestamp: Timestamp) {
         viewModelScope.launch {
             timestampRepo.deleteTimestamp(timestamp)
@@ -144,11 +122,5 @@ class TimestampViewerViewModel @Inject constructor(
     fun updateCurrentTime(duration: Duration) {
         currentTime.value = duration
         Log.d("TimestampEditorViewModel", "current time:${duration.inWholeSeconds} ")
-    }
-
-    fun updateDescription(timestamp: Timestamp, description: String) {
-        viewModelScope.launch {
-            descriptionUpdates.emit(timestamp to description)
-        }
     }
 }

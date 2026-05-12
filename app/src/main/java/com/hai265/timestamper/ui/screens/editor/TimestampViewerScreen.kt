@@ -27,28 +27,17 @@ import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.foundation.text.input.KeyboardActionHandler
-import androidx.compose.foundation.text.input.TextFieldState
-import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FabPosition
-import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SheetState
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
-import androidx.compose.material3.rememberModalBottomSheetState
-import androidx.compose.material3.rememberStandardBottomSheetState
 import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -65,8 +54,6 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalLayoutDirection
@@ -74,8 +61,6 @@ import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -89,9 +74,10 @@ import com.hai265.timestamper.R
 import com.hai265.timestamper.data.database.Timestamp
 import com.hai265.timestamper.ui.fakes.fakeTimestamp1
 import com.hai265.timestamper.ui.fakes.fakeTimestampList
+import com.hai265.timestamper.ui.screens.timestampeditor.TimestampEditorSheet
 import com.hai265.timestamper.ui.screens.youtubeplayer.ComposeYouTubePlayer
 import com.hai265.timestamper.ui.screens.youtubeplayer.YouTubePlayerController
-import kotlinx.coroutines.DisposableHandle
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.parcelize.Parcelize
 import java.util.Locale
@@ -113,10 +99,11 @@ fun TimestampViewerScreen(windowSize: WindowWidthSizeClass) {
     val preferences by viewmodel.preferences.collectAsState()
     var showSettingsDialog by rememberSaveable { mutableStateOf(false) }
     var bottomSheetState by rememberSaveable { mutableStateOf<BottomSheetState>(BottomSheetState.Hidden) }
+    val scope = rememberCoroutineScope()
 
     val video = state.video
     val controller = remember { YouTubePlayerController() }
-    val sheetState = rememberModalBottomSheetState()
+    var newlyAddedTimestampId by rememberSaveable { mutableStateOf<Long?>(null) }
 
     val configuration = LocalConfiguration.current
     val activity = LocalActivity.current
@@ -154,7 +141,10 @@ fun TimestampViewerScreen(windowSize: WindowWidthSizeClass) {
     Scaffold(
         floatingActionButton = {
             FloatingActionButton(onClick = {
-                bottomSheetState = BottomSheetState.NewTimestamp
+                video?.videoId?.let {
+                    bottomSheetState = BottomSheetState.EditTimestamp(Timestamp(videoId = it))
+
+                }
             }) {
                 Icon(Icons.Filled.Add, "Add")
             }
@@ -169,7 +159,7 @@ fun TimestampViewerScreen(windowSize: WindowWidthSizeClass) {
                 onDescriptionClick = {
                     bottomSheetState = BottomSheetState.EditTimestamp(it)
                 },
-                highlightedId = state.newlyAddedTimestampId,
+                highlightedId = newlyAddedTimestampId,
                 textSingleLine = textSingleLine,
                 onCLickSettings = { showSettingsDialog = true }
             )
@@ -233,20 +223,17 @@ fun TimestampViewerScreen(windowSize: WindowWidthSizeClass) {
 
     when (bottomSheetState) {
         is BottomSheetState.Hidden -> {} // Don't show sheet
-        BottomSheetState.NewTimestamp ->
-            TimestampEditorSheet(
-                onDismiss = { bottomSheetState = BottomSheetState.Hidden },
-                onSave = { timestamp -> viewmodel.upsertTimestamp(timestamp) },
-                sheetState = sheetState,
-                timestamp = viewmodel.getEmptyTimestamp(),
-            )
-
         is BottomSheetState.EditTimestamp -> {
             val timestamp = (bottomSheetState as BottomSheetState.EditTimestamp).timestamp
             TimestampEditorSheet(
                 onDismiss = { bottomSheetState = BottomSheetState.Hidden },
-                onSave = { timestamp -> viewmodel.upsertTimestamp(timestamp) },
-                sheetState = sheetState,
+                onAddTimestamp = { addedTimestampId ->
+                    scope.launch {
+                        newlyAddedTimestampId = addedTimestampId
+                        delay(1000)
+                        newlyAddedTimestampId = null
+                    }
+                },
                 timestamp = timestamp,
             )
         }
@@ -449,88 +436,6 @@ fun keyboardAsState(): State<Boolean> {
     return rememberUpdatedState(isImeVisible)
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun TimestampEditorSheet(
-    timestamp: Timestamp,
-    onDismiss: () -> Unit,
-    onSave: (Timestamp) -> Unit,
-    sheetState: SheetState,
-) {
-    val scope = rememberCoroutineScope()
-    val focusRequester = remember { FocusRequester() }
-
-    val hideSheet = {
-        scope.launch { sheetState.hide() }.invokeOnCompletion {
-            if (!sheetState.isVisible) {
-                onDismiss()
-            }
-        }
-    }
-    val textFieldState = rememberTextFieldState(initialText = timestamp.description)
-
-    LaunchedEffect(Unit) {
-        focusRequester.requestFocus()
-    }
-
-    ModalBottomSheet(
-        onDismissRequest = onDismiss,
-        sheetState = sheetState,
-        dragHandle = {},
-    ) {
-        TimestampEditorSheetColumn(timestamp, textFieldState, focusRequester, onSave, hideSheet)
-    }
-}
-
-@Composable
-private fun TimestampEditorSheetColumn(
-    timestamp: Timestamp,
-    textFieldState: TextFieldState,
-    focusRequester: FocusRequester,
-    onSave: (Timestamp) -> Unit,
-    hideSheet: () -> DisposableHandle
-) {
-    var isMultiline by remember { mutableStateOf(false) }
-    Column(modifier = Modifier.padding(16.dp)) {
-        Text(
-            text = "Timestamp: ${timestamp.time.formatDurationToHHMMSS()}",
-            color = MaterialTheme.colorScheme.primary,
-            fontWeight = FontWeight.Bold,
-            maxLines = 1,
-        )
-
-        Row(verticalAlignment = if (isMultiline) Alignment.Bottom else Alignment.CenterVertically) {
-            TextField(
-                state = textFieldState,
-                placeholder = { Text("Description") },
-                keyboardOptions = KeyboardOptions.Default.copy(
-                    keyboardType = KeyboardType.Text,
-                    imeAction = ImeAction.Done
-                ),
-                onKeyboardAction = KeyboardActionHandler {
-                    onSave(timestamp.copy(description = textFieldState.text.toString()))
-                    hideSheet()
-                },
-                onTextLayout = { result ->
-                    isMultiline = (result.invoke()?.lineCount ?: 0) > 1
-                },
-                modifier = Modifier
-                    .weight(1f)
-                    .focusRequester(focusRequester)
-            )
-            FilledIconButton(
-                onClick = {
-                    onSave(timestamp.copy(description = textFieldState.text.toString()))
-                    hideSheet()
-                }, modifier = Modifier
-                    .padding(start = 16.dp)
-            ) {
-                Icon(Icons.Filled.Check, "Save")
-            }
-        }
-    }
-}
-
 fun Duration.formatDurationToHHMMSS(): String =
     this.toComponents { hours, minutes, seconds, _ ->
         if (hours >= 1L) {
@@ -543,7 +448,6 @@ fun Duration.formatDurationToHHMMSS(): String =
 @Parcelize
 sealed interface BottomSheetState : Parcelable {
     object Hidden : BottomSheetState
-    object NewTimestamp : BottomSheetState
     data class EditTimestamp(val timestamp: Timestamp) : BottomSheetState
 }
 
@@ -585,9 +489,7 @@ fun TimestampItemPreview() {
 fun TimestampSheetPortraitPreview() {
     TimestampEditorSheet(
         fakeTimestamp1,
-        {},
-        onSave = {},
-        sheetState = rememberStandardBottomSheetState(),
+        {}, {}
     )
 }
 
@@ -599,8 +501,6 @@ fun TimestampSheetPortraitPreview() {
 fun TimestampSheetLandscapePreview() {
     TimestampEditorSheet(
         fakeTimestamp1,
-        {},
-        onSave = {},
-        sheetState = rememberStandardBottomSheetState(),
+        {}, {}
     )
 }
