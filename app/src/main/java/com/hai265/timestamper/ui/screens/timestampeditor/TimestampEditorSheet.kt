@@ -18,7 +18,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -28,6 +27,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.layout.onVisibilityChanged
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
@@ -57,12 +57,6 @@ fun TimestampEditorSheet(
         }
     }
     val textFieldState = rememberTextFieldState(initialText = timestamp.description)
-
-    LaunchedEffect(sheetState.isVisible) {
-        if (sheetState.isVisible) {
-            focusRequester.requestFocus()
-        }
-    }
 
     ModalBottomSheet(
         onDismissRequest = onDismiss,
@@ -114,6 +108,11 @@ private fun TimestampEditorSheetContent(
                 modifier = Modifier
                     .weight(1f)
                     .focusRequester(focusRequester)
+                    .onVisibilityChanged { visible ->
+                        if (visible) {
+                            focusRequester.requestFocus()
+                        }
+                    }
             )
             FilledIconButton(
                 onClick = {
