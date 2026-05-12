@@ -41,7 +41,7 @@ data class Preferences(
 
 @OptIn(FlowPreview::class)
 @HiltViewModel
-class TimestampEditorViewModel @Inject constructor(
+class TimestampViewerViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val videoRepo: VideoRepository,
     private val timestampRepo: TimestampRepository,

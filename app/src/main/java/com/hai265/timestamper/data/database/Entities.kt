@@ -43,9 +43,9 @@ data class Video(
 data class Timestamp(
     @PrimaryKey(autoGenerate = true)
     val id: Long = 0,
-    val videoId: String,
-    val time: Duration,
-    val description: String
+    val videoId: String = "",
+    val time: Duration = Duration.ZERO,
+    val description: String = ""
 ) : Parcelable
 
 @Serializable

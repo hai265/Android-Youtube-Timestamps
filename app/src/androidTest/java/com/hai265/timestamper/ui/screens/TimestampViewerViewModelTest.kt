@@ -18,7 +18,7 @@ import com.hai265.timestamper.data.repos.TimestampRepository
 import com.hai265.timestamper.data.repos.VideoRepository
 import com.hai265.timestamper.domain.UpsertTimestampUseCase
 import com.hai265.timestamper.ui.screens.editor.TimestampEditorState
-import com.hai265.timestamper.ui.screens.editor.TimestampEditorViewModel
+import com.hai265.timestamper.ui.screens.editor.TimestampViewerViewModel
 import junit.framework.TestCase.assertEquals
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.StandardTestDispatcher
@@ -31,7 +31,7 @@ import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Instant
 
 @RunWith(AndroidJUnit4::class)
-class TimestampEditorViewModelTest {
+class TimestampViewerViewModelTest {
 
     private val testDispatcher = StandardTestDispatcher()
     private lateinit var videoRepo: VideoRepository
@@ -39,7 +39,7 @@ class TimestampEditorViewModelTest {
     private lateinit var preferencesRepo: PreferencesRepository
     private lateinit var savedStateHandle: SavedStateHandle
 
-    private lateinit var subject: TimestampEditorViewModel
+    private lateinit var subject: TimestampViewerViewModel
 
     private lateinit var db: AppDatabase
 
@@ -69,7 +69,7 @@ class TimestampEditorViewModelTest {
         timestampRepo = TimestampRepository(db.timestampDao())
         preferencesRepo = PreferencesRepository(context.dataStore)
         savedStateHandle = SavedStateHandle(mapOf("id" to videoId))
-        subject = TimestampEditorViewModel(
+        subject = TimestampViewerViewModel(
             savedStateHandle = savedStateHandle,
             videoRepo = videoRepo,
             timestampRepo = timestampRepo,

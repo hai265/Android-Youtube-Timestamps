@@ -19,7 +19,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.hai265.timestamper.ui.screens.editor.TimestampEditorScreen
+import com.hai265.timestamper.ui.screens.editor.TimestampViewerScreen
 import com.hai265.timestamper.ui.screens.list.VideoListScreen
 import kotlinx.serialization.Serializable
 
@@ -72,7 +72,7 @@ private fun NavGraph(
             }, windowSize = windowSize)
         }
         composable<Navigables.VideoScreen> {
-            TimestampEditorScreen(windowSize = windowSize)
+            TimestampViewerScreen(windowSize = windowSize)
         }
     }
 }
