@@ -4,6 +4,8 @@ import android.content.Context
 import android.widget.Toast
 import com.hai265.timestamper.data.repos.VideoResult
 
+
+//TODO: Central place to handle adding video and showing toast?
 fun handleVideoResult(context: Context, videoResult: VideoResult, onSuccess: () -> Unit) {
     when (videoResult) {
         is VideoResult.Success -> {

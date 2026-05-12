@@ -11,6 +11,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -34,7 +35,20 @@ class TimestampDialogActivity : FragmentActivity() {
         handleIntent(intent)
 
         setContent {
-            BottomSheet(onExit = { finish() })
+            val state by viewmodel.state.collectAsState()
+            when (state) {
+                is State.AddTimestamp -> {
+                    BottomSheet(onExit = { finish() })
+                }
+
+                State.Finished -> {
+                    finish()
+                }
+
+                State.Initial -> {
+
+                }
+            }
         }
     }
 

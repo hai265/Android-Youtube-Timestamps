@@ -11,30 +11,45 @@ import kotlinx.coroutines.flow.update
 import javax.inject.Inject
 import kotlin.time.Duration
 
-data class AddTimestamp(
-    val videoId: String,
-    val time: Duration
-)
+
+sealed interface State {
+    data object Initial : State
+    data class AddTimestamp(
+        val videoId: String,
+        val time: Duration
+    ) : State
+
+    data object Finished : State //TODO: Message in finished?
+}
+
 
 @HiltViewModel
 class TimestampDialogActivityViewModel @Inject constructor(
     private val repo: VideoRepository
 ) : ViewModel() {
 
-    private val _addTimestamp = MutableStateFlow<AddTimestamp?>(null)
-    val addTimestamp = _addTimestamp.asStateFlow()
+    private val _state = MutableStateFlow<State>(State.Initial)
+    val state = _state.asStateFlow()
 
     suspend fun addVideo(url: String): VideoResult {
         val videoResult = repo.addVideo(url)
         when (videoResult) {
-            is VideoResult.InvalidUrl -> TODO()
-            is VideoResult.NetworkError -> TODO()
+            is VideoResult.InvalidUrl -> {
+                _state.update { State.Finished }
+            }
+
+            is VideoResult.NetworkError -> {
+                _state.update { State.Finished }
+            }
+
             is VideoResult.Success -> {
                 val id = videoResult.videoId
                 val timestamp = getYoutubeTimestampFromUrl(url)
 
                 if (timestamp != null) {
-                    _addTimestamp.update { AddTimestamp(id, timestamp) }
+                    _state.update { State.AddTimestamp(id, timestamp) }
+                } else {
+                    _state.update { State.Finished }
                 }
             }
         }
