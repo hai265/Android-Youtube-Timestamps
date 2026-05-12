@@ -6,7 +6,7 @@ import com.hai265.timestamper.data.repos.VideoResult
 
 fun handleVideoResult(context: Context, videoResult: VideoResult, onSuccess: () -> Unit) {
     when (videoResult) {
-        VideoResult.Success -> {
+        is VideoResult.Success -> {
             Toast.makeText(
                 context,
                 "Video Successfully Added",
@@ -27,14 +27,6 @@ fun handleVideoResult(context: Context, videoResult: VideoResult, onSuccess: () 
             Toast.makeText(
                 context,
                 "Network Error: ${videoResult.errorMessage}",
-                Toast.LENGTH_LONG
-            ).show()
-        }
-
-        VideoResult.VideoAlreadyExists -> {
-            Toast.makeText(
-                context,
-                "Video already exists",
                 Toast.LENGTH_LONG
             ).show()
         }
