@@ -1,4 +1,4 @@
-package com.hai265.timestamper
+package com.hai265.timestamper.ui.screens.timestampeditor
 
 import androidx.lifecycle.ViewModel
 import com.hai265.timestamper.data.getYoutubeTimestampFromUrl
@@ -17,7 +17,7 @@ data class AddTimestamp(
 )
 
 @HiltViewModel
-class MainViewModel @Inject constructor(
+class TimestampDialogActivityViewModel @Inject constructor(
     private val repo: VideoRepository
 ) : ViewModel() {
 
