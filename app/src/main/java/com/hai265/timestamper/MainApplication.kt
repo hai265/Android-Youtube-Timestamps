@@ -6,7 +6,14 @@ import coil3.PlatformContext
 import coil3.SingletonImageLoader
 import coil3.memory.MemoryCache
 import coil3.request.crossfade
+import dagger.Module
+import dagger.Provides
+import dagger.hilt.InstallIn
 import dagger.hilt.android.HiltAndroidApp
+import dagger.hilt.components.SingletonComponent
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.SupervisorJob
+import javax.inject.Singleton
 
 @HiltAndroidApp
 class MainApplication : Application(), SingletonImageLoader.Factory {
@@ -26,4 +33,13 @@ class MainApplication : Application(), SingletonImageLoader.Factory {
 //            }
             .build()
     }
+}
+
+@InstallIn(SingletonComponent::class)
+@Module
+object CoroutinesScopesModule {
+    @Singleton
+    @Provides
+    fun providesApplicationCoroutineScope(
+    ): CoroutineScope = CoroutineScope(SupervisorJob())
 }

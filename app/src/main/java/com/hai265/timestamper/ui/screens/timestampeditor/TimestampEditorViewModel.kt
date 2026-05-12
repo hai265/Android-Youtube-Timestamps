@@ -15,7 +15,7 @@ class TimestampEditorViewModel @Inject constructor(
 
     fun upsertTimestamp(timestamp: Timestamp) {
         viewModelScope.launch {
-            upsertTimestampUseCase.invoke(timestamp)
+            upsertTimestampUseCase.invokeExternalScope(timestamp)
         }
     }
 }
