@@ -2,6 +2,7 @@ package com.hai265.timestamper.ui.screens.timestampeditor
 
 import android.content.Intent
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
@@ -10,12 +11,10 @@ import androidx.compose.runtime.getValue
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.lifecycleScope
 import com.hai265.timestamper.data.database.Timestamp
-import com.hai265.timestamper.ui.handleVideoResult
 import com.hai265.timestamper.ui.theme.AppTheme
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 @AndroidEntryPoint
 class TimestampDialogActivity : FragmentActivity() {
@@ -37,7 +36,13 @@ class TimestampDialogActivity : FragmentActivity() {
                                 time = (state as State.AddTimestamp).time
                             ),
                             onDismiss = { finish() },
-                            onAddTimestamp = {}
+                            onAddTimestamp = {
+                                Toast.makeText(
+                                    applicationContext,
+                                    "Timestamp successfully created",
+                                    Toast.LENGTH_LONG
+                                ).show()
+                            }
                         )
                     }
 
@@ -57,10 +62,7 @@ class TimestampDialogActivity : FragmentActivity() {
         if (intent.action == Intent.ACTION_SEND) {
             intent.getStringExtra(Intent.EXTRA_TEXT)?.let {
                 lifecycleScope.launch(Dispatchers.IO) {
-                    val videoResult = viewmodel.addVideo(it)
-                    withContext(Dispatchers.Main) {
-                        handleVideoResult(this@TimestampDialogActivity, videoResult, {})
-                    }
+                    viewmodel.addVideo(it)
                 }
             }
         }

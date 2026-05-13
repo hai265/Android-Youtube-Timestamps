@@ -31,7 +31,7 @@ class TimestampDialogActivityViewModel @Inject constructor(
     private val _state = MutableStateFlow<State>(State.Initial)
     val state = _state.asStateFlow()
 
-    suspend fun addVideo(url: String): VideoResult {
+    suspend fun addVideo(url: String) {
         val videoResult = repo.addVideo(url)
         when (videoResult) {
             is VideoResult.InvalidUrl -> {
@@ -53,8 +53,6 @@ class TimestampDialogActivityViewModel @Inject constructor(
                 }
             }
         }
-
-        return videoResult
     }
 
 }
