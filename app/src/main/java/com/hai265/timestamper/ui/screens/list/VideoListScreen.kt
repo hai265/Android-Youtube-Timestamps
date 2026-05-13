@@ -387,11 +387,17 @@ fun VideoDropdownMenu(
         ) {
             DropdownMenuItem(
                 text = { Text("Delete", color = MaterialTheme.colorScheme.error) },
-                onClick = onTapDeleteVideo
+                onClick = {
+                    expanded = false
+                    onTapDeleteVideo()
+                }
             )
             DropdownMenuItem(
                 text = { Text("Share Timestamps") },
-                onClick = onShareTimestamps
+                onClick = {
+                    expanded = false
+                    onShareTimestamps()
+                }
             )
         }
     }
@@ -416,11 +422,17 @@ fun MenuDropDown(
         ) {
             DropdownMenuItem(
                 text = { Text("Import") },
-                onClick = onTapImportVideo
+                onClick = {
+                    expanded = false
+                    onTapImportVideo()
+                }
             )
             DropdownMenuItem(
                 text = { Text("Export") },
-                onClick = onTapExportVideo
+                onClick = {
+                    expanded = false
+                    onTapExportVideo()
+                }
             )
         }
     }
