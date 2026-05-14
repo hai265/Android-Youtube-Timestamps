@@ -19,6 +19,7 @@ import kotlin.time.Duration
 
 sealed interface VideoResult {
     data class Success(val videoId: String) : VideoResult
+    data class VideoAlreadyExists(val videoId: String) : VideoResult
 
     data class InvalidUrl(val url: String) : VideoResult
     data class NetworkError(val errorMessage: String?) : VideoResult
@@ -48,7 +49,7 @@ class VideoRepository @Inject constructor(
     suspend fun addVideo(url: String): VideoResult {
         val videoId = getYouTubeIdFromUrl(url) ?: return VideoResult.InvalidUrl(url)
         if (getVideoById(videoId) != null) {
-            return VideoResult.Success(videoId)
+            return VideoResult.VideoAlreadyExists(videoId)
         }
         val metadata = try {
             youtubeMetadataApi.getYoutubeMetadata(url)

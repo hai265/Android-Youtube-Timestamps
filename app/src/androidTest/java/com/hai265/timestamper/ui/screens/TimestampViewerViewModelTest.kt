@@ -16,7 +16,6 @@ import com.hai265.timestamper.data.repos.PreferencesRepository
 import com.hai265.timestamper.data.repos.RepoModule.Companion.dataStore
 import com.hai265.timestamper.data.repos.TimestampRepository
 import com.hai265.timestamper.data.repos.VideoRepository
-import com.hai265.timestamper.domain.UpsertTimestampUseCase
 import com.hai265.timestamper.ui.screens.editor.TimestampEditorState
 import com.hai265.timestamper.ui.screens.editor.TimestampViewerViewModel
 import junit.framework.TestCase.assertEquals
@@ -74,7 +73,6 @@ class TimestampViewerViewModelTest {
             videoRepo = videoRepo,
             timestampRepo = timestampRepo,
             preferencesRepository = preferencesRepo,
-            upsertTimestampUseCase = UpsertTimestampUseCase(timestampRepo, videoRepo)
         )
     }
 

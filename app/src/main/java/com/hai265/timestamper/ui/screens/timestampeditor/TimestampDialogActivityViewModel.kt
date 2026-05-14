@@ -42,8 +42,12 @@ class TimestampDialogActivityViewModel @Inject constructor(
                 _state.update { State.Finished }
             }
 
-            is VideoResult.Success -> {
-                val id = videoResult.videoId
+            is VideoResult.Success,
+            is VideoResult.VideoAlreadyExists -> {
+                val id = when (videoResult) {
+                    is VideoResult.Success -> videoResult.videoId
+                    is VideoResult.VideoAlreadyExists -> videoResult.videoId
+                }
                 val timestamp = getYoutubeTimestampFromUrl(url)
 
                 if (timestamp != null) {

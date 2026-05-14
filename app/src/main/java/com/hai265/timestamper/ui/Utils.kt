@@ -7,30 +7,16 @@ import com.hai265.timestamper.data.repos.VideoResult
 
 //TODO: Central place to handle adding video and showing toast?
 fun handleVideoResult(context: Context, videoResult: VideoResult, onSuccess: () -> Unit) {
-    when (videoResult) {
-        is VideoResult.Success -> {
-            Toast.makeText(
-                context,
-                "Video Successfully Added",
-                Toast.LENGTH_LONG
-            ).show()
-            onSuccess()
-        }
-
-        is VideoResult.InvalidUrl -> {
-            Toast.makeText(
-                context,
-                "Invalid Url: ${videoResult.url}",
-                Toast.LENGTH_LONG
-            ).show()
-        }
-
-        is VideoResult.NetworkError -> {
-            Toast.makeText(
-                context,
-                "Network Error: ${videoResult.errorMessage}",
-                Toast.LENGTH_LONG
-            ).show()
-        }
+    if (videoResult is VideoResult.Success) onSuccess()
+    val toastText = when (videoResult) {
+        is VideoResult.Success -> "Video Successfully Added"
+        is VideoResult.VideoAlreadyExists -> "Video Already Exists"
+        is VideoResult.InvalidUrl -> "Invalid Url: ${videoResult.url}"
+        is VideoResult.NetworkError -> "Network Error: ${videoResult.errorMessage}"
     }
+    Toast.makeText(
+        context,
+        toastText,
+        Toast.LENGTH_LONG
+    ).show()
 }

@@ -7,6 +7,7 @@ plugins {
     alias(libs.plugins.ksp)
     alias(libs.plugins.hilt)
     alias(libs.plugins.kotlin.parcelize)
+    alias(libs.plugins.google.services)
 }
 
 extensions.configure<ApplicationExtension> {
@@ -87,6 +88,9 @@ dependencies {
     implementation(libs.logging.interceptor)
     implementation(libs.kotlinx.datetime)
     implementation(libs.kotlinx.serialization.core)
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.firestore)
+
 
     implementation(libs.kotlinx.io.core)
     androidTestImplementation(libs.androidx.junit)
