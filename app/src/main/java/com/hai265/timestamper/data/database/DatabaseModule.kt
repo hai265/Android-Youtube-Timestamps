@@ -2,6 +2,8 @@ package com.hai265.timestamper.data.database
 
 import android.content.Context
 import androidx.room.Room
+import androidx.sqlite.driver.bundled.BundledSQLiteDriver
+import com.powersync.integrations.room.loadPowerSyncExtension
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -16,10 +18,16 @@ abstract class DatabaseModule {
         @Provides
         @Singleton
         fun providesAppDatabase(@ApplicationContext context: Context): AppDatabase {
+            val driver = BundledSQLiteDriver().also {
+                it.loadPowerSyncExtension() // Extension method by PowerSync
+            }
+
             return Room.databaseBuilder(
                 context,
                 AppDatabase::class.java, "app_database"
-            ).build()
+            )
+                .setDriver(driver)
+                .build()
         }
 
         @Provides

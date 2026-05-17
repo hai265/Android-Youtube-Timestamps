@@ -90,7 +90,11 @@ dependencies {
     implementation(libs.kotlinx.serialization.core)
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.firestore)
-
+    implementation(libs.powersync.core)
+    implementation(libs.powersync.room)
+    implementation(libs.androidx.sqlite.bundled)
+    implementation(libs.powersync.integration.supabase)
+    implementation(libs.postgrest.kt)
 
     implementation(libs.kotlinx.io.core)
     androidTestImplementation(libs.androidx.junit)
