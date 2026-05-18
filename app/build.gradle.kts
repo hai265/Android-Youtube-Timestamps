@@ -1,5 +1,9 @@
 import com.android.build.api.dsl.ApplicationExtension
+import java.util.Properties
 
+val localProps = Properties().apply {
+    load(rootProject.file("local.properties").inputStream())
+}
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
@@ -37,6 +41,14 @@ extensions.configure<ApplicationExtension> {
         debug {
             enableUnitTestCoverage = true
             enableAndroidTestCoverage = true
+            buildConfigField(
+                "String", "POWERSYNC_TOKEN",
+                "\"${localProps["powersync.dev.token"]}\""
+            )
+            buildConfigField(
+                "String", "POWERSYNC_ENDPOINT",
+                "\"${localProps["powersync.endpoint"]}\""
+            )
         }
     }
     compileOptions {
@@ -46,6 +58,7 @@ extensions.configure<ApplicationExtension> {
 
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 }
 
