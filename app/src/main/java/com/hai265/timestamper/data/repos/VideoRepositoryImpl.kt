@@ -6,10 +6,14 @@ import com.hai265.timestamper.data.database.TimestampDao
 import com.hai265.timestamper.data.database.Video
 import com.hai265.timestamper.data.database.VideoDao
 import com.hai265.timestamper.data.database.VideoWithTimestamps
+import com.hai265.timestamper.data.database.powersync.MyConnector
 import com.hai265.timestamper.data.getYouTubeIdFromUrl
 import com.hai265.timestamper.data.network.YoutubeMetadataApiService
+import com.powersync.PowerSyncDatabase
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import retrofit2.HttpException
 import java.io.IOException
@@ -30,7 +34,17 @@ class VideoRepositoryImpl @Inject constructor(
     val timestmapDao: TimestampDao,
     val youtubeMetadataApi: YoutubeMetadataApiService,
     val database: AppDatabase,
+    private val powersyncDatabase: PowerSyncDatabase,
+    private val connector: MyConnector,
+    externalScope: CoroutineScope,
 ) : VideoRepository {
+
+    init {
+        externalScope.launch {
+            powersyncDatabase.connect(connector)
+        }
+    }
+
     override fun getVideos(): Flow<List<Video>> {
         return videoDao.getAllVideos()
     }
