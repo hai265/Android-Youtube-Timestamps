@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.preferencesDataStore
+import dagger.Binds
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -15,6 +16,10 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 abstract class RepoModule {
+
+    @Binds
+    abstract fun providesVideoRepository(repo: VideoRepositoryImpl): VideoRepository
+
     companion object {
         val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "settings")
 
