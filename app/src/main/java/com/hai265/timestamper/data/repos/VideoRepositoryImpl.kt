@@ -10,6 +10,8 @@ import com.hai265.timestamper.data.database.powersync.MyConnector
 import com.hai265.timestamper.data.getYouTubeIdFromUrl
 import com.hai265.timestamper.data.network.YoutubeMetadataApiService
 import com.powersync.PowerSyncDatabase
+import com.powersync.db.schema.RawTable
+import com.powersync.db.schema.RawTableSchema
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -41,7 +43,19 @@ class VideoRepositoryImpl @Inject constructor(
 
     init {
         externalScope.launch {
+            val table = RawTable(
+                name = "videos",
+                schema = RawTableSchema()
+            )
+
+            for (write in listOf("INSERT", "UPDATE", "DELETE")) {
+                powersyncDatabase.execute(
+                    "SELECT powersync_create_raw_table_crud_trigger(?, ?, ?)",
+                    listOf(table.jsonDescription(), "$write", write),
+                )
+            }
             powersyncDatabase.connect(connector)
+
         }
     }
 

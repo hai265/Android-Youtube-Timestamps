@@ -1,8 +1,10 @@
 package com.hai265.timestamper.data.database.powersync
 
 import co.touchlab.kermit.Logger
+import com.hai265.timestamper.BuildConfig
 import com.hai265.timestamper.data.database.AppDatabase
 import com.powersync.PowerSyncDatabase
+import com.powersync.connectors.PowerSyncBackendConnector
 import com.powersync.db.schema.Schema
 import com.powersync.integrations.room.RoomConnectionPool
 import dagger.Module
@@ -31,6 +33,16 @@ abstract class PowerSyncModule {
                 logger = Logger,
             )
             return powersync
+        }
+
+        @Provides
+        fun providesPowerSyncConnector(): PowerSyncBackendConnector {
+            return SupabaseConnector(
+                powerSyncEndpoint = BuildConfig.POWERSYNC_ENDPOINT,
+                supabaseUrl = BuildConfig.SUPABASE_ENDPOINT,
+                supabaseKey = BuildConfig.SUPABASE_KEY,
+                storageBucket = BuildConfig.SUPABASE_STORAGE_BUCKET
+            )
         }
     }
 }

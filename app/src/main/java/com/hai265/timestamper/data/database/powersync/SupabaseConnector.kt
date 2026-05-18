@@ -1,6 +1,7 @@
 package com.hai265.timestamper.data.database.powersync
 
 import co.touchlab.kermit.Logger
+import com.hai265.timestamper.BuildConfig
 import com.powersync.PowerSyncDatabase
 import com.powersync.connectors.PowerSyncBackendConnector
 import com.powersync.connectors.PowerSyncCredentials
@@ -158,19 +159,23 @@ public open class SupabaseConnector(
      */
     override suspend fun fetchCredentials(): PowerSyncCredentials =
         runWrapped {
-            check(supabaseClient.auth.sessionStatus.value is SessionStatus.Authenticated) { "Supabase client is not authenticated" }
-
-            // Use Supabase token for PowerSync
-            val session =
-                supabaseClient.auth.currentSessionOrNull()
-                    ?: error("Could not fetch Supabase credentials")
-
-            check(session.user != null) { "No user data" }
-
-            PowerSyncCredentials(
-                endpoint = powerSyncEndpoint,
-                token = session.accessToken, // Use the access token to authenticate against PowerSync
+            return PowerSyncCredentials(
+                endpoint = BuildConfig.POWERSYNC_ENDPOINT,
+                token = BuildConfig.POWERSYNC_TOKEN,
             )
+//            check(supabaseClient.auth.sessionStatus.value is SessionStatus.Authenticated) { "Supabase client is not authenticated" }
+//
+//            // Use Supabase token for PowerSync
+//            val session =
+//                supabaseClient.auth.currentSessionOrNull()
+//                    ?: error("Could not fetch Supabase credentials")
+//
+//            check(session.user != null) { "No user data" }
+//
+//            PowerSyncCredentials(
+//                endpoint = powerSyncEndpoint,
+//                token = session.accessToken, // Use the access token to authenticate against PowerSync
+//            )
         }
 
     /**
