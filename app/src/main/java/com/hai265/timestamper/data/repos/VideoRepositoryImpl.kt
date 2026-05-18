@@ -31,7 +31,7 @@ sealed interface VideoResult {
     data class NetworkError(val errorMessage: String?) : VideoResult
 }
 
-class VideoRepositoryImpl @Inject constructor(
+class VideoRepository @Inject constructor(
     val videoDao: VideoDao,
     val timestmapDao: TimestampDao,
     val youtubeMetadataApi: YoutubeMetadataApiService,
@@ -39,7 +39,7 @@ class VideoRepositoryImpl @Inject constructor(
     private val powersyncDatabase: PowerSyncDatabase,
     private val connector: MyConnector,
     externalScope: CoroutineScope,
-) : VideoRepository {
+) {
 
     init {
         externalScope.launch {
@@ -59,22 +59,22 @@ class VideoRepositoryImpl @Inject constructor(
         }
     }
 
-    override fun getVideos(): Flow<List<Video>> {
+    fun getVideos(): Flow<List<Video>> {
         return videoDao.getAllVideos()
     }
 
-    override suspend fun getVideosWithTimestamps(): List<VideoWithTimestamps> {
+    suspend fun getVideosWithTimestamps(): List<VideoWithTimestamps> {
         return videoDao.getAllVideosAndTimestamps()
     }
 
-    override suspend fun getVideoById(id: String): Video? {
+    suspend fun getVideoById(id: String): Video? {
         return videoDao.getVideoById(id)
     }
 
     //Two errors can occur
     // 1. url is invalid
     // 2. video already added
-    override suspend fun addVideo(url: String): VideoResult {
+    suspend fun addVideo(url: String): VideoResult {
         val videoId = getYouTubeIdFromUrl(url) ?: return VideoResult.InvalidUrl(url)
         if (getVideoById(videoId) != null) {
             return VideoResult.VideoAlreadyExists(videoId)
@@ -104,7 +104,7 @@ class VideoRepositoryImpl @Inject constructor(
         return VideoResult.Success(videoId)
     }
 
-    override suspend fun importVideosWithTimestamps(videoWithTimestamps: List<VideoWithTimestamps>) {
+    suspend fun importVideosWithTimestamps(videoWithTimestamps: List<VideoWithTimestamps>) {
         database.withTransaction {
             videoWithTimestamps.forEach { (video, timestamps) ->
                 if (videoDao.getVideoById(video.videoId) == null) {
@@ -117,7 +117,7 @@ class VideoRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun deleteVideo(video: Video) {
+    suspend fun deleteVideo(video: Video) {
         withContext(Dispatchers.IO) {
             videoDao.deleteVideo(video)
         }
@@ -125,14 +125,14 @@ class VideoRepositoryImpl @Inject constructor(
 
     //TODO: Optimize so I don't write to db every second
     //Performance profiling?
-    override suspend fun updateVideoLastWatched(videoId: String, lastWatchedTimestamp: Duration) {
+    suspend fun updateVideoLastWatched(videoId: String, lastWatchedTimestamp: Duration) {
         withContext(Dispatchers.IO) {
             videoDao.updateLastPlayed(videoId, lastWatchedTimestamp.inWholeMilliseconds)
         }
     }
 
 
-    override suspend fun updateLastEdited(videoId: String) {
+    suspend fun updateLastEdited(videoId: String) {
         withContext(Dispatchers.IO) {
             videoDao.updateLastEdited(videoId, Clock.System.now())
         }
