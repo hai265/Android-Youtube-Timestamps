@@ -18,6 +18,7 @@ import javax.inject.Singleton
 abstract class RepoModule {
 
     @Binds
+    @Singleton
     abstract fun providesVideoRepository(repo: VideoRepositoryImpl): VideoRepository
 
     companion object {
