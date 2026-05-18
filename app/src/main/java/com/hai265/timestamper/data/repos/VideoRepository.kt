@@ -6,10 +6,10 @@ import com.hai265.timestamper.data.database.TimestampDao
 import com.hai265.timestamper.data.database.Video
 import com.hai265.timestamper.data.database.VideoDao
 import com.hai265.timestamper.data.database.VideoWithTimestamps
-import com.hai265.timestamper.data.database.powersync.MyConnector
 import com.hai265.timestamper.data.getYouTubeIdFromUrl
 import com.hai265.timestamper.data.network.YoutubeMetadataApiService
 import com.powersync.PowerSyncDatabase
+import com.powersync.connectors.PowerSyncBackendConnector
 import com.powersync.db.schema.RawTable
 import com.powersync.db.schema.RawTableSchema
 import kotlinx.coroutines.CoroutineScope
@@ -20,6 +20,7 @@ import kotlinx.coroutines.withContext
 import retrofit2.HttpException
 import java.io.IOException
 import javax.inject.Inject
+import javax.inject.Singleton
 import kotlin.time.Clock
 import kotlin.time.Duration
 
@@ -31,13 +32,14 @@ sealed interface VideoResult {
     data class NetworkError(val errorMessage: String?) : VideoResult
 }
 
+@Singleton
 class VideoRepository @Inject constructor(
     val videoDao: VideoDao,
     val timestmapDao: TimestampDao,
     val youtubeMetadataApi: YoutubeMetadataApiService,
     val database: AppDatabase,
     private val powersyncDatabase: PowerSyncDatabase,
-    private val connector: MyConnector,
+    private val connector: PowerSyncBackendConnector,
     externalScope: CoroutineScope,
 ) {
 
@@ -48,12 +50,12 @@ class VideoRepository @Inject constructor(
                 schema = RawTableSchema()
             )
 
-            for (write in listOf("INSERT", "UPDATE", "DELETE")) {
-                powersyncDatabase.execute(
-                    "SELECT powersync_create_raw_table_crud_trigger(?, ?, ?)",
-                    listOf(table.jsonDescription(), "$write", write),
-                )
-            }
+//            for (write in listOf("INSERT", "UPDATE", "DELETE")) {
+//                powersyncDatabase.execute(
+//                    "SELECT powersync_create_raw_table_crud_trigger(?, ?, ?)",
+//                    listOf(table.jsonDescription(), "$write", write),
+//                )
+//            }
             powersyncDatabase.connect(connector)
 
         }
@@ -94,7 +96,7 @@ class VideoRepository @Inject constructor(
 
         videoDao.addVideo(
             Video(
-                videoId = videoId,
+                id = videoId,
                 videoTitle = metadata.title,
                 thumbnail = metadata.thumbnail,
                 lastEdited = Clock.System.now(),
@@ -107,7 +109,7 @@ class VideoRepository @Inject constructor(
     suspend fun importVideosWithTimestamps(videoWithTimestamps: List<VideoWithTimestamps>) {
         database.withTransaction {
             videoWithTimestamps.forEach { (video, timestamps) ->
-                if (videoDao.getVideoById(video.videoId) == null) {
+                if (videoDao.getVideoById(video.id) == null) {
                     videoDao.addVideo(video)
                 }
                 timestamps.forEach {

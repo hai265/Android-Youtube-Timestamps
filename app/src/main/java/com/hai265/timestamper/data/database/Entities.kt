@@ -16,7 +16,7 @@ import kotlin.time.Instant
 @Serializable
 data class Video(
     @PrimaryKey
-    val videoId: String,
+    val id: String,
     val videoTitle: String?,
     val thumbnail: String,
     val lastEdited: Instant,
@@ -31,13 +31,13 @@ data class Video(
     foreignKeys = [
         ForeignKey(
             entity = Video::class,
-            parentColumns = ["videoId"],
-            childColumns = ["videoId"],
+            parentColumns = ["id"],
+            childColumns = ["id"],
             onDelete = ForeignKey.CASCADE
         )
     ],
     indices = [
-        Index("videoId")
+        Index("id")
     ]
 )
 data class Timestamp(
@@ -52,7 +52,7 @@ data class Timestamp(
 data class VideoWithTimestamps(
     @Embedded val video: Video,
     @Relation(
-        parentColumn = "videoId",
+        parentColumn = "id",
         entityColumn = "videoId",
     )
     val timestamps: List<Timestamp>

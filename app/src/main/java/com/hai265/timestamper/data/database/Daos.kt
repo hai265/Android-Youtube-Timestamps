@@ -18,10 +18,10 @@ interface VideoDao {
     @Query("SELECT * from videos")
     suspend fun getAllVideosAndTimestamps(): List<VideoWithTimestamps>
 
-    @Query("SELECT * from videos WHERE videoId =:id")
+    @Query("SELECT * from videos WHERE id =:id")
     suspend fun getVideoById(id: String): Video?
 
-    @Query("UPDATE videos SET lastPlayed = :timestamp WHERE videoId = :videoId")
+    @Query("UPDATE videos SET lastPlayed = :timestamp WHERE id = :videoId")
     suspend fun updateLastPlayed(videoId: String, timestamp: Long)
 
     @Upsert
@@ -30,7 +30,7 @@ interface VideoDao {
     @Delete
     fun deleteVideo(id: Video)
 
-    @Query("UPDATE videos SET lastEdited = :now WHERE videoId =:videoId")
+    @Query("UPDATE videos SET lastEdited = :now WHERE id =:videoId")
     fun updateLastEdited(videoId: String, now: Instant)
 }
 

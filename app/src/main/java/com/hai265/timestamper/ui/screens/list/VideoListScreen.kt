@@ -188,7 +188,7 @@ fun VideoListScreen(onTapVideo: (id: String) -> Unit, windowSize: WindowWidthSiz
                 coroutineScope.launch {
                     val intent = Intent(Intent.ACTION_SEND).apply {
                         action = Intent.ACTION_SEND
-                        putExtra(Intent.EXTRA_TEXT, viewmodel.getTimestampsAsString(video.videoId))
+                        putExtra(Intent.EXTRA_TEXT, viewmodel.getTimestampsAsString(video.id))
                         type = "text/plain"
                     }
                     context.startActivity(Intent.createChooser(intent, null))
@@ -266,7 +266,7 @@ private fun VideoListScreen(
             items(videoList) { video ->
                 VideoItem(
                     video = video,
-                    onTap = { onTapVideo(video.videoId) },
+                    onTap = { onTapVideo(video.id) },
                     onTapDeleteVideo = { onDeleteVideo(video) },
                     onTapExportVideo = { uri -> onExportVideo(video, uri) },
                     onTapShareVideo = { onTapShareVideo(video) },
@@ -320,7 +320,7 @@ private fun VideoItem(
             val timezoneId = android.icu.util.TimeZone.getDefault().id
             Column(modifier = Modifier.weight(1f)) {
                 Text(
-                    video.videoTitle ?: "Video ID: ${video.videoId}",
+                    video.videoTitle ?: "Video ID: ${video.id}",
                     style = MaterialTheme.typography.titleMedium,
                 )
                 Text(
@@ -518,7 +518,7 @@ fun DeleteConfirmationDialog(
             Text(
                 text = buildAnnotatedString {
                     withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
-                        append(video.videoTitle ?: video.videoId)
+                        append(video.videoTitle ?: video.id)
                     }
                     append("will be removed from your list.")
                 }

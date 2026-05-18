@@ -15,7 +15,6 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 abstract class RepoModule {
-
     companion object {
         val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "settings")
 

@@ -120,7 +120,6 @@ dependencies {
     implementation(libs.androidx.sqlite.bundled)
     implementation(libs.powersync.integration.supabase)
     implementation(libs.postgrest.kt)
-
     implementation(libs.kotlinx.io.core)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
