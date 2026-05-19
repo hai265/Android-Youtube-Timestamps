@@ -50,6 +50,14 @@ extensions.configure<ApplicationExtension> {
     }
 }
 
+sqldelight {
+    databases {
+        register("AppSqlDatabase") {
+            packageName.set("com.hai265.timestamper")
+        }
+    }
+}
+
 dependencies {
 
     implementation(libs.androidx.core.ktx)
@@ -93,6 +101,7 @@ dependencies {
 //    implementation(libs.firebase.firestore)
     implementation(libs.kotlinx.io.core)
     implementation(libs.android.driver)
+    implementation(libs.sqldelight.coroutines.extensions)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(platform(libs.androidx.compose.bom))

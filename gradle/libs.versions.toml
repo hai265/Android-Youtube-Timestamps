@@ -8,6 +8,7 @@ composeBomVersion = "2026.03.01"
 converterGson = "3.0.0"
 converterScalars = "3.0.0"
 androidyoutubeplayer = "13.0.0"
+coroutinesExtensions = "2.0.2"
 datastorePreferences = "1.2.1"
 firebaseBom = "34.13.0"
 fragmentKtx = "1.8.9"
@@ -47,7 +48,7 @@ google-services = "4.4.4"
 sqldelight = "2.3.2"
 
 [libraries]
-android-driver = { module = "app.cash.sqldelight:android-driver", version.ref = "androidDriver" }
+android-driver = { module = "app.cash.sqldelight:android-driver", version.ref = "sqldelight" }
 androidx-activity-ktx = { module = "androidx.activity:activity-ktx", version.ref = "activityKtx" }
 androidx-compose-bom = { module = "androidx.compose:compose-bom", version.ref = "composeBomVersion" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -106,6 +107,7 @@ androidx-fragment-compose = { group = "androidx.fragment", name = "fragment-comp
 androidx-media3-exoplayer = { group = "androidx.media3", name = "media3-exoplayer", version.ref = "media3Exoplayer" }
 androidx-compose-material3-window-size-class1 = { group = "androidx.compose.material3", name = "material3-window-size-class", version.ref = "material3WindowSizeClass" }
 androidx-compose-material3 = { group = "androidx.compose.material3", name = "material3", version.ref = "material3" }
+sqldelight-coroutines-extensions = { module = "app.cash.sqldelight:coroutines-extensions", version.ref = "sqldelight" }
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
 kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }

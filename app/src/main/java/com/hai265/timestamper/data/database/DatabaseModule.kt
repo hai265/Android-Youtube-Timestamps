@@ -2,6 +2,7 @@ package com.hai265.timestamper.data.database
 
 import android.content.Context
 import androidx.room.Room
+import dagger.Binds
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -12,6 +13,10 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 abstract class DatabaseModule {
+
+    @Binds
+    abstract fun providesVideoDao(dao: SqlDelightVideoDao): VideoDao
+
     companion object {
         @Provides
         @Singleton
@@ -22,8 +27,15 @@ abstract class DatabaseModule {
             ).build()
         }
 
-        @Provides
-        fun providesVideoDao(database: AppDatabase) = database.videoDao()
+//        @Provides
+//        @Singleton
+//        fun providesSqlDelightDatabase(@ApplicationContext context: Context): AppSqlDatabase {
+//            return AppSqlDatabase(
+//                AndroidSqliteDriver(
+//                    AppSqlDatabase.Schema, context, "app_database.db"
+//                )
+//            )
+//        }
 
         @Provides
         fun providesTimestampDao(database: AppDatabase) = database.timestampDao()
