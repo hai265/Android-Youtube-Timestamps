@@ -34,7 +34,9 @@ abstract class DatabaseModule {
         }
 
         @Provides
-        fun providesTimestampDao(database: AppDatabase) = database.timestampDao()
+        fun providesTimestampDao(driver: SqlDriver): TimestampDao {
+            return SqlDelightTimestampsDao(AppSqlDatabase(driver))
+        }
 
         @Provides
         fun providesVideoDao(driver: SqlDriver): VideoDao {

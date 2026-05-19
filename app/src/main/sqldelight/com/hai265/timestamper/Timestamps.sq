@@ -1,0 +1,38 @@
+CREATE TABLE timestamps(
+-- TODO: change integer to UUID
+id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL ,
+video_id TEXT NOT NULL,
+time INTEGER NOT NULL,
+description TEXT NOT NULL
+);
+
+getTimestmaps:
+SELECT * FROM timestamps WHERE video_id = :videoId ORDER BY time ASC;
+
+
+insertNewTimestamp:
+INSERT INTO timestamps(
+video_id,
+time,
+description
+)
+VALUES (?,?,?)
+;
+
+upsertTimestamp:
+INSERT OR REPLACE INTO timestamps(
+id,
+video_id,
+time,
+description
+)
+VALUES (?,?,?,?);
+
+deleteTimestamp:
+DELETE FROM timestamps WHERE id = :id;
+
+getTimestampById:
+SELECT * FROM timestamps WHERE id = :id;
+
+getLastInsertId:
+SELECT last_insert_rowid();
