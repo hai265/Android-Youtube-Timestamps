@@ -8,14 +8,8 @@ import com.hai265.timestamper.data.database.VideoDao
 import com.hai265.timestamper.data.database.VideoWithTimestamps
 import com.hai265.timestamper.data.getYouTubeIdFromUrl
 import com.hai265.timestamper.data.network.YoutubeMetadataApiService
-import com.powersync.PowerSyncDatabase
-import com.powersync.connectors.PowerSyncBackendConnector
-import com.powersync.db.schema.RawTable
-import com.powersync.db.schema.RawTableSchema
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import retrofit2.HttpException
 import java.io.IOException
@@ -38,29 +32,7 @@ class VideoRepository @Inject constructor(
     val timestmapDao: TimestampDao,
     val youtubeMetadataApi: YoutubeMetadataApiService,
     val database: AppDatabase,
-    private val powersyncDatabase: PowerSyncDatabase,
-    private val connector: PowerSyncBackendConnector,
-    externalScope: CoroutineScope,
 ) {
-
-    init {
-        externalScope.launch {
-            //TODO: Only run this once per application
-            val table = RawTable(
-                name = "videos",
-                schema = RawTableSchema()
-            )
-
-            for (write in listOf("INSERT", "UPDATE", "DELETE")) {
-                powersyncDatabase.execute(
-                    "SELECT powersync_create_raw_table_crud_trigger(?, ?, ?)",
-                    listOf(table.jsonDescription(), "$write", write),
-                )
-            }
-            powersyncDatabase.connect(connector)
-
-        }
-    }
 
     fun getVideos(): Flow<List<Video>> {
         return videoDao.getAllVideos()

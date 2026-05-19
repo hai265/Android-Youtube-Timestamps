@@ -1,5 +1,6 @@
 package com.hai265.timestamper.data.database
 
+import app.cash.sqldelight.async.coroutines.awaitAsOne
 import app.cash.sqldelight.coroutines.asFlow
 import app.cash.sqldelight.coroutines.mapToList
 import com.hai265.timestamper.AppSqlDatabase
@@ -17,14 +18,14 @@ class SqlDelightTimestampsDao(private val database: AppSqlDatabase) : TimestampD
         }
     }
 
-    override fun upsertTimestamp(timestamp: Timestamp): Long {
+    override suspend fun upsertTimestamp(timestamp: Timestamp): Long {
         return if (timestamp.id == 0L) {
             queries.insertNewTimestamp(
                 video_id = timestamp.videoId,
                 time = timestamp.time.inWholeMilliseconds,
                 description = timestamp.description,
             )
-            queries.getLastInsertId().executeAsOne()
+            queries.getLastInsertId().awaitAsOne()
         } else {
             queries.upsertTimestamp(
                 id = timestamp.id,
@@ -37,15 +38,16 @@ class SqlDelightTimestampsDao(private val database: AppSqlDatabase) : TimestampD
 
     }
 
-    override fun deleteTimestamp(timestamp: Timestamp) {
+    override suspend fun deleteTimestamp(timestamp: Timestamp) {
         queries.deleteTimestamp(timestamp.id)
     }
 
     override fun getTimestampById(id: Long): Timestamp {
+        //TODO: await suspend
         return queries.getTimestampById(id).executeAsOne().toTimestamp()
     }
 
-    override fun addTimestamps(timestamps: List<Timestamp>) {
+    override suspend fun addTimestamps(timestamps: List<Timestamp>) {
         database.transaction {
             timestamps.forEach { timestamp ->
                 upsertTimestamp(timestamp)

@@ -1,5 +1,7 @@
 package com.hai265.timestamper.data.database
 
+import app.cash.sqldelight.async.coroutines.awaitAsList
+import app.cash.sqldelight.async.coroutines.awaitAsOneOrNull
 import app.cash.sqldelight.coroutines.asFlow
 import app.cash.sqldelight.coroutines.mapToList
 import com.hai265.timestamper.AppSqlDatabase
@@ -23,22 +25,22 @@ class SqlDelightVideoDao(private val database: AppSqlDatabase) : VideoDao {
 
     override suspend fun getAllVideosAndTimestamps(): List<VideoWithTimestamps> {
         return queries.getAllVideosWithTimestamps()
-            .executeAsList()
-            .groupBy { it.video_id }
+            .awaitAsList()
+            .groupBy { it.id }
             .map { (_, rows) ->
                 VideoWithTimestamps(
                     video = Video(
-                        id = rows.first().video_id,
+                        id = rows.first().id,
                         videoTitle = rows.first().video_title,
                         thumbnail = rows.first().thumbnail,
                         lastEdited = Instant.fromEpochMilliseconds(rows.first().last_edited),
                         lastPlayed = rows.first().last_played.milliseconds
                     ),
                     timestamps = rows.mapNotNull { row ->
-                        row.id?.let {
+                        row.id_?.let {
                             Timestamp(
                                 id = it,
-                                videoId = row.video_id,
+                                videoId = row.video_id ?: "",
                                 time = row.time?.milliseconds ?: Duration.ZERO,
                                 description = row.description ?: ""
                             )
@@ -50,7 +52,7 @@ class SqlDelightVideoDao(private val database: AppSqlDatabase) : VideoDao {
 
     override suspend fun getVideoById(id: String): Video? =
         withContext(Dispatchers.IO) {
-            queries.getVideoById(id).executeAsOneOrNull()?.toVideo()
+            queries.getVideoById(id).awaitAsOneOrNull()?.toVideo()
         }
 
     override suspend fun updateLastPlayed(videoId: String, timestamp: Long) {
@@ -61,7 +63,7 @@ class SqlDelightVideoDao(private val database: AppSqlDatabase) : VideoDao {
 
     override suspend fun addVideo(video: Video) {
         queries.addVideo(
-            video_id = video.id,
+            id = video.id,
             video_title = video.videoTitle ?: "",
             thumbnail = video.thumbnail,
             last_edited = video.lastEdited.epochSeconds,
@@ -69,18 +71,19 @@ class SqlDelightVideoDao(private val database: AppSqlDatabase) : VideoDao {
         )
     }
 
-    override fun deleteVideo(id: Video) {
+    override suspend fun deleteVideo(id: Video) {
         queries.deleteVideo(id.id)
+
     }
 
-    override fun updateLastEdited(videoId: String, now: Instant) {
+    override suspend fun updateLastEdited(videoId: String, now: Instant) {
         queries.updateLastEdited(now.epochSeconds, videoId)
     }
 }
 
 private fun Videos.toVideo(): Video {
     return Video(
-        id = this.video_id,
+        id = this.id,
         videoTitle = this.video_title,
         thumbnail = this.thumbnail,
         lastEdited = Instant.fromEpochMilliseconds(this.last_edited),

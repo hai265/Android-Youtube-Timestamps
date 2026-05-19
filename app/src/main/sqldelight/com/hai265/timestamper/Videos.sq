@@ -1,5 +1,5 @@
 CREATE TABLE videos(
-video_id TEXT PRIMARY KEY NOT NULL,
+id TEXT PRIMARY KEY NOT NULL,
 video_title TEXT NOT NULL,
 thumbnail TEXT NOT NULL,
 last_edited INTEGER NOT NULL,
@@ -15,11 +15,11 @@ ORDER BY last_edited DESC ;
 getVideoById:
 SELECT *
 FROM videos
-WHERE video_id = :id ;
+WHERE id = :id ;
 
 addVideo:
 INSERT OR REPLACE INTO videos(
-    video_id,
+    id,
     video_title,
     thumbnail,
     last_edited,
@@ -29,18 +29,18 @@ VALUES (?, ?, ?, ?, ?);
 
 getAllVideosWithTimestamps:
 SELECT * FROM videos
-LEFT JOIN timestamps ON videos.video_id = timestamps.video_id;
+LEFT JOIN timestamps ON videos.id = timestamps.video_id;
 
 updateLastPlayed:
 UPDATE videos
 SET last_played = :lastPlayed
-WHERE video_id = :id;
+WHERE id = :id;
 
 updateLastEdited:
 UPDATE videos
 SET last_edited = :lastEdited
-WHERE video_id = :id;
+WHERE id = :id;
 
 deleteVideo:
 DELETE FROM videos
-WHERE video_id = :videoId;
+WHERE id = :videoId;

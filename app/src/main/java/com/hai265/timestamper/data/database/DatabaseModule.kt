@@ -4,14 +4,16 @@ import android.content.Context
 import androidx.room.Room
 import androidx.sqlite.driver.bundled.BundledSQLiteDriver
 import app.cash.sqldelight.db.SqlDriver
-import app.cash.sqldelight.driver.android.AndroidSqliteDriver
 import com.hai265.timestamper.AppSqlDatabase
+import com.powersync.PowerSyncDatabase
 import com.powersync.integrations.room.loadPowerSyncExtension
+import com.powersync.integrations.sqldelight.PowerSyncDriver
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import kotlinx.coroutines.CoroutineScope
 import javax.inject.Singleton
 
 @Module
@@ -35,10 +37,11 @@ abstract class DatabaseModule {
 
         @Provides
         @Singleton
-        fun provideSqlDriver(@ApplicationContext context: Context): SqlDriver {
-            return AndroidSqliteDriver(
-                AppSqlDatabase.Schema, context, "app_database.db"
-            )
+        fun provideSqlDriver(
+            powerSyncDatabase: PowerSyncDatabase,
+            externalScope: CoroutineScope,
+        ): SqlDriver {
+            return PowerSyncDriver(powerSyncDatabase, externalScope)
         }
 
         @Provides

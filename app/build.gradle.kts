@@ -77,8 +77,11 @@ extensions.configure<ApplicationExtension> {
 
 sqldelight {
     databases {
-        register("AppSqlDatabase") {
-            packageName.set("com.hai265.timestamper")
+        linkSqlite = false
+        create("AppSqlDatabase") {
+            generateAsync = true
+            deriveSchemaFromMigrations = false
+            dialect("app.cash.sqldelight:sqlite-3-38-dialect:2.0.2")
         }
     }
 }
@@ -132,6 +135,7 @@ dependencies {
     implementation(libs.kotlinx.io.core)
     implementation(libs.android.driver)
     implementation(libs.sqldelight.coroutines.extensions)
+    implementation(libs.integration.sqldelight)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(platform(libs.androidx.compose.bom))

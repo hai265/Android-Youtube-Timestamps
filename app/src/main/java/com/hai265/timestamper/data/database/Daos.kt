@@ -28,10 +28,10 @@ interface VideoDao {
     suspend fun addVideo(video: Video)
 
     @Delete
-    fun deleteVideo(id: Video)
+    suspend fun deleteVideo(id: Video)
 
     @Query("UPDATE videos SET last_edited = :now WHERE id =:videoId")
-    fun updateLastEdited(videoId: String, now: Instant)
+    suspend fun updateLastEdited(videoId: String, now: Instant)
 }
 
 @Dao
@@ -40,14 +40,14 @@ interface TimestampDao {
     fun getTimestamps(videoId: String): Flow<List<Timestamp>>
 
     @Upsert
-    fun upsertTimestamp(timestamp: Timestamp): Long
+    suspend fun upsertTimestamp(timestamp: Timestamp): Long
 
     @Delete
-    fun deleteTimestamp(timestamp: Timestamp)
+    suspend fun deleteTimestamp(timestamp: Timestamp)
 
     @Query("SELECT * from timestamps WHERE id = :id")
     fun getTimestampById(id: Long): Timestamp
 
     @Insert
-    fun addTimestamps(timestamps: List<Timestamp>)
+    suspend fun addTimestamps(timestamps: List<Timestamp>)
 }

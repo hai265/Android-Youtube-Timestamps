@@ -5,7 +5,7 @@ video_id TEXT NOT NULL,
 time INTEGER NOT NULL,
 description TEXT NOT NULL,
 
-FOREIGN KEY (video_id) REFERENCES videos(video_id) ON DELETE CASCADE
+FOREIGN KEY (video_id) REFERENCES videos(id) ON DELETE CASCADE
 );
 
 getTimestmaps:
