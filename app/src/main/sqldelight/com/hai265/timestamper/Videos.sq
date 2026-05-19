@@ -27,6 +27,10 @@ INSERT OR REPLACE INTO videos(
 )
 VALUES (?, ?, ?, ?, ?);
 
+getAllVideosWithTimestamps:
+SELECT * FROM videos
+LEFT JOIN timestamps ON videos.video_id = timestamps.video_id;
+
 updateLastPlayed:
 UPDATE videos
 SET last_played = :lastPlayed

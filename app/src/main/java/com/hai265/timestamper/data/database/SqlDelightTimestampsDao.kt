@@ -54,7 +54,7 @@ class SqlDelightTimestampsDao(private val database: AppSqlDatabase) : TimestampD
     }
 }
 
-private fun Timestamps.toTimestamp(): Timestamp {
+fun Timestamps.toTimestamp(): Timestamp {
     return Timestamp(
         id = this.id,
         videoId = this.video_id,

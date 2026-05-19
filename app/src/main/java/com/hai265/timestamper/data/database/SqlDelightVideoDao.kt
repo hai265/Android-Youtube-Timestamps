@@ -8,10 +8,11 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
+import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Instant
 
-class SqlDelightVideoDao(database: AppSqlDatabase) : VideoDao {
+class SqlDelightVideoDao(private val database: AppSqlDatabase) : VideoDao {
     private val queries = database.videosQueries
 
     override fun getAllVideos(): Flow<List<Video>> {
@@ -21,7 +22,30 @@ class SqlDelightVideoDao(database: AppSqlDatabase) : VideoDao {
     }
 
     override suspend fun getAllVideosAndTimestamps(): List<VideoWithTimestamps> {
-        TODO("Not yet implemented")
+        return queries.getAllVideosWithTimestamps()
+            .executeAsList()
+            .groupBy { it.video_id }
+            .map { (_, rows) ->
+                VideoWithTimestamps(
+                    video = Video(
+                        videoId = rows.first().video_id,
+                        videoTitle = rows.first().video_title,
+                        thumbnail = rows.first().thumbnail,
+                        lastEdited = Instant.fromEpochMilliseconds(rows.first().last_edited),
+                        lastPlayed = rows.first().last_played.milliseconds
+                    ),
+                    timestamps = rows.mapNotNull { row ->
+                        row.id?.let {
+                            Timestamp(
+                                id = it,
+                                videoId = row.video_id,
+                                time = row.time?.milliseconds ?: Duration.ZERO,
+                                description = row.description ?: ""
+                            )
+                        }
+                    }
+                )
+            }
     }
 
     override suspend fun getVideoById(id: String): Video? =

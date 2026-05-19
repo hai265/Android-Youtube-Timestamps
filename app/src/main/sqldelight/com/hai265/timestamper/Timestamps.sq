@@ -3,12 +3,13 @@ CREATE TABLE timestamps(
 id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL ,
 video_id TEXT NOT NULL,
 time INTEGER NOT NULL,
-description TEXT NOT NULL
+description TEXT NOT NULL,
+
+FOREIGN KEY (video_id) REFERENCES videos(video_id) ON DELETE CASCADE
 );
 
 getTimestmaps:
 SELECT * FROM timestamps WHERE video_id = :videoId ORDER BY time ASC;
-
 
 insertNewTimestamp:
 INSERT INTO timestamps(
