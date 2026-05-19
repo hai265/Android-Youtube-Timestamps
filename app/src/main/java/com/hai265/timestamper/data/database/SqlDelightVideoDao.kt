@@ -10,6 +10,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Instant
@@ -31,16 +32,23 @@ class SqlDelightVideoDao @Inject constructor(@ApplicationContext context: Contex
         TODO("Not yet implemented")
     }
 
-    override suspend fun getVideoById(id: String): Video? {
-        TODO("Not yet implemented")
-    }
+    override suspend fun getVideoById(id: String): Video? =
+        withContext(Dispatchers.IO) {
+            database.videoQueries.getVideoById(id).executeAsOneOrNull()?.toVideo()
+        }
 
     override suspend fun updateLastPlayed(videoId: String, timestamp: Long) {
         TODO("Not yet implemented")
     }
 
     override suspend fun addVideo(video: Video) {
-        database.videoQueries.addVideo()
+        database.videoQueries.addVideo(
+            video_id = video.videoId,
+            video_title = video.videoTitle ?: "",
+            thumbnail = video.thumbnail,
+            last_edited = video.lastEdited.epochSeconds,
+            last_played = video.lastPlayed.inWholeMilliseconds
+        )
     }
 
     override fun deleteVideo(id: Video) {
