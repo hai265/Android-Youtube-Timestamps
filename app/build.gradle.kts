@@ -17,7 +17,7 @@ extensions.configure<ApplicationExtension> {
 
     defaultConfig {
         applicationId = "com.hai265.timestamper"
-        minSdk = 24
+        minSdk = 30
         targetSdk = 36
         versionCode = 1
         versionName = "1.0"
