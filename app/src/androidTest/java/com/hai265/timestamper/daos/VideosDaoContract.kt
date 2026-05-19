@@ -119,8 +119,8 @@ abstract class VideosDaoContract {
             lastEdited = Instant.ZERO,
             lastPlayed = Duration.ZERO
         )
-        val ts1 = Timestamp(id = 0L, videoId = "a", time = Duration.ZERO, description = "")
-        val ts2 = Timestamp(id = 1L, time = Duration.ZERO, description = "")
-        val ts3 = Timestamp(id = 2L, time = Duration.ZERO, description = "")
+        val ts1 = Timestamp(id = 1L, videoId = "a", time = Duration.ZERO, description = "")
+        val ts2 = Timestamp(id = 2L, time = Duration.ZERO, description = "")
+        val ts3 = Timestamp(id = 3L, time = Duration.ZERO, description = "")
     }
 }
