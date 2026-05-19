@@ -1,6 +1,7 @@
 package com.hai265.timestamper.data.database
 
 import android.os.Parcelable
+import androidx.room.ColumnInfo
 import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.ForeignKey
@@ -17,10 +18,13 @@ import kotlin.time.Instant
 data class Video(
     @PrimaryKey
     val id: String,
+    @ColumnInfo(name = "video_title")
     val videoTitle: String?,
     val thumbnail: String,
+    @ColumnInfo(name = "last_edited")
     val lastEdited: Instant,
     //TODO: Rename to lastPlayedPosition
+    @ColumnInfo(name = "last_played")
     val lastPlayed: Duration,
 )
 
@@ -43,6 +47,7 @@ data class Video(
 data class Timestamp(
     @PrimaryKey(autoGenerate = true)
     val id: Long = 0,
+    @ColumnInfo(name = "video_id")
     val videoId: String = "",
     val time: Duration = Duration.ZERO,
     val description: String = ""
@@ -53,7 +58,7 @@ data class VideoWithTimestamps(
     @Embedded val video: Video,
     @Relation(
         parentColumn = "id",
-        entityColumn = "videoId",
+        entityColumn = "video_id",
     )
     val timestamps: List<Timestamp>
 )

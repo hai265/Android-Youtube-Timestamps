@@ -31,12 +31,10 @@ class DurationConverter {
 
 class InstantConverter {
     @TypeConverter
-    fun fromInstant(instant: Instant?): Long? {
-        return instant?.epochSeconds
-    }
+    fun fromInstant(value: Instant?): String? =
+        value?.toString()
 
     @TypeConverter
-    fun toInstant(value: Long?): Instant {
-        return Instant.fromEpochSeconds(value ?: 0L)
-    }
+    fun toInstant(value: String?): Instant? =
+        value?.let { Instant.parse(it) }
 }

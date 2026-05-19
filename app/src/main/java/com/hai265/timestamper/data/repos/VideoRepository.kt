@@ -45,17 +45,18 @@ class VideoRepository @Inject constructor(
 
     init {
         externalScope.launch {
+            //TODO: Only run this once per application
             val table = RawTable(
                 name = "videos",
                 schema = RawTableSchema()
             )
 
-//            for (write in listOf("INSERT", "UPDATE", "DELETE")) {
-//                powersyncDatabase.execute(
-//                    "SELECT powersync_create_raw_table_crud_trigger(?, ?, ?)",
-//                    listOf(table.jsonDescription(), "$write", write),
-//                )
-//            }
+            for (write in listOf("INSERT", "UPDATE", "DELETE")) {
+                powersyncDatabase.execute(
+                    "SELECT powersync_create_raw_table_crud_trigger(?, ?, ?)",
+                    listOf(table.jsonDescription(), "$write", write),
+                )
+            }
             powersyncDatabase.connect(connector)
 
         }
