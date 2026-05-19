@@ -8,6 +8,7 @@ plugins {
     alias(libs.plugins.hilt)
     alias(libs.plugins.kotlin.parcelize)
 //    alias(libs.plugins.google.services)
+    alias(libs.plugins.sqldelight)
 }
 
 extensions.configure<ApplicationExtension> {
@@ -90,8 +91,8 @@ dependencies {
     implementation(libs.kotlinx.serialization.core)
 //    implementation(platform(libs.firebase.bom))
 //    implementation(libs.firebase.firestore)
-
     implementation(libs.kotlinx.io.core)
+    implementation(libs.android.driver)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(platform(libs.androidx.compose.bom))

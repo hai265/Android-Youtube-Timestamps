@@ -1,0 +1,7 @@
+CREATE TABLE videos(
+video_id TEXT PRIMARY KEY NOT NULL,
+video_title STRING NOT NULL,
+thumbnail STRING NOT NULL,
+last_edited INTEGER NOT NULL,
+last_played INTEGER NOT NULL
+);
