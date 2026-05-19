@@ -3,6 +3,9 @@ package com.hai265.timestamper.data.database
 import android.content.Context
 import androidx.room.Room
 import androidx.sqlite.driver.bundled.BundledSQLiteDriver
+import app.cash.sqldelight.db.SqlDriver
+import app.cash.sqldelight.driver.android.AndroidSqliteDriver
+import com.hai265.timestamper.AppSqlDatabase
 import com.powersync.integrations.room.loadPowerSyncExtension
 import dagger.Module
 import dagger.Provides
@@ -31,9 +34,21 @@ abstract class DatabaseModule {
         }
 
         @Provides
-        fun providesVideoDao(database: AppDatabase) = database.videoDao()
+        @Singleton
+        fun provideSqlDriver(@ApplicationContext context: Context): SqlDriver {
+            return AndroidSqliteDriver(
+                AppSqlDatabase.Schema, context, "app_database.db"
+            )
+        }
 
         @Provides
-        fun providesTimestampDao(database: AppDatabase) = database.timestampDao()
+        fun providesTimestampDao(driver: SqlDriver): TimestampDao {
+            return SqlDelightTimestampsDao(AppSqlDatabase(driver))
+        }
+
+        @Provides
+        fun providesVideoDao(driver: SqlDriver): VideoDao {
+            return SqlDelightVideoDao(AppSqlDatabase(driver))
+        }
     }
 }

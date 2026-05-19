@@ -12,6 +12,7 @@ plugins {
     alias(libs.plugins.hilt)
     alias(libs.plugins.kotlin.parcelize)
 //    alias(libs.plugins.google.services)
+    alias(libs.plugins.sqldelight)
 }
 
 extensions.configure<ApplicationExtension> {
@@ -20,7 +21,7 @@ extensions.configure<ApplicationExtension> {
 
     defaultConfig {
         applicationId = "com.hai265.timestamper"
-        minSdk = 24
+        minSdk = 30
         targetSdk = 36
         versionCode = 1
         versionName = "1.0"
@@ -74,6 +75,14 @@ extensions.configure<ApplicationExtension> {
     }
 }
 
+sqldelight {
+    databases {
+        register("AppSqlDatabase") {
+            packageName.set("com.hai265.timestamper")
+        }
+    }
+}
+
 dependencies {
 
     implementation(libs.androidx.core.ktx)
@@ -121,6 +130,8 @@ dependencies {
     implementation(libs.powersync.integration.supabase)
     implementation(libs.postgrest.kt)
     implementation(libs.kotlinx.io.core)
+    implementation(libs.android.driver)
+    implementation(libs.sqldelight.coroutines.extensions)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(platform(libs.androidx.compose.bom))
