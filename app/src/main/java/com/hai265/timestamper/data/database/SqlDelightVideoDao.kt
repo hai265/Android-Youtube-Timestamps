@@ -23,7 +23,7 @@ class SqlDelightVideoDao @Inject constructor(@ApplicationContext context: Contex
     )
 
     override fun getAllVideos(): Flow<List<Video>> {
-        return database.videoQueries.getAllVideos().asFlow().mapToList(Dispatchers.IO).map {
+        return database.videosQueries.getAllVideos().asFlow().mapToList(Dispatchers.IO).map {
             it.map { it.toVideo() }
         }
     }
@@ -34,15 +34,17 @@ class SqlDelightVideoDao @Inject constructor(@ApplicationContext context: Contex
 
     override suspend fun getVideoById(id: String): Video? =
         withContext(Dispatchers.IO) {
-            database.videoQueries.getVideoById(id).executeAsOneOrNull()?.toVideo()
+            database.videosQueries.getVideoById(id).executeAsOneOrNull()?.toVideo()
         }
 
     override suspend fun updateLastPlayed(videoId: String, timestamp: Long) {
-        TODO("Not yet implemented")
+        withContext(Dispatchers.IO) {
+            database.videosQueries.updateLastPlayed(timestamp, videoId)
+        }
     }
 
     override suspend fun addVideo(video: Video) {
-        database.videoQueries.addVideo(
+        database.videosQueries.addVideo(
             video_id = video.videoId,
             video_title = video.videoTitle ?: "",
             thumbnail = video.thumbnail,
@@ -52,11 +54,11 @@ class SqlDelightVideoDao @Inject constructor(@ApplicationContext context: Contex
     }
 
     override fun deleteVideo(id: Video) {
-        TODO("Not yet implemented")
+        database.videosQueries.deleteVideo(id.videoId)
     }
 
     override fun updateLastEdited(videoId: String, now: Instant) {
-        TODO("Not yet implemented")
+        database.videosQueries.updateLastEdited(now.epochSeconds, videoId)
     }
 }
 

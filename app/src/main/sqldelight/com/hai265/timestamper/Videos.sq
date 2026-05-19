@@ -26,3 +26,17 @@ INSERT OR REPLACE INTO videos(
     last_played
 )
 VALUES (?, ?, ?, ?, ?);
+
+updateLastPlayed:
+UPDATE videos
+SET last_played = :lastPlayed
+WHERE video_id = :id;
+
+updateLastEdited:
+UPDATE videos
+SET last_edited = :lastEdited
+WHERE video_id = :id;
+
+deleteVideo:
+DELETE FROM videos
+WHERE video_id = :videoId;
