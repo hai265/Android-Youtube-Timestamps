@@ -41,7 +41,7 @@ class SqlDelightVideoDao(private val database: AppSqlDatabase) : VideoDao {
                     timestamps = rows.mapNotNull { row ->
                         row.id_?.let {
                             Timestamp(
-                                id = it,
+                                id = 0L, //TODO: Timestamp
                                 videoId = row.video_id ?: "",
                                 time = row.time?.milliseconds ?: Duration.ZERO,
                                 description = row.description ?: ""
