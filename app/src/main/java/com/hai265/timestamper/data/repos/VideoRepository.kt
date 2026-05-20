@@ -17,6 +17,7 @@ import javax.inject.Inject
 import javax.inject.Singleton
 import kotlin.time.Clock
 import kotlin.time.Duration
+import kotlin.uuid.ExperimentalUuidApi
 
 sealed interface VideoResult {
     data class Success(val videoId: String) : VideoResult
@@ -49,6 +50,7 @@ class VideoRepository @Inject constructor(
     //Two errors can occur
     // 1. url is invalid
     // 2. video already added
+    @OptIn(ExperimentalUuidApi::class)
     suspend fun addVideo(url: String): VideoResult {
         val videoId = getYouTubeIdFromUrl(url) ?: return VideoResult.InvalidUrl(url)
         if (getVideoById(videoId) != null) {

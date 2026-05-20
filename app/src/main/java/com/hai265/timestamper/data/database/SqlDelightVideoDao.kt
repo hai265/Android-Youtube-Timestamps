@@ -13,6 +13,8 @@ import kotlinx.coroutines.withContext
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Instant
+import kotlin.uuid.ExperimentalUuidApi
+import kotlin.uuid.Uuid
 
 class SqlDelightVideoDao(private val database: AppSqlDatabase) : VideoDao {
     private val queries = database.videosQueries
@@ -30,7 +32,7 @@ class SqlDelightVideoDao(private val database: AppSqlDatabase) : VideoDao {
             .map { (_, rows) ->
                 VideoWithTimestamps(
                     video = Video(
-                        videoId = rows.first().id,
+                        videoId = rows.first().video_id,
                         videoTitle = rows.first().video_title,
                         thumbnail = rows.first().thumbnail,
                         lastEdited = rows.first().last_edited,
@@ -62,9 +64,11 @@ class SqlDelightVideoDao(private val database: AppSqlDatabase) : VideoDao {
         }
     }
 
+    @OptIn(ExperimentalUuidApi::class)
     override suspend fun addVideo(video: Video) {
         queries.addVideo(
-            id = video.videoId,
+            id = Uuid.random().toString(),
+            video_id = video.videoId,
             video_title = video.videoTitle ?: "",
             thumbnail = video.thumbnail,
             last_edited = video.lastEdited,
@@ -84,7 +88,7 @@ class SqlDelightVideoDao(private val database: AppSqlDatabase) : VideoDao {
 
 private fun Videos.toVideo(): Video {
     return Video(
-        videoId = this.id,
+        videoId = this.video_id,
         videoTitle = this.video_title,
         thumbnail = this.thumbnail,
         lastEdited = this.last_edited,

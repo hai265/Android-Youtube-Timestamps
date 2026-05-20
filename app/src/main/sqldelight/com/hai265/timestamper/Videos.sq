@@ -1,5 +1,6 @@
 CREATE TABLE videos(
 id TEXT PRIMARY KEY NOT NULL,
+video_id TEXT NOT NULL,
 video_title TEXT NOT NULL,
 thumbnail TEXT NOT NULL,
 last_edited TEXT AS kotlinx.datetime.Instant NOT NULL,
@@ -15,17 +16,18 @@ ORDER BY last_edited DESC ;
 getVideoById:
 SELECT *
 FROM videos
-WHERE id = :id ;
+WHERE video_id = :id ;
 
 addVideo:
-INSERT OR REPLACE INTO videos(
+INSERT INTO videos(
     id,
+    video_id,
     video_title,
     thumbnail,
     last_edited,
     last_played
 )
-VALUES (?, ?, ?, ?, ?);
+VALUES (?,?, ?, ?, ?, ?);
 
 getAllVideosWithTimestamps:
 SELECT * FROM videos
@@ -34,13 +36,13 @@ LEFT JOIN timestamps ON videos.id = timestamps.video_id;
 updateLastPlayed:
 UPDATE videos
 SET last_played = :lastPlayed
-WHERE id = :id;
+WHERE video_id = :id;
 
 updateLastEdited:
 UPDATE videos
 SET last_edited = :lastEdited
-WHERE id = :id;
+WHERE video_id = :id;
 
 deleteVideo:
 DELETE FROM videos
-WHERE id = :videoId;
+WHERE video_id = :videoId;
