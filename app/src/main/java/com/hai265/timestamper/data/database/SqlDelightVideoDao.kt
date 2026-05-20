@@ -33,8 +33,8 @@ class SqlDelightVideoDao(private val database: AppSqlDatabase) : VideoDao {
                         id = rows.first().id,
                         videoTitle = rows.first().video_title,
                         thumbnail = rows.first().thumbnail,
-                        lastEdited = Instant.fromEpochMilliseconds(rows.first().last_edited),
-                        lastPlayed = rows.first().last_played.milliseconds
+                        lastEdited = rows.first().last_edited,
+                        lastPlayed = rows.first().last_played
                     ),
                     timestamps = rows.mapNotNull { row ->
                         row.id_?.let {
@@ -55,9 +55,10 @@ class SqlDelightVideoDao(private val database: AppSqlDatabase) : VideoDao {
             queries.getVideoById(id).awaitAsOneOrNull()?.toVideo()
         }
 
+    //TODO: timestamp pass in duration
     override suspend fun updateLastPlayed(videoId: String, timestamp: Long) {
         withContext(Dispatchers.IO) {
-            queries.updateLastPlayed(timestamp, videoId)
+            queries.updateLastPlayed(timestamp.milliseconds, videoId)
         }
     }
 
@@ -66,8 +67,8 @@ class SqlDelightVideoDao(private val database: AppSqlDatabase) : VideoDao {
             id = video.id,
             video_title = video.videoTitle ?: "",
             thumbnail = video.thumbnail,
-            last_edited = video.lastEdited.epochSeconds,
-            last_played = video.lastPlayed.inWholeMilliseconds
+            last_edited = video.lastEdited,
+            last_played = video.lastPlayed
         )
     }
 
@@ -77,7 +78,7 @@ class SqlDelightVideoDao(private val database: AppSqlDatabase) : VideoDao {
     }
 
     override suspend fun updateLastEdited(videoId: String, now: Instant) {
-        queries.updateLastEdited(now.epochSeconds, videoId)
+        queries.updateLastEdited(now, videoId)
     }
 }
 
@@ -86,7 +87,7 @@ private fun Videos.toVideo(): Video {
         id = this.id,
         videoTitle = this.video_title,
         thumbnail = this.thumbnail,
-        lastEdited = Instant.fromEpochMilliseconds(this.last_edited),
-        lastPlayed = this.last_played.milliseconds
+        lastEdited = this.last_edited,
+        lastPlayed = this.last_played
     )
 }

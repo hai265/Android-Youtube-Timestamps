@@ -2,8 +2,8 @@ CREATE TABLE videos(
 id TEXT PRIMARY KEY NOT NULL,
 video_title TEXT NOT NULL,
 thumbnail TEXT NOT NULL,
-last_edited INTEGER NOT NULL,
-last_played INTEGER NOT NULL
+last_edited TEXT AS kotlinx.datetime.Instant NOT NULL,
+last_played TEXT AS kotlin.time.Duration NOT NULL
 );
 
 

@@ -24,8 +24,10 @@ class MainApplication : Application(), SingletonImageLoader.Factory {
 
     @Inject
     lateinit var powerbaseDatabase: PowerSyncDatabase
+
     @Inject
     lateinit var powersyncConnector: PowerSyncBackendConnector
+
     @Inject
     lateinit var scope: CoroutineScope
     override fun newImageLoader(context: PlatformContext): ImageLoader {

@@ -5,6 +5,7 @@ import androidx.room.Room
 import androidx.sqlite.driver.bundled.BundledSQLiteDriver
 import app.cash.sqldelight.db.SqlDriver
 import com.hai265.timestamper.AppSqlDatabase
+import com.hai265.timestamper.Videos
 import com.powersync.PowerSyncDatabase
 import com.powersync.integrations.room.loadPowerSyncExtension
 import com.powersync.integrations.sqldelight.PowerSyncDriver
@@ -46,12 +47,23 @@ abstract class DatabaseModule {
 
         @Provides
         fun providesTimestampDao(driver: SqlDriver): TimestampDao {
-            return SqlDelightTimestampsDao(AppSqlDatabase(driver))
+            return SqlDelightTimestampsDao(
+                //TODO: Create AppSqlDatabase once
+                AppSqlDatabase(
+                    driver = driver,
+                    videosAdapter = Videos.Adapter(instantAdapter, durationAdapter)
+                )
+            )
         }
 
         @Provides
         fun providesVideoDao(driver: SqlDriver): VideoDao {
-            return SqlDelightVideoDao(AppSqlDatabase(driver))
+            return SqlDelightVideoDao(
+                AppSqlDatabase(
+                    driver = driver,
+                    videosAdapter = Videos.Adapter(instantAdapter, durationAdapter)
+                )
+            )
         }
     }
 }
