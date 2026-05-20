@@ -77,10 +77,10 @@ extensions.configure<ApplicationExtension> {
 
 sqldelight {
     databases {
-        linkSqlite = false
+        linkSqlite.set(false)
         create("AppSqlDatabase") {
-            generateAsync = true
-            deriveSchemaFromMigrations = false
+            generateAsync.set(true)
+            deriveSchemaFromMigrations.set(false)
             dialect("app.cash.sqldelight:sqlite-3-38-dialect:2.0.2")
         }
     }

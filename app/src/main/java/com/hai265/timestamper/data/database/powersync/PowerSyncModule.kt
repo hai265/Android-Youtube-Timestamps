@@ -1,17 +1,15 @@
 package com.hai265.timestamper.data.database.powersync
 
-import co.touchlab.kermit.Logger
+import android.content.Context
 import com.hai265.timestamper.BuildConfig
-import com.hai265.timestamper.data.database.AppDatabase
+import com.powersync.DatabaseDriverFactory
 import com.powersync.PowerSyncDatabase
 import com.powersync.connectors.PowerSyncBackendConnector
-import com.powersync.db.schema.Schema
-import com.powersync.integrations.room.RoomConnectionPool
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
-import kotlinx.coroutines.CoroutineScope
 import javax.inject.Singleton
 
 @Module
@@ -21,20 +19,16 @@ abstract class PowerSyncModule {
         @Provides
         @Singleton
         fun providesPowerSyncDatabase(
-            appDatabase: AppDatabase,
-            externalScope: CoroutineScope,
+            @ApplicationContext context: Context
         ): PowerSyncDatabase {
-            val schema = Schema()
-            val pool = RoomConnectionPool(appDatabase, schema)
+            val driverFactory = DatabaseDriverFactory(context)
 
-            val powersync = PowerSyncDatabase.opened(
-                pool = pool,
-                scope = externalScope,
+            val powersyncDatabase = PowerSyncDatabase(
+                factory = driverFactory,
                 schema = schema,
-                identifier = "app_database", // Prefer to use the same path/name as your Room database
-                logger = Logger,
+                dbFilename = "app_database"
             )
-            return powersync
+            return powersyncDatabase
         }
 
         @Provides
