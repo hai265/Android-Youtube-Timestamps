@@ -43,7 +43,7 @@ import kotlinx.coroutines.launch
 fun TimestampEditorSheet(
     timestamp: Timestamp,
     onDismiss: () -> Unit,
-    onAddTimestamp: (Long) -> Unit,
+    onAddTimestamp: (String) -> Unit,
 ) {
     val viewmodel = hiltViewModel<TimestampEditorViewModel>()
     val sheetState = rememberModalBottomSheetState()

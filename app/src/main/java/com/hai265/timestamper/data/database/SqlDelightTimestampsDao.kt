@@ -20,19 +20,20 @@ class SqlDelightTimestampsDao(private val database: AppSqlDatabase) : TimestampD
     }
 
     @OptIn(ExperimentalUuidApi::class)
-    override suspend fun upsertTimestamp(timestamp: Timestamp): Long {
+    override suspend fun upsertTimestamp(timestamp: Timestamp): String {
+        val id = Uuid.random().toString()
         queries.upsertTimestamp(
-            id = Uuid.random().toString(),
+            id = id,
             video_id = timestamp.videoId,
             time = timestamp.time.inWholeMilliseconds,
             description = timestamp.description,
         )
-        return 0L
+        return id
 
     }
 
     override suspend fun deleteTimestamp(timestamp: Timestamp) {
-        TODO("")
+        queries.deleteTimestamp(timestamp.id)
     }
 
     override fun getTimestampById(id: Long): Timestamp {
@@ -52,7 +53,7 @@ class SqlDelightTimestampsDao(private val database: AppSqlDatabase) : TimestampD
 
 fun Timestamps.toTimestamp(): Timestamp {
     return Timestamp(
-        id = 0L,
+        id = this.id,
         videoId = this.video_id,
         time = this.time.milliseconds,
         description = this.description

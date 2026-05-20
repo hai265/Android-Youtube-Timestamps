@@ -15,12 +15,12 @@ class TimestampRepository @Inject constructor(
         return timestampDao.getTimestamps(videoId)
     }
 
-    suspend fun addOrUpdateTimestamp(timestamp: Timestamp): Long {
+    suspend fun addOrUpdateTimestamp(timestamp: Timestamp): String {
         return withContext(Dispatchers.IO) {
             Log.d("TimestampRepository", "addOrUpdateTimestamp: ")
             //Room's upsert returns =-1 if existing timestamp is updated, returns id otherwise
             val timestampId = timestampDao.upsertTimestamp(timestamp)
-            if (timestampId == -1L) {
+            if (timestampId == "") {
                 timestamp.id
             } else {
                 timestampId

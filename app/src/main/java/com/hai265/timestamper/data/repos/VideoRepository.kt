@@ -1,7 +1,5 @@
 package com.hai265.timestamper.data.repos
 
-import androidx.room.withTransaction
-import com.hai265.timestamper.data.database.AppDatabase
 import com.hai265.timestamper.data.database.TimestampDao
 import com.hai265.timestamper.data.database.Video
 import com.hai265.timestamper.data.database.VideoDao
@@ -32,7 +30,6 @@ class VideoRepository @Inject constructor(
     val videoDao: VideoDao,
     val timestmapDao: TimestampDao,
     val youtubeMetadataApi: YoutubeMetadataApiService,
-    val database: AppDatabase,
 ) {
 
     fun getVideos(): Flow<List<Video>> {
@@ -82,16 +79,16 @@ class VideoRepository @Inject constructor(
     }
 
     suspend fun importVideosWithTimestamps(videoWithTimestamps: List<VideoWithTimestamps>) {
-        database.withTransaction {
-            videoWithTimestamps.forEach { (video, timestamps) ->
-                if (videoDao.getVideoById(video.videoId) == null) {
-                    videoDao.addVideo(video)
-                }
-                timestamps.forEach {
-                    timestmapDao.upsertTimestamp(it)
-                }
+        //TODO: one transaction
+        videoWithTimestamps.forEach { (video, timestamps) ->
+            if (videoDao.getVideoById(video.videoId) == null) {
+                videoDao.addVideo(video)
+            }
+            timestamps.forEach {
+                timestmapDao.upsertTimestamp(it)
             }
         }
+
     }
 
     suspend fun deleteVideo(video: Video) {

@@ -40,7 +40,7 @@ interface TimestampDao {
     fun getTimestamps(videoId: String): Flow<List<Timestamp>>
 
     @Upsert
-    suspend fun upsertTimestamp(timestamp: Timestamp): Long
+    suspend fun upsertTimestamp(timestamp: Timestamp): String
 
     @Delete
     suspend fun deleteTimestamp(timestamp: Timestamp)

@@ -6,6 +6,7 @@ import com.hai265.timestamper.data.database.Video
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Instant
+import kotlin.uuid.ExperimentalUuidApi
 
 val fakeVideo1 = Video(
     videoId = "tQDO-uVCl40",
@@ -25,22 +26,23 @@ val fakeVideo2 = Video(
 
 val fakeVideoList = listOf(fakeVideo1, fakeVideo2)
 
+@OptIn(ExperimentalUuidApi::class)
 val fakeTimestamp1 = Timestamp(
-    id = 1,
+    id = "id1",
     videoId = "1",
     time = Duration.ZERO,
     description = "Sample Description"
 )
 
 val fakeTimestamp2 = Timestamp(
-    id = 2,
+    id = "id2",
     videoId = "1",
     time = 10000000.milliseconds,
     description = "Sample Description"
 )
 
 val fakeTimestamp3 = Timestamp(
-    id = 3,
+    id = "id3",
     videoId = "1",
     time = 10000000.milliseconds,
     description = "Sample Description"

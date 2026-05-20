@@ -11,7 +11,7 @@ class TimestampEditorViewModel @Inject constructor(
     private val upsertTimestampUseCase: UpsertTimestampUseCase,
 ) : ViewModel() {
 
-    suspend fun upsertTimestamp(timestamp: Timestamp): Long {
+    suspend fun upsertTimestamp(timestamp: Timestamp): String {
         return upsertTimestampUseCase.invokeExternalScope(timestamp)
     }
 }

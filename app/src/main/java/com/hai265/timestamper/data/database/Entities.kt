@@ -12,6 +12,8 @@ import kotlinx.parcelize.Parcelize
 import kotlinx.serialization.Serializable
 import kotlin.time.Duration
 import kotlin.time.Instant
+import kotlin.uuid.ExperimentalUuidApi
+import kotlin.uuid.Uuid
 
 @Entity(tableName = "videos")
 @Serializable
@@ -45,9 +47,9 @@ data class Video(
         Index("video_id")
     ]
 )
-data class Timestamp(
-    @PrimaryKey(autoGenerate = true)
-    val id: Long = 0,
+data class Timestamp @OptIn(ExperimentalUuidApi::class) constructor(
+    @PrimaryKey
+    val id: String = Uuid.random().toString(),
     @ColumnInfo(name = "video_id")
     val videoId: String = "",
     val time: Duration = Duration.ZERO,

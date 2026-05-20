@@ -12,12 +12,12 @@ class UpsertTimestampUseCase @Inject constructor(
     private val videoRepository: VideoRepository,
     private val externalScope: CoroutineScope,
 ) {
-    suspend fun invoke(timestamp: Timestamp): Long {
+    suspend fun invoke(timestamp: Timestamp): String {
         videoRepository.updateLastEdited(timestamp.videoId)
         return timestampRepo.addOrUpdateTimestamp(timestamp)
     }
 
-    suspend fun invokeExternalScope(timestamp: Timestamp): Long {
+    suspend fun invokeExternalScope(timestamp: Timestamp): String {
         return externalScope.async {
             videoRepository.updateLastEdited(timestamp.videoId)
             timestampRepo.addOrUpdateTimestamp(timestamp)

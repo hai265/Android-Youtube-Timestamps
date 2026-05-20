@@ -103,7 +103,7 @@ fun TimestampViewerScreen(windowSize: WindowWidthSizeClass) {
 
     val video = state.video
     val controller = remember { YouTubePlayerController() }
-    var newlyAddedTimestampId by rememberSaveable { mutableStateOf<Long?>(null) }
+    var newlyAddedTimestampId by rememberSaveable { mutableStateOf<String?>(null) }
 
     val configuration = LocalConfiguration.current
     val activity = LocalActivity.current
@@ -270,7 +270,7 @@ fun TimestampList(
     onDelete: (timestamp: Timestamp) -> Unit,
     onTimestampClick: (Duration) -> Unit,
     onDescriptionClick: (Timestamp) -> Unit,
-    highlightedId: Long?,
+    highlightedId: String?,
     textSingleLine: Boolean,
     onCLickSettings: () -> Unit,
     modifier: Modifier = Modifier,
@@ -475,7 +475,7 @@ fun TimestampListPreview() {
 fun TimestampItemPreview() {
     TimestampItem(
         timestamp = Timestamp(
-            id = 0,
+            id = "id",
             videoId = "",
             time = Duration.ZERO,
             description = "timestamp description"
