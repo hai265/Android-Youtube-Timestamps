@@ -3,6 +3,7 @@
 activityKtx = "1.13.0"
 agp = "9.2.1"
 androidDriver = "2.3.2"
+androidDriverVersion = "<version>"
 coilCompose = "3.4.0"
 composeBomVersion = "2026.03.01"
 converterGson = "3.0.0"
