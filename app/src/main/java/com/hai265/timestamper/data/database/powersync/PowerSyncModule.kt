@@ -12,12 +12,14 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.CoroutineScope
+import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
 abstract class PowerSyncModule {
     companion object {
         @Provides
+        @Singleton
         fun providesPowerSyncDatabase(
             appDatabase: AppDatabase,
             externalScope: CoroutineScope,
@@ -36,6 +38,7 @@ abstract class PowerSyncModule {
         }
 
         @Provides
+        @Singleton
         fun providesPowerSyncConnector(): PowerSyncBackendConnector {
             return SupabaseConnector(
                 powerSyncEndpoint = BuildConfig.POWERSYNC_ENDPOINT,
