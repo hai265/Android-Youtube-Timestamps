@@ -43,7 +43,7 @@ class SqlDelightVideoDao(private val database: AppSqlDatabase) : VideoDao {
                             Timestamp(
                                 id = row.id_,
                                 videoId = row.video_id_ ?: "",
-                                time = row.time?.milliseconds ?: Duration.ZERO,
+                                time = row.time ?: Duration.ZERO,
                                 description = row.description ?: ""
                             )
                         }

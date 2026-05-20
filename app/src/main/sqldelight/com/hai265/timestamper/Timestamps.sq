@@ -1,7 +1,7 @@
 CREATE TABLE timestamps(
 id TEXT PRIMARY KEY,
 video_id TEXT NOT NULL,
-time INTEGER NOT NULL,
+time INTEGER AS kotlin.time.Duration NOT NULL,
 description TEXT NOT NULL,
 
 FOREIGN KEY (video_id) REFERENCES videos(id) ON DELETE CASCADE

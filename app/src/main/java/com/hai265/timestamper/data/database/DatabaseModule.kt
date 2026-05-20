@@ -2,6 +2,7 @@ package com.hai265.timestamper.data.database
 
 import app.cash.sqldelight.db.SqlDriver
 import com.hai265.timestamper.AppSqlDatabase
+import com.hai265.timestamper.Timestamps
 import com.hai265.timestamper.Videos
 import com.powersync.PowerSyncDatabase
 import com.powersync.integrations.sqldelight.PowerSyncDriver
@@ -31,7 +32,8 @@ abstract class DatabaseModule {
                 //TODO: Create AppSqlDatabase once
                 AppSqlDatabase(
                     driver = driver,
-                    videosAdapter = Videos.Adapter(instantAdapter, durationAdapter)
+                    videosAdapter = Videos.Adapter(instantAdapter, durationAdapter),
+                    timestampsAdapter = Timestamps.Adapter(durationAdapter),
                 )
             )
         }
@@ -41,7 +43,8 @@ abstract class DatabaseModule {
             return SqlDelightVideoDao(
                 AppSqlDatabase(
                     driver = driver,
-                    videosAdapter = Videos.Adapter(instantAdapter, durationAdapter)
+                    videosAdapter = Videos.Adapter(instantAdapter, durationAdapter),
+                    timestampsAdapter = Timestamps.Adapter(durationAdapter)
                 )
             )
         }

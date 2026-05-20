@@ -7,7 +7,6 @@ import com.hai265.timestamper.Timestamps
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
-import kotlin.time.Duration.Companion.milliseconds
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 
@@ -25,7 +24,7 @@ class SqlDelightTimestampsDao(private val database: AppSqlDatabase) : TimestampD
         queries.upsertTimestamp(
             id = id,
             video_id = timestamp.videoId,
-            time = timestamp.time.inWholeMilliseconds,
+            time = timestamp.time,
             description = timestamp.description,
         )
         return id
@@ -55,7 +54,7 @@ fun Timestamps.toTimestamp(): Timestamp {
     return Timestamp(
         id = this.id,
         videoId = this.video_id,
-        time = this.time.milliseconds,
+        time = this.time,
         description = this.description
     )
 }
