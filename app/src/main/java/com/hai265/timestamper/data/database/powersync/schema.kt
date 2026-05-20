@@ -12,7 +12,7 @@ val schema = Schema(
                 Column.text("video_title"),
                 Column.text("thumbnail"),
                 Column.text("last_edited"),
-                Column.text("last_played"),
+                Column.integer("last_played"),
                 Column.text("video_id")
             )
         ),
