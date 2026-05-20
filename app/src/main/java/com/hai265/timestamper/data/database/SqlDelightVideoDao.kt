@@ -30,7 +30,7 @@ class SqlDelightVideoDao(private val database: AppSqlDatabase) : VideoDao {
             .map { (_, rows) ->
                 VideoWithTimestamps(
                     video = Video(
-                        id = rows.first().id,
+                        videoId = rows.first().id,
                         videoTitle = rows.first().video_title,
                         thumbnail = rows.first().thumbnail,
                         lastEdited = rows.first().last_edited,
@@ -64,7 +64,7 @@ class SqlDelightVideoDao(private val database: AppSqlDatabase) : VideoDao {
 
     override suspend fun addVideo(video: Video) {
         queries.addVideo(
-            id = video.id,
+            id = video.videoId,
             video_title = video.videoTitle ?: "",
             thumbnail = video.thumbnail,
             last_edited = video.lastEdited,
@@ -73,7 +73,7 @@ class SqlDelightVideoDao(private val database: AppSqlDatabase) : VideoDao {
     }
 
     override suspend fun deleteVideo(id: Video) {
-        queries.deleteVideo(id.id)
+        queries.deleteVideo(id.videoId)
 
     }
 
@@ -84,7 +84,7 @@ class SqlDelightVideoDao(private val database: AppSqlDatabase) : VideoDao {
 
 private fun Videos.toVideo(): Video {
     return Video(
-        id = this.id,
+        videoId = this.id,
         videoTitle = this.video_title,
         thumbnail = this.thumbnail,
         lastEdited = this.last_edited,

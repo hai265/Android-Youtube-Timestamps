@@ -8,7 +8,7 @@ import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Instant
 
 val fakeVideo1 = Video(
-    id = "tQDO-uVCl40",
+    videoId = "tQDO-uVCl40",
     videoTitle = "【みんなのGOLF WORLD】メジロ家のパーマー、ライアン、アルダン、ブライトの4人でゲーム実況だ！【前編】",
     thumbnail = "https://img.youtube.com/vi/tQDO-uVCl40/maxresdefault.jpg",
     lastEdited = Instant.fromEpochSeconds(1777855059),
@@ -16,7 +16,7 @@ val fakeVideo1 = Video(
 )
 
 val fakeVideo2 = Video(
-    id = "b-P-wuUEUeQ",
+    videoId = "b-P-wuUEUeQ",
     videoTitle = "テトリス99】初心に帰ってテトリスをやろう\uD83C\uDFAE【星街すいせい",
     thumbnail = "https://img.youtube.com/vi/b-P-wuUEUeQ/maxresdefault.jpg",
     lastEdited = Instant.ZERO,

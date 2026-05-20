@@ -53,7 +53,7 @@ class TimestampViewerViewModel @Inject constructor(
                 .drop(1) //Drop default Duration.ZERO value
                 .sample(1000)
                 .collect { lastWatchedTimestamp ->
-                    state.value.video?.id?.let { videoId ->
+                    state.value.video?.videoId?.let { videoId ->
                         videoRepo.updateVideoLastWatched(videoId, lastWatchedTimestamp)
                     }
                 }

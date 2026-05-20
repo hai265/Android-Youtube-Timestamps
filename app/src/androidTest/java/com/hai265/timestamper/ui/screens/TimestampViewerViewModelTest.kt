@@ -44,7 +44,7 @@ class TimestampViewerViewModelTest {
 
     private val videoId = "videoId"
     private val testVideo = Video(
-        id = videoId,
+        videoId = videoId,
         videoTitle = "Test Video",
         thumbnail = "thumb",
         lastEdited = Instant.ZERO,

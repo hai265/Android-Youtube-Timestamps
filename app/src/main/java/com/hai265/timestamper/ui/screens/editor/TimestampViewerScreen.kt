@@ -116,7 +116,7 @@ fun TimestampViewerScreen(windowSize: WindowWidthSizeClass) {
         movableContentOf {
             video?.let {
                 ComposeYouTubePlayer(
-                    videoId = video.id,
+                    videoId = video.videoId,
                     onCurrentTime = viewmodel::updateCurrentTime,
                     controller = controller,
                     startingTime = video.lastPlayed,
@@ -141,7 +141,7 @@ fun TimestampViewerScreen(windowSize: WindowWidthSizeClass) {
     Scaffold(
         floatingActionButton = {
             FloatingActionButton(onClick = {
-                video?.id?.let {
+                video?.videoId?.let {
                     bottomSheetState = BottomSheetState.EditTimestamp(
                         Timestamp(
                             videoId = it,
