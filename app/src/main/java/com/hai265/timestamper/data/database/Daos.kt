@@ -11,15 +11,12 @@ import kotlin.time.Instant
 
 @Dao
 interface VideoDao {
-    @Query("SELECT * from videos ORDER BY last_edited DESC")
     fun getAllVideos(): Flow<List<Video>>
 
     @Transaction
-    @Query("SELECT * from videos")
     suspend fun getAllVideosAndTimestamps(): List<VideoWithTimestamps>
 
-    @Query("SELECT * from videos WHERE video_id =:id")
-    suspend fun getVideoById(id: String): Video?
+    suspend fun getVideoByYoutubeId(youtubeId: String): Video?
 
     @Query("UPDATE videos SET last_played = :timestamp WHERE video_id = :videoId")
     suspend fun updateLastPlayed(videoId: String, timestamp: Long)

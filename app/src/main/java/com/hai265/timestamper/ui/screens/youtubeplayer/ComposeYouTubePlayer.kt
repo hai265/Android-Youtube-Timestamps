@@ -34,7 +34,7 @@ import kotlin.time.toDuration
 //Need a way to save the player on rotation
 @Composable
 fun ComposeYouTubePlayer(
-    videoId: String,
+    youtubeId: String,
     onCurrentTime: (duration: Duration) -> Unit,
     controller: YouTubePlayerController,
     startingTime: Duration,
@@ -69,7 +69,7 @@ fun ComposeYouTubePlayer(
                         controller.player = player
                         player.loadOrCueVideo(
                             lifecycleOwner.lifecycle,
-                            videoId,
+                            youtubeId,
                             startingTime.inWholeSeconds.toFloat()
                         )
                     }
@@ -133,7 +133,7 @@ class ComposeExampleActivity : ComponentActivity() {
             var videoId by remember { mutableStateOf("tQDO-uVCl40") }
             Column {
                 ComposeYouTubePlayer(
-                    videoId = videoId,
+                    youtubeId = videoId,
                     onCurrentTime = {},
                     controller = YouTubePlayerController(),
                     startingTime = Duration.ZERO,
@@ -151,7 +151,7 @@ class ComposeExampleActivity : ComponentActivity() {
 fun ComposeYoutubePlayerPreview() {
     Column {
         ComposeYouTubePlayer(
-            videoId = "tQDO-uVCl40",
+            youtubeId = "tQDO-uVCl40",
             onCurrentTime = {},
             controller = YouTubePlayerController(),
             startingTime = 120.toDuration(DurationUnit.SECONDS),

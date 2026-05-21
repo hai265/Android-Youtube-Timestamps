@@ -40,8 +40,8 @@ class VideoRepository @Inject constructor(
         return videoDao.getAllVideosAndTimestamps()
     }
 
-    suspend fun getVideoById(id: String): Video? {
-        return videoDao.getVideoById(id)
+    suspend fun getVideoByYoutubeId(id: String): Video? {
+        return videoDao.getVideoByYoutubeId(id)
     }
 
     //Two errors can occur
@@ -50,7 +50,7 @@ class VideoRepository @Inject constructor(
     @OptIn(ExperimentalUuidApi::class)
     suspend fun addVideo(url: String): VideoResult {
         val videoId = getYouTubeIdFromUrl(url) ?: return VideoResult.InvalidUrl(url)
-        if (getVideoById(videoId) != null) {
+        if (getVideoByYoutubeId(videoId) != null) {
             return VideoResult.VideoAlreadyExists(videoId)
         }
         val metadata = try {
@@ -68,6 +68,7 @@ class VideoRepository @Inject constructor(
 
         videoDao.addVideo(
             Video(
+                id = "id",
                 youtubeId = videoId,
                 videoTitle = metadata.title,
                 thumbnail = metadata.thumbnail,
@@ -81,7 +82,7 @@ class VideoRepository @Inject constructor(
     suspend fun importVideosWithTimestamps(videoWithTimestamps: List<VideoWithTimestamps>) {
         //TODO: one transaction
         videoWithTimestamps.forEach { (video, timestamps) ->
-            if (videoDao.getVideoById(video.youtubeId) == null) {
+            if (videoDao.getVideoByYoutubeId(video.youtubeId) == null) {
                 videoDao.addVideo(video)
             }
             timestamps.forEach {

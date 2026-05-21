@@ -1,6 +1,7 @@
 import app.cash.sqldelight.db.SqlDriver
 import app.cash.sqldelight.driver.jdbc.sqlite.JdbcSqliteDriver
 import com.hai265.timestamper.AppSqlDatabase
+import com.hai265.timestamper.Timestamps
 import com.hai265.timestamper.Videos
 import com.hai265.timestamper.common.ZERO
 import com.hai265.timestamper.data.database.SqlDelightVideoDao
@@ -35,7 +36,8 @@ class SqlDelightVideosDaoTest {
             driver = driver,
             videosAdapter = Videos.Adapter(
                 instantAdapter, durationAdapter
-            )
+            ),
+            timestampsAdapter = Timestamps.Adapter(durationAdapter)
         )
 
 
@@ -53,7 +55,7 @@ class SqlDelightVideosDaoTest {
             db.timestampsQueries.upsertTimestamp(
                 id = it.id,
                 video_id = videoId,
-                time = it.time.inWholeMilliseconds,
+                time = it.time,
                 description = it.description
             )
         }
@@ -78,12 +80,12 @@ class SqlDelightVideosDaoTest {
     @Test
     fun `video with timestamps returns all of them`() = runTest {
         dao.addVideo(videoA)
-        val ts1 = ts1.copy(videoId = videoA.youtubeId)
-        val ts2 = ts2.copy(videoId = videoA.youtubeId)
+        val ts1 = ts1.copy(videoId = videoA.id)
+        val ts2 = ts2.copy(videoId = videoA.id)
         insertTimestamps(
-            videoA.youtubeId,
+            videoA.id,
             ts1,
-            ts2.copy(videoId = videoA.youtubeId)
+            ts2
         )
 
         val result = dao.getAllVideosAndTimestamps()
@@ -96,21 +98,21 @@ class SqlDelightVideosDaoTest {
 
     @Test
     fun `multiple videos each get their own timestamps`() = runTest {
-        val ts1 = ts1.copy(videoId = videoA.youtubeId)
-        val ts2 = ts2.copy(videoId = videoB.youtubeId)
-        val ts3 = ts3.copy(videoId = videoB.youtubeId)
+        val ts1 = ts1.copy(videoId = videoA.id)
+        val ts2 = ts2.copy(videoId = videoB.id)
+        val ts3 = ts3.copy(videoId = videoB.id)
         dao.addVideo(videoA)
         dao.addVideo(videoB)
-        insertTimestamps(videoA.youtubeId, ts1)
-        insertTimestamps(videoB.youtubeId, ts2, ts3)
+        insertTimestamps(videoA.id, ts1)
+        insertTimestamps(videoB.id, ts2, ts3)
 
         val result = dao.getAllVideosAndTimestamps()
-            .sortedBy { it.video.youtubeId }
+            .sortedBy { it.video.id }
 
-        assertEquals(videoA.youtubeId, result[0].video.youtubeId)
+        assertEquals(videoA.id, result[0].video.id)
         assertEquals(1, result[0].timestamps.size)
 
-        assertEquals(videoB.youtubeId, result[1].video.youtubeId)
+        assertEquals(videoB.id, result[1].video.id)
         assertEquals(2, result[1].timestamps.size)
     }
 
@@ -118,11 +120,11 @@ class SqlDelightVideosDaoTest {
     fun `timestamps do not bleed across videos`() = runTest {
         dao.addVideo(videoA)
         dao.addVideo(videoB)
-        insertTimestamps(videoA.youtubeId, ts1)
+        insertTimestamps(videoA.id, ts1)
 
         val result = dao.getAllVideosAndTimestamps()
-        val videoAResult = result.first { it.video.youtubeId == videoA.youtubeId }
-        val videoBResult = result.first { it.video.youtubeId == videoB.youtubeId }
+        val videoAResult = result.first { it.video.id == videoA.id }
+        val videoBResult = result.first { it.video.id == videoB.id }
 
         assertEquals(1, videoAResult.timestamps.size)
         assert(videoBResult.timestamps.isEmpty())
@@ -130,6 +132,7 @@ class SqlDelightVideosDaoTest {
 
     companion object {
         val videoA = Video(
+            id = "ida",
             youtubeId = "a",
             videoTitle = "Video A",
             thumbnail = "thumbnail",
@@ -137,14 +140,15 @@ class SqlDelightVideosDaoTest {
             lastPlayed = Duration.ZERO
         )
         val videoB = Video(
+            id = "idb",
             youtubeId = "b",
             videoTitle = "Video B",
             thumbnail = "thumbnail",
             lastEdited = Instant.ZERO,
             lastPlayed = Duration.ZERO
         )
-        val ts1 = Timestamp(id = 1L, videoId = "a", time = Duration.ZERO, description = "")
-        val ts2 = Timestamp(id = 2L, time = Duration.ZERO, description = "")
-        val ts3 = Timestamp(id = 3L, time = Duration.ZERO, description = "")
+        val ts1 = Timestamp(id = "id1", videoId = "a", time = Duration.ZERO, description = "")
+        val ts2 = Timestamp(id = "id2", videoId = "b", time = Duration.ZERO, description = "")
+        val ts3 = Timestamp(id = "id3", videoId = "c", time = Duration.ZERO, description = "")
     }
 }

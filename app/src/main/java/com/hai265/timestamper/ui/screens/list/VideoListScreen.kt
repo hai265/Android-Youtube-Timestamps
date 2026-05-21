@@ -190,7 +190,7 @@ fun VideoListScreen(onTapVideo: (id: String) -> Unit, windowSize: WindowWidthSiz
                         action = Intent.ACTION_SEND
                         putExtra(
                             Intent.EXTRA_TEXT,
-                            viewmodel.getTimestampsAsString(video.youtubeId)
+                            viewmodel.getTimestampsAsString(video.id)
                         )
                         type = "text/plain"
                     }

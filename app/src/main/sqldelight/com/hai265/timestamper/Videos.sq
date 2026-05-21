@@ -16,6 +16,11 @@ ORDER BY last_edited DESC ;
 getVideoById:
 SELECT *
 FROM videos
+WHERE id = :id ;
+
+getVideoByYoutubeId:
+SELECT *
+FROM videos
 WHERE youtube_id = :id ;
 
 addVideo:
@@ -36,13 +41,13 @@ LEFT JOIN timestamps ON videos.id = timestamps.video_id;
 updateLastPlayed:
 UPDATE videos
 SET last_played = :lastPlayed
-WHERE youtube_id = :id;
+WHERE id = :id;
 
 updateLastEdited:
 UPDATE videos
 SET last_edited = :lastEdited
-WHERE youtube_id = :id;
+WHERE id = :id;
 
 deleteVideo:
 DELETE FROM videos
-WHERE youtube_id = :videoId;
+WHERE id = :videoId;

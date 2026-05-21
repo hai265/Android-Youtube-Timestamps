@@ -32,6 +32,7 @@ class SqlDelightVideoDao(private val database: AppSqlDatabase) : VideoDao {
             .map { (_, rows) ->
                 VideoWithTimestamps(
                     video = Video(
+                        id = rows.first().id,
                         youtubeId = rows.first().youtube_id,
                         videoTitle = rows.first().video_title,
                         thumbnail = rows.first().thumbnail,
@@ -42,7 +43,7 @@ class SqlDelightVideoDao(private val database: AppSqlDatabase) : VideoDao {
                         row.id_?.let {
                             Timestamp(
                                 id = row.id_,
-                                videoId = row.youtube_id ?: "",
+                                videoId = row.video_id ?: "",
                                 time = row.time ?: Duration.ZERO,
                                 description = row.description ?: ""
                             )
@@ -52,9 +53,9 @@ class SqlDelightVideoDao(private val database: AppSqlDatabase) : VideoDao {
             }
     }
 
-    override suspend fun getVideoById(id: String): Video? =
+    override suspend fun getVideoByYoutubeId(youtubeId: String): Video? =
         withContext(Dispatchers.IO) {
-            queries.getVideoById(id).awaitAsOneOrNull()?.toVideo()
+            queries.getVideoByYoutubeId(youtubeId).awaitAsOneOrNull()?.toVideo()
         }
 
     //TODO: timestamp pass in duration
@@ -67,7 +68,7 @@ class SqlDelightVideoDao(private val database: AppSqlDatabase) : VideoDao {
     @OptIn(ExperimentalUuidApi::class)
     override suspend fun addVideo(video: Video) {
         queries.addVideo(
-            id = Uuid.random().toString(),
+            id = video.id.ifEmpty { Uuid.random().toString() },
             youtube_id = video.youtubeId,
             video_title = video.videoTitle ?: "",
             thumbnail = video.thumbnail,
@@ -77,7 +78,7 @@ class SqlDelightVideoDao(private val database: AppSqlDatabase) : VideoDao {
     }
 
     override suspend fun deleteVideo(id: Video) {
-        queries.deleteVideo(id.youtubeId)
+        queries.deleteVideo(id.id)
 
     }
 
@@ -88,6 +89,7 @@ class SqlDelightVideoDao(private val database: AppSqlDatabase) : VideoDao {
 
 private fun Videos.toVideo(): Video {
     return Video(
+        id = this.id,
         youtubeId = this.youtube_id,
         videoTitle = this.video_title,
         thumbnail = this.thumbnail,

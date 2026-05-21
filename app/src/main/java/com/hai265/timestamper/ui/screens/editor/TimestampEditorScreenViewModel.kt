@@ -12,12 +12,15 @@ import com.hai265.timestamper.data.repos.TimestampRepository
 import com.hai265.timestamper.data.repos.VideoRepository
 import com.hai265.timestamper.ui.Navigables
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.drop
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.sample
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -43,7 +46,7 @@ class TimestampViewerViewModel @Inject constructor(
     private val timestampRepo: TimestampRepository,
     private val preferencesRepository: PreferencesRepository,
 ) : ViewModel() {
-    private val videoId = savedStateHandle.toRoute<Navigables.VideoScreen>().id
+    private val youtubeId = savedStateHandle.toRoute<Navigables.VideoScreen>().id
 
     private val _currentTime = MutableStateFlow(Duration.ZERO)
 
@@ -53,24 +56,32 @@ class TimestampViewerViewModel @Inject constructor(
                 .drop(1) //Drop default Duration.ZERO value
                 .sample(1000)
                 .collect { lastWatchedTimestamp ->
-                    state.value.video?.youtubeId?.let { videoId ->
+                    state.value.video?.id?.let { videoId ->
                         videoRepo.updateVideoLastWatched(videoId, lastWatchedTimestamp)
                     }
                 }
         }
     }
 
-    val state = combine(
-        timestampRepo.getTimestamps(videoId),
-        flow { emit(videoRepo.getVideoById(videoId)) },
-        _currentTime
-    ) { timestamps, video, currentTime ->
-        TimestampEditorState(video, timestamps, currentTime)
-    }.stateIn(
-        scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(5000L),
-        initialValue = TimestampEditorState()
-    )
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val state =
+        flow { emit(videoRepo.getVideoByYoutubeId(youtubeId)) }
+            .flatMapLatest { video ->
+                if (video != null) {
+                    combine(
+                        timestampRepo.getTimestamps(video.id),
+                        _currentTime
+                    ) { timestamps, currentTime ->
+                        TimestampEditorState(video, timestamps, currentTime)
+                    }
+                } else {
+                    flowOf(TimestampEditorState())
+                }
+            }.stateIn(
+                scope = viewModelScope,
+                started = SharingStarted.WhileSubscribed(5000L),
+                initialValue = TimestampEditorState()
+            )
 
     val preferences = combine(
         preferencesRepository.hideKeyboardOnScreenTap(),

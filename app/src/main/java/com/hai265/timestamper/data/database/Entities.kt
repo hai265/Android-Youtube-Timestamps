@@ -12,6 +12,8 @@ import kotlin.uuid.Uuid
 
 @Serializable
 data class Video(
+    //TODO: uuid
+    val id: String,
     val youtubeId: String,
     val videoTitle: String?,
     val thumbnail: String,
@@ -24,7 +26,8 @@ data class Video(
 @Serializable
 data class Timestamp @OptIn(ExperimentalUuidApi::class) constructor(
     val id: String = Uuid.random().toString(),
-    val videoId: String = "",
+    //TODO: non-optinal
+    val videoId: String,
     val time: Duration = Duration.ZERO,
     val description: String = ""
 ) : Parcelable
