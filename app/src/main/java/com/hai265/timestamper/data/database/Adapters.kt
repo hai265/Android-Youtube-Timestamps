@@ -4,6 +4,8 @@ import app.cash.sqldelight.ColumnAdapter
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Instant
+import kotlin.uuid.ExperimentalUuidApi
+import kotlin.uuid.Uuid
 
 val instantAdapter = object : ColumnAdapter<Instant, String> {
     override fun decode(databaseValue: String): Instant =
@@ -19,4 +21,13 @@ val durationAdapter = object : ColumnAdapter<Duration, Long> {
 
     override fun encode(value: Duration): Long =
         value.inWholeMilliseconds
+}
+
+@OptIn(ExperimentalUuidApi::class)
+val uuidAdapter = object : ColumnAdapter<Uuid, String> {
+    override fun decode(databaseValue: String): Uuid =
+        Uuid.parse(databaseValue)
+
+    override fun encode(value: Uuid): String =
+        value.toString()
 }

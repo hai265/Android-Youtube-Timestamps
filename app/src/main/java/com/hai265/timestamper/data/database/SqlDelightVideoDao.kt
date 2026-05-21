@@ -32,7 +32,7 @@ class SqlDelightVideoDao(private val database: AppSqlDatabase) : VideoDao {
             .map { (_, rows) ->
                 VideoWithTimestamps(
                     video = Video(
-                        id = rows.first().id,
+                        id = rows.first().id.toString(),
                         youtubeId = rows.first().youtube_id,
                         videoTitle = rows.first().video_title,
                         thumbnail = rows.first().thumbnail,
@@ -61,14 +61,14 @@ class SqlDelightVideoDao(private val database: AppSqlDatabase) : VideoDao {
     //TODO: timestamp pass in duration
     override suspend fun updateLastPlayed(videoId: String, timestamp: Long) {
         withContext(Dispatchers.IO) {
-            queries.updateLastPlayed(timestamp.milliseconds, videoId)
+            queries.updateLastPlayed(timestamp.milliseconds, Uuid.parse(videoId))
         }
     }
 
     @OptIn(ExperimentalUuidApi::class)
     override suspend fun addVideo(video: Video) {
         queries.addVideo(
-            id = video.id.ifEmpty { Uuid.random().toString() },
+            id = if (video.id.isEmpty()) Uuid.random() else Uuid.parse(video.id),
             youtube_id = video.youtubeId,
             video_title = video.videoTitle ?: "",
             thumbnail = video.thumbnail,
@@ -78,18 +78,19 @@ class SqlDelightVideoDao(private val database: AppSqlDatabase) : VideoDao {
     }
 
     override suspend fun deleteVideo(id: Video) {
-        queries.deleteVideo(id.id)
+        queries.deleteVideo(Uuid.parse(id.id))
 
     }
 
     override suspend fun updateLastEdited(videoId: String, now: Instant) {
-        queries.updateLastEdited(now, videoId)
+        queries.updateLastEdited(now, Uuid.parse(videoId))
     }
 }
 
+@OptIn(ExperimentalUuidApi::class)
 private fun Videos.toVideo(): Video {
     return Video(
-        id = this.id,
+        id = this.id.toString(),
         youtubeId = this.youtube_id,
         videoTitle = this.video_title,
         thumbnail = this.thumbnail,

@@ -1,5 +1,5 @@
 CREATE TABLE videos(
-id TEXT PRIMARY KEY NOT NULL,
+id TEXT AS kotlin.uuid.Uuid  PRIMARY KEY NOT NULL,
 youtube_id TEXT NOT NULL,
 video_title TEXT NOT NULL,
 thumbnail TEXT NOT NULL,

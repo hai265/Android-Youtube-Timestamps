@@ -86,6 +86,12 @@ sqldelight {
     }
 }
 
+kotlin {
+    compilerOptions {
+        freeCompilerArgs.add("-opt-in=kotlin.uuid.ExperimentalUuidApi")
+    }
+}
+
 dependencies {
 
     implementation(libs.androidx.core.ktx)

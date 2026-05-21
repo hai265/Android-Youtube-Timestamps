@@ -9,6 +9,7 @@ import com.hai265.timestamper.data.database.Timestamp
 import com.hai265.timestamper.data.database.Video
 import com.hai265.timestamper.data.database.durationAdapter
 import com.hai265.timestamper.data.database.instantAdapter
+import com.hai265.timestamper.data.database.uuidAdapter
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.junit.After
@@ -19,6 +20,7 @@ import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
 import kotlin.time.Duration
 import kotlin.time.Instant
+import kotlin.uuid.Uuid
 
 @RunWith(JUnit4::class)
 class SqlDelightVideosDaoTest {
@@ -35,7 +37,7 @@ class SqlDelightVideosDaoTest {
         db = AppSqlDatabase(
             driver = driver,
             videosAdapter = Videos.Adapter(
-                instantAdapter, durationAdapter
+                uuidAdapter, instantAdapter, durationAdapter
             ),
             timestampsAdapter = Timestamps.Adapter(durationAdapter)
         )
@@ -132,7 +134,7 @@ class SqlDelightVideosDaoTest {
 
     companion object {
         val videoA = Video(
-            id = "ida",
+            id = Uuid.fromLongs(1L, 1L).toString(),
             youtubeId = "a",
             videoTitle = "Video A",
             thumbnail = "thumbnail",
@@ -140,15 +142,30 @@ class SqlDelightVideosDaoTest {
             lastPlayed = Duration.ZERO
         )
         val videoB = Video(
-            id = "idb",
+            id = Uuid.fromLongs(2L, 2L).toString(),
             youtubeId = "b",
             videoTitle = "Video B",
             thumbnail = "thumbnail",
             lastEdited = Instant.ZERO,
             lastPlayed = Duration.ZERO
         )
-        val ts1 = Timestamp(id = "id1", videoId = "a", time = Duration.ZERO, description = "")
-        val ts2 = Timestamp(id = "id2", videoId = "b", time = Duration.ZERO, description = "")
-        val ts3 = Timestamp(id = "id3", videoId = "c", time = Duration.ZERO, description = "")
+        val ts1 = Timestamp(
+            id = "id1",
+            videoId = Uuid.fromLongs(1L, 1L).toString(),
+            time = Duration.ZERO,
+            description = ""
+        )
+        val ts2 = Timestamp(
+            id = "id2",
+            videoId = Uuid.fromLongs(1L, 1L).toString(),
+            time = Duration.ZERO,
+            description = ""
+        )
+        val ts3 = Timestamp(
+            id = "id3",
+            videoId = Uuid.fromLongs(1L, 1L).toString(),
+            time = Duration.ZERO,
+            description = ""
+        )
     }
 }
