@@ -82,6 +82,7 @@ import kotlinx.coroutines.launch
 import kotlinx.parcelize.Parcelize
 import java.util.Locale
 import kotlin.time.Duration
+import kotlin.uuid.Uuid
 
 //https://www.figma.com/design/9GKdOD5q3yAT0mKgrcGmpf/Android-Youtube-Timestamp-Tool?node-id=1-6261&t=xjloAEfEmnkGJuPR-0
 
@@ -144,6 +145,7 @@ fun TimestampViewerScreen(windowSize: WindowWidthSizeClass) {
                 video?.id?.let {
                     bottomSheetState = BottomSheetState.EditTimestamp(
                         Timestamp(
+                            id = Uuid.random().toString(),
                             videoId = it,
                             time = state.playerTime
                         )

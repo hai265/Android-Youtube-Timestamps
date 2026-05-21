@@ -8,7 +8,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlin.uuid.ExperimentalUuidApi
-import kotlin.uuid.Uuid
 
 class SqlDelightTimestampsDao(private val database: AppSqlDatabase) : TimestampDao {
     val queries = database.timestampsQueries
@@ -20,14 +19,13 @@ class SqlDelightTimestampsDao(private val database: AppSqlDatabase) : TimestampD
 
     @OptIn(ExperimentalUuidApi::class)
     override suspend fun upsertTimestamp(timestamp: Timestamp): String {
-        val id = Uuid.random().toString()
         queries.upsertTimestamp(
-            id = id,
+            id = timestamp.id,
             video_id = timestamp.videoId,
             time = timestamp.time,
             description = timestamp.description,
         )
-        return id
+        return timestamp.id
 
     }
 

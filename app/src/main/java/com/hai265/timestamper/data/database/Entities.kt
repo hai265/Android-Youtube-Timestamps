@@ -8,7 +8,6 @@ import kotlinx.serialization.Serializable
 import kotlin.time.Duration
 import kotlin.time.Instant
 import kotlin.uuid.ExperimentalUuidApi
-import kotlin.uuid.Uuid
 
 @Serializable
 data class Video(
@@ -25,7 +24,7 @@ data class Video(
 @Parcelize
 @Serializable
 data class Timestamp @OptIn(ExperimentalUuidApi::class) constructor(
-    val id: String = Uuid.random().toString(),
+    val id: String,
     //TODO: non-optinal
     val videoId: String,
     val time: Duration = Duration.ZERO,

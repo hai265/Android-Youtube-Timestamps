@@ -15,6 +15,7 @@ import com.hai265.timestamper.ui.theme.AppTheme
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlin.uuid.Uuid
 
 @AndroidEntryPoint
 class TimestampDialogActivity : FragmentActivity() {
@@ -32,6 +33,7 @@ class TimestampDialogActivity : FragmentActivity() {
                     is State.AddTimestamp -> {
                         TimestampEditorSheet(
                             timestamp = Timestamp(
+                                id = Uuid.random().toString(),
                                 videoId = (state as State.AddTimestamp).videoId,
                                 time = (state as State.AddTimestamp).time
                             ),
