@@ -68,7 +68,7 @@ class VideoRepository @Inject constructor(
 
         videoDao.addVideo(
             Video(
-                videoId = videoId,
+                youtubeId = videoId,
                 videoTitle = metadata.title,
                 thumbnail = metadata.thumbnail,
                 lastEdited = Clock.System.now(),
@@ -81,7 +81,7 @@ class VideoRepository @Inject constructor(
     suspend fun importVideosWithTimestamps(videoWithTimestamps: List<VideoWithTimestamps>) {
         //TODO: one transaction
         videoWithTimestamps.forEach { (video, timestamps) ->
-            if (videoDao.getVideoById(video.videoId) == null) {
+            if (videoDao.getVideoById(video.youtubeId) == null) {
                 videoDao.addVideo(video)
             }
             timestamps.forEach {

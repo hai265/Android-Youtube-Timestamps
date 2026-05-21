@@ -28,6 +28,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import retrofit2.HttpException
 import retrofit2.Response
+import kotlin.jvm.java
 
 
 const val VIDEO_URL = "https://www.youtube.com/watch?v=videoid"
@@ -156,8 +157,8 @@ class VideoRepositoryTest {
     fun testImportVideosExistingVideoAlreadyExistNotReplaced() = runTest {
         // Add video1 via network — its metadata comes from FakeYoutubeMetadataApiService,
         // so the stored version will differ from fakeVideo1's hardcoded fields.
-        subject.addVideo(youtubeUrlFromId(fakeVideo1.videoId))
-        val networkFetchedVideo1 = subject.getVideoById(fakeVideo1.videoId)
+        subject.addVideo(youtubeUrlFromId(fakeVideo1.youtubeId))
+        val networkFetchedVideo1 = subject.getVideoById(fakeVideo1.youtubeId)
 
         // Sanity check: confirm the stored video differs from the fakeVideo1 fixture,
         // proving that importing fakeVideo1 would actually be a meaningful change if allowed.
@@ -171,7 +172,7 @@ class VideoRepositoryTest {
         subject.importVideosWithTimestamps(videoWithTimestamps)
 
         // video1 already existed — import should NOT overwrite it.
-        val videoAfterImport = subject.getVideoById(fakeVideo1.videoId)
+        val videoAfterImport = subject.getVideoById(fakeVideo1.youtubeId)
         assertEquals(
             "Existing video1 should not be replaced by import",
             networkFetchedVideo1,
@@ -182,7 +183,7 @@ class VideoRepositoryTest {
         assertEquals(
             "New video2 should be inserted exactly as provided",
             fakeVideo2,
-            subject.getVideoById(fakeVideo2.videoId)
+            subject.getVideoById(fakeVideo2.youtubeId)
         )
     }
 
@@ -212,13 +213,13 @@ class VideoRepositoryTest {
         val videoWithTimestamps = listOf(
             VideoWithTimestamps(
                 video = fakeVideo1,
-                timestamps = listOf(fakeTimestamp1.copy(videoId = fakeVideo1.videoId))
+                timestamps = listOf(fakeTimestamp1.copy(videoId = fakeVideo1.youtubeId))
             ),
             VideoWithTimestamps(
                 video = fakeVideo2,
                 timestamps = listOf(
-                    fakeTimestamp2.copy(videoId = fakeVideo2.videoId),
-                    fakeTimestamp3.copy(videoId = fakeVideo2.videoId)
+                    fakeTimestamp2.copy(videoId = fakeVideo2.youtubeId),
+                    fakeTimestamp3.copy(videoId = fakeVideo2.youtubeId)
                 )
             )
         )

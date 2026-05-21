@@ -32,7 +32,7 @@ class SqlDelightVideoDao(private val database: AppSqlDatabase) : VideoDao {
             .map { (_, rows) ->
                 VideoWithTimestamps(
                     video = Video(
-                        videoId = rows.first().video_id,
+                        youtubeId = rows.first().youtube_id,
                         videoTitle = rows.first().video_title,
                         thumbnail = rows.first().thumbnail,
                         lastEdited = rows.first().last_edited,
@@ -42,7 +42,7 @@ class SqlDelightVideoDao(private val database: AppSqlDatabase) : VideoDao {
                         row.id_?.let {
                             Timestamp(
                                 id = row.id_,
-                                videoId = row.video_id_ ?: "",
+                                videoId = row.youtube_id ?: "",
                                 time = row.time ?: Duration.ZERO,
                                 description = row.description ?: ""
                             )
@@ -68,7 +68,7 @@ class SqlDelightVideoDao(private val database: AppSqlDatabase) : VideoDao {
     override suspend fun addVideo(video: Video) {
         queries.addVideo(
             id = Uuid.random().toString(),
-            video_id = video.videoId,
+            youtube_id = video.youtubeId,
             video_title = video.videoTitle ?: "",
             thumbnail = video.thumbnail,
             last_edited = video.lastEdited,
@@ -77,7 +77,7 @@ class SqlDelightVideoDao(private val database: AppSqlDatabase) : VideoDao {
     }
 
     override suspend fun deleteVideo(id: Video) {
-        queries.deleteVideo(id.videoId)
+        queries.deleteVideo(id.youtubeId)
 
     }
 
@@ -88,7 +88,7 @@ class SqlDelightVideoDao(private val database: AppSqlDatabase) : VideoDao {
 
 private fun Videos.toVideo(): Video {
     return Video(
-        videoId = this.video_id,
+        youtubeId = this.youtube_id,
         videoTitle = this.video_title,
         thumbnail = this.thumbnail,
         lastEdited = this.last_edited,

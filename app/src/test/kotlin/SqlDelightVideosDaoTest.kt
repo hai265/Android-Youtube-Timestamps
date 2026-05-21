@@ -70,7 +70,7 @@ class SqlDelightVideosDaoTest {
         val result = dao.getAllVideosAndTimestamps()
 
         assert(result.size == 1)
-        assertEquals(videoA.videoId, result[0].video.videoId)
+        assertEquals(videoA.youtubeId, result[0].video.youtubeId)
         assert(result[0].timestamps.isEmpty())
     }
 
@@ -78,12 +78,12 @@ class SqlDelightVideosDaoTest {
     @Test
     fun `video with timestamps returns all of them`() = runTest {
         dao.addVideo(videoA)
-        val ts1 = ts1.copy(videoId = videoA.videoId)
-        val ts2 = ts2.copy(videoId = videoA.videoId)
+        val ts1 = ts1.copy(videoId = videoA.youtubeId)
+        val ts2 = ts2.copy(videoId = videoA.youtubeId)
         insertTimestamps(
-            videoA.videoId,
+            videoA.youtubeId,
             ts1,
-            ts2.copy(videoId = videoA.videoId)
+            ts2.copy(videoId = videoA.youtubeId)
         )
 
         val result = dao.getAllVideosAndTimestamps()
@@ -96,21 +96,21 @@ class SqlDelightVideosDaoTest {
 
     @Test
     fun `multiple videos each get their own timestamps`() = runTest {
-        val ts1 = ts1.copy(videoId = videoA.videoId)
-        val ts2 = ts2.copy(videoId = videoB.videoId)
-        val ts3 = ts3.copy(videoId = videoB.videoId)
+        val ts1 = ts1.copy(videoId = videoA.youtubeId)
+        val ts2 = ts2.copy(videoId = videoB.youtubeId)
+        val ts3 = ts3.copy(videoId = videoB.youtubeId)
         dao.addVideo(videoA)
         dao.addVideo(videoB)
-        insertTimestamps(videoA.videoId, ts1)
-        insertTimestamps(videoB.videoId, ts2, ts3)
+        insertTimestamps(videoA.youtubeId, ts1)
+        insertTimestamps(videoB.youtubeId, ts2, ts3)
 
         val result = dao.getAllVideosAndTimestamps()
-            .sortedBy { it.video.videoId }
+            .sortedBy { it.video.youtubeId }
 
-        assertEquals(videoA.videoId, result[0].video.videoId)
+        assertEquals(videoA.youtubeId, result[0].video.youtubeId)
         assertEquals(1, result[0].timestamps.size)
 
-        assertEquals(videoB.videoId, result[1].video.videoId)
+        assertEquals(videoB.youtubeId, result[1].video.youtubeId)
         assertEquals(2, result[1].timestamps.size)
     }
 
@@ -118,11 +118,11 @@ class SqlDelightVideosDaoTest {
     fun `timestamps do not bleed across videos`() = runTest {
         dao.addVideo(videoA)
         dao.addVideo(videoB)
-        insertTimestamps(videoA.videoId, ts1)
+        insertTimestamps(videoA.youtubeId, ts1)
 
         val result = dao.getAllVideosAndTimestamps()
-        val videoAResult = result.first { it.video.videoId == videoA.videoId }
-        val videoBResult = result.first { it.video.videoId == videoB.videoId }
+        val videoAResult = result.first { it.video.youtubeId == videoA.youtubeId }
+        val videoBResult = result.first { it.video.youtubeId == videoB.youtubeId }
 
         assertEquals(1, videoAResult.timestamps.size)
         assert(videoBResult.timestamps.isEmpty())
@@ -130,14 +130,14 @@ class SqlDelightVideosDaoTest {
 
     companion object {
         val videoA = Video(
-            videoId = "a",
+            youtubeId = "a",
             videoTitle = "Video A",
             thumbnail = "thumbnail",
             lastEdited = Instant.ZERO,
             lastPlayed = Duration.ZERO
         )
         val videoB = Video(
-            videoId = "b",
+            youtubeId = "b",
             videoTitle = "Video B",
             thumbnail = "thumbnail",
             lastEdited = Instant.ZERO,

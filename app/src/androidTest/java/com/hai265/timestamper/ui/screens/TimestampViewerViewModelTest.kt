@@ -26,6 +26,7 @@ import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
+import kotlin.jvm.java
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Instant
 
@@ -44,7 +45,7 @@ class TimestampViewerViewModelTest {
 
     private val videoId = "videoId"
     private val testVideo = Video(
-        videoId = videoId,
+        youtubeId = videoId,
         videoTitle = "Test Video",
         thumbnail = "thumb",
         lastEdited = Instant.ZERO,
