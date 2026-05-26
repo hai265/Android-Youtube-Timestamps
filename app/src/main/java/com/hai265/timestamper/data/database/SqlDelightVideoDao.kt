@@ -10,7 +10,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
-import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Instant
 import kotlin.uuid.ExperimentalUuidApi
@@ -32,7 +31,7 @@ class SqlDelightVideoDao(private val database: AppSqlDatabase) : VideoDao {
             .map { (_, rows) ->
                 VideoWithTimestamps(
                     video = Video(
-                        id = rows.first().id.toString(),
+                        id = rows.first().id,
                         youtubeId = rows.first().youtube_id,
                         videoTitle = rows.first().video_title,
                         thumbnail = rows.first().thumbnail,
@@ -40,14 +39,16 @@ class SqlDelightVideoDao(private val database: AppSqlDatabase) : VideoDao {
                         lastPlayed = rows.first().last_played
                     ),
                     timestamps = rows.mapNotNull { row ->
-                        row.id_?.let {
-                            Timestamp(
-                                id = row.id_,
-                                videoId = row.video_id ?: "",
-                                time = row.time ?: Duration.ZERO,
-                                description = row.description ?: ""
-                            )
-                        }
+                        val id = row.id_ ?: return@mapNotNull null
+                        val videoId = row.video_id ?: return@mapNotNull null
+                        val time = row.time ?: return@mapNotNull null
+                        val description = row.description ?: return@mapNotNull null
+                        Timestamp(
+                            id = id,
+                            videoId = videoId,
+                            time = time,
+                            description = description,
+                        )
                     }
                 )
             }
@@ -59,16 +60,16 @@ class SqlDelightVideoDao(private val database: AppSqlDatabase) : VideoDao {
         }
 
     //TODO: timestamp pass in duration
-    override suspend fun updateLastPlayed(videoId: String, timestamp: Long) {
+    override suspend fun updateLastPlayed(videoId: Uuid, timestamp: Long) {
         withContext(Dispatchers.IO) {
-            queries.updateLastPlayed(timestamp.milliseconds, Uuid.parse(videoId))
+            queries.updateLastPlayed(timestamp.milliseconds, videoId)
         }
     }
 
     @OptIn(ExperimentalUuidApi::class)
     override suspend fun addVideo(video: Video) {
         queries.addVideo(
-            id = if (video.id.isEmpty()) Uuid.random() else Uuid.parse(video.id),
+            id = video.id,
             youtube_id = video.youtubeId,
             video_title = video.videoTitle ?: "",
             thumbnail = video.thumbnail,
@@ -77,20 +78,20 @@ class SqlDelightVideoDao(private val database: AppSqlDatabase) : VideoDao {
         )
     }
 
-    override suspend fun deleteVideo(id: Video) {
-        queries.deleteVideo(Uuid.parse(id.id))
+    override suspend fun deleteVideo(video: Video) {
+        queries.deleteVideo(video.id)
 
     }
 
-    override suspend fun updateLastEdited(videoId: String, now: Instant) {
-        queries.updateLastEdited(now, Uuid.parse(videoId))
+    override suspend fun updateLastEdited(videoId: Uuid, now: Instant) {
+        queries.updateLastEdited(now, videoId)
     }
 }
 
 @OptIn(ExperimentalUuidApi::class)
 private fun Videos.toVideo(): Video {
     return Video(
-        id = this.id.toString(),
+        id = this.id,
         youtubeId = this.youtube_id,
         videoTitle = this.video_title,
         thumbnail = this.thumbnail,

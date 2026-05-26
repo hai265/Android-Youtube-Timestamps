@@ -148,6 +148,7 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     androidTestImplementation(libs.android.driver)
     androidTestImplementation(libs.turbine)
+    androidTestImplementation(libs.sqllite.driver)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
     testImplementation(libs.kotlinx.coroutines.test)

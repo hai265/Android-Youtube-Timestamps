@@ -8,17 +8,18 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlin.uuid.ExperimentalUuidApi
+import kotlin.uuid.Uuid
 
 class SqlDelightTimestampsDao(private val database: AppSqlDatabase) : TimestampDao {
     val queries = database.timestampsQueries
-    override fun getTimestamps(videoId: String): Flow<List<Timestamp>> {
+    override fun getTimestamps(videoId: Uuid): Flow<List<Timestamp>> {
         return queries.getTimestmaps(videoId).asFlow().mapToList(Dispatchers.IO).map {
             it.map { it.toTimestamp() }
         }
     }
 
     @OptIn(ExperimentalUuidApi::class)
-    override suspend fun upsertTimestamp(timestamp: Timestamp): String {
+    override suspend fun upsertTimestamp(timestamp: Timestamp): Uuid {
         queries.upsertTimestamp(
             id = timestamp.id,
             video_id = timestamp.videoId,
@@ -33,10 +34,10 @@ class SqlDelightTimestampsDao(private val database: AppSqlDatabase) : TimestampD
         queries.deleteTimestamp(timestamp.id)
     }
 
-    override fun getTimestampById(id: Long): Timestamp {
+    override fun getTimestampById(id: Uuid): Timestamp {
         //TODO: id string
         //TODO: await suspend
-        return queries.getTimestampById(id.toString()).executeAsOne().toTimestamp()
+        return queries.getTimestampById(id).executeAsOne().toTimestamp()
     }
 
     override suspend fun addTimestamps(timestamps: List<Timestamp>) {

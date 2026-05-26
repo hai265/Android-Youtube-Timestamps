@@ -33,7 +33,11 @@ abstract class DatabaseModule {
                 AppSqlDatabase(
                     driver = driver,
                     videosAdapter = Videos.Adapter(uuidAdapter, instantAdapter, durationAdapter),
-                    timestampsAdapter = Timestamps.Adapter(durationAdapter),
+                    timestampsAdapter = Timestamps.Adapter(
+                        uuidAdapter,
+                        uuidAdapter,
+                        durationAdapter
+                    ),
                 )
             )
         }
@@ -44,7 +48,11 @@ abstract class DatabaseModule {
                 AppSqlDatabase(
                     driver = driver,
                     videosAdapter = Videos.Adapter(uuidAdapter, instantAdapter, durationAdapter),
-                    timestampsAdapter = Timestamps.Adapter(durationAdapter)
+                    timestampsAdapter = Timestamps.Adapter(
+                        uuidAdapter,
+                        uuidAdapter,
+                        durationAdapter
+                    )
                 )
             )
         }

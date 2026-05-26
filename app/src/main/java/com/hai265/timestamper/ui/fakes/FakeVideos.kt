@@ -7,9 +7,10 @@ import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Instant
 import kotlin.uuid.ExperimentalUuidApi
+import kotlin.uuid.Uuid
 
 val fakeVideo1 = Video(
-    id = "id1",
+    id = Uuid.fromLongs(1, 1),
     youtubeId = "tQDO-uVCl40",
     videoTitle = "【みんなのGOLF WORLD】メジロ家のパーマー、ライアン、アルダン、ブライトの4人でゲーム実況だ！【前編】",
     thumbnail = "https://img.youtube.com/vi/tQDO-uVCl40/maxresdefault.jpg",
@@ -18,7 +19,7 @@ val fakeVideo1 = Video(
 )
 
 val fakeVideo2 = Video(
-    id = "id2",
+    id = Uuid.fromLongs(2, 2),
     youtubeId = "b-P-wuUEUeQ",
     videoTitle = "テトリス99】初心に帰ってテトリスをやろう\uD83C\uDFAE【星街すいせい",
     thumbnail = "https://img.youtube.com/vi/b-P-wuUEUeQ/maxresdefault.jpg",
@@ -30,22 +31,22 @@ val fakeVideoList = listOf(fakeVideo1, fakeVideo2)
 
 @OptIn(ExperimentalUuidApi::class)
 val fakeTimestamp1 = Timestamp(
-    id = "id1",
-    videoId = "1",
+    id = Uuid.fromLongs(1, 1),
+    videoId = Uuid.fromLongs(1, 1),
     time = Duration.ZERO,
     description = "Sample Description"
 )
 
 val fakeTimestamp2 = Timestamp(
-    id = "id2",
-    videoId = "1",
+    id = Uuid.fromLongs(2, 2),
+    videoId = Uuid.fromLongs(2, 2),
     time = 10000000.milliseconds,
     description = "Sample Description"
 )
 
 val fakeTimestamp3 = Timestamp(
-    id = "id3",
-    videoId = "1",
+    id = Uuid.fromLongs(3, 3),
+    videoId = Uuid.fromLongs(3, 3),
     time = 10000000.milliseconds,
     description = "Sample Description"
 )

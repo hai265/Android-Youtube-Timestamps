@@ -34,7 +34,7 @@ class TimestampDialogActivity : FragmentActivity() {
                     is State.AddTimestamp -> {
                         TimestampEditorSheet(
                             timestamp = Timestamp(
-                                id = Uuid.random().toString(),
+                                id = Uuid.random(),
                                 videoId = (state as State.AddTimestamp).videoId,
                                 time = (state as State.AddTimestamp).time
                             ),

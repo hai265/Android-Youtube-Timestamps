@@ -1,6 +1,6 @@
 CREATE TABLE timestamps(
-id TEXT PRIMARY KEY,
-video_id TEXT NOT NULL,
+id TEXT AS kotlin.uuid.Uuid PRIMARY KEY NOT NULL,
+video_id TEXT AS kotlin.uuid.Uuid  NOT NULL,
 time INTEGER AS kotlin.time.Duration NOT NULL,
 description TEXT NOT NULL,
 

@@ -16,10 +16,11 @@ import javax.inject.Singleton
 import kotlin.time.Clock
 import kotlin.time.Duration
 import kotlin.uuid.ExperimentalUuidApi
+import kotlin.uuid.Uuid
 
 sealed interface VideoResult {
-    data class Success(val videoId: String) : VideoResult
-    data class VideoAlreadyExists(val videoId: String) : VideoResult
+    data class Success(val videoId: Uuid) : VideoResult
+    data class VideoAlreadyExists(val videoId: Uuid) : VideoResult
 
     data class InvalidUrl(val url: String) : VideoResult
     data class NetworkError(val errorMessage: String?) : VideoResult
@@ -49,10 +50,9 @@ class VideoRepository @Inject constructor(
     // 2. video already added
     @OptIn(ExperimentalUuidApi::class)
     suspend fun addVideo(url: String): VideoResult {
-        val videoId = getYouTubeIdFromUrl(url) ?: return VideoResult.InvalidUrl(url)
-        if (getVideoByYoutubeId(videoId) != null) {
-            return VideoResult.VideoAlreadyExists(videoId)
-        }
+        val youtubeId = getYouTubeIdFromUrl(url) ?: return VideoResult.InvalidUrl(url)
+        //return if video already exists
+        getVideoByYoutubeId(youtubeId)?.id?.let { return VideoResult.VideoAlreadyExists(it) }
         val metadata = try {
             youtubeMetadataApi.getYoutubeMetadata(url)
         } catch (e: IOException) {
@@ -66,17 +66,18 @@ class VideoRepository @Inject constructor(
             return VideoResult.NetworkError(message)
         }
 
+        val newVideoId = Uuid.random()
         videoDao.addVideo(
             Video(
-                id = "id",
-                youtubeId = videoId,
+                id = newVideoId,
+                youtubeId = youtubeId,
                 videoTitle = metadata.title,
                 thumbnail = metadata.thumbnail,
                 lastEdited = Clock.System.now(),
                 lastPlayed = Duration.ZERO,
             )
         )
-        return VideoResult.Success(videoId)
+        return VideoResult.Success(newVideoId)
     }
 
     suspend fun importVideosWithTimestamps(videoWithTimestamps: List<VideoWithTimestamps>) {
@@ -100,14 +101,14 @@ class VideoRepository @Inject constructor(
 
     //TODO: Optimize so I don't write to db every second
     //Performance profiling?
-    suspend fun updateVideoLastWatched(videoId: String, lastWatchedTimestamp: Duration) {
+    suspend fun updateVideoLastWatched(videoId: Uuid, lastWatchedTimestamp: Duration) {
         withContext(Dispatchers.IO) {
             videoDao.updateLastPlayed(videoId, lastWatchedTimestamp.inWholeMilliseconds)
         }
     }
 
 
-    suspend fun updateLastEdited(videoId: String) {
+    suspend fun updateLastEdited(videoId: Uuid) {
         withContext(Dispatchers.IO) {
             videoDao.updateLastEdited(videoId, Clock.System.now())
         }

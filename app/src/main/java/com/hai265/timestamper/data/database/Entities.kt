@@ -8,11 +8,11 @@ import kotlinx.serialization.Serializable
 import kotlin.time.Duration
 import kotlin.time.Instant
 import kotlin.uuid.ExperimentalUuidApi
+import kotlin.uuid.Uuid
 
 @Serializable
 data class Video(
-    //TODO: uuid
-    val id: String,
+    val id: Uuid,
     val youtubeId: String,
     val videoTitle: String?,
     val thumbnail: String,
@@ -24,9 +24,8 @@ data class Video(
 @Parcelize
 @Serializable
 data class Timestamp @OptIn(ExperimentalUuidApi::class) constructor(
-    val id: String,
-    //TODO: non-optinal
-    val videoId: String,
+    val id: Uuid,
+    val videoId: Uuid,
     val time: Duration = Duration.ZERO,
     val description: String = ""
 ) : Parcelable

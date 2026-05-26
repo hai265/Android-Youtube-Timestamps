@@ -1,10 +1,18 @@
 package com.hai265.timestamper.ui.screens
 
 import android.content.Context
-import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.hai265.timestamper.data.database.AppDatabase
+import app.cash.sqldelight.db.SqlDriver
+import app.cash.sqldelight.driver.jdbc.sqlite.JdbcSqliteDriver
+import com.hai265.timestamper.AppSqlDatabase
+import com.hai265.timestamper.Timestamps
+import com.hai265.timestamper.Videos
+import com.hai265.timestamper.data.database.SqlDelightTimestampsDao
+import com.hai265.timestamper.data.database.SqlDelightVideoDao
+import com.hai265.timestamper.data.database.durationAdapter
+import com.hai265.timestamper.data.database.instantAdapter
+import com.hai265.timestamper.data.database.uuidAdapter
 import com.hai265.timestamper.data.repos.TimestampRepository
 import com.hai265.timestamper.data.repos.VideoRepository
 import com.hai265.timestamper.domain.ExportTimestampsToFileUseCase
@@ -17,7 +25,8 @@ import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 class VideoListScreenViewModelTest {
-    private lateinit var db: AppDatabase
+    private lateinit var driver: SqlDriver
+    private lateinit var db: AppSqlDatabase
 
     private lateinit var videoRepository: VideoRepository
     private lateinit var timestampRepository: TimestampRepository
@@ -27,19 +36,23 @@ class VideoListScreenViewModelTest {
     @Before
     fun setup() {
         val context = ApplicationProvider.getApplicationContext<Context>()
-        db = Room.inMemoryDatabaseBuilder(
-            context, AppDatabase::class.java
+        driver = JdbcSqliteDriver(JdbcSqliteDriver.IN_MEMORY)
+
+        db = AppSqlDatabase(
+            driver = driver,
+            videosAdapter = Videos.Adapter(
+                uuidAdapter, instantAdapter, durationAdapter
+            ),
+            timestampsAdapter = Timestamps.Adapter(uuidAdapter, uuidAdapter, durationAdapter)
         )
-            .allowMainThreadQueries()
-            .build()
 
         videoRepository = VideoRepository(
-            db.videoDao(), youtubeMetadataApi = FakeYoutubeMetadata(),
-            timestmapDao = db.timestampDao(),
-            database = db,
+            videoDao = SqlDelightVideoDao(db),
+            youtubeMetadataApi = FakeYoutubeMetadata(),
+            timestmapDao = SqlDelightTimestampsDao(db),
         )
         timestampRepository = TimestampRepository(
-            timestampDao = db.timestampDao()
+            timestampDao = SqlDelightTimestampsDao(db)
         )
         subject = VideoListScreenViewModel(
             videoRepository,
@@ -58,7 +71,7 @@ class VideoListScreenViewModelTest {
 
     @After
     fun tearDown() {
-        db.close()
+        driver.close()
     }
 
     @Test

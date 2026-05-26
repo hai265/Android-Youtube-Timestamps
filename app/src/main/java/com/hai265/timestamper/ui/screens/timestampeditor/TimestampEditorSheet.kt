@@ -37,13 +37,14 @@ import com.hai265.timestamper.data.database.Timestamp
 import com.hai265.timestamper.ui.screens.editor.formatDurationToHHMMSS
 import kotlinx.coroutines.DisposableHandle
 import kotlinx.coroutines.launch
+import kotlin.uuid.Uuid
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TimestampEditorSheet(
     timestamp: Timestamp,
     onDismiss: () -> Unit,
-    onAddTimestamp: (String) -> Unit,
+    onAddTimestamp: (Uuid) -> Unit,
 ) {
     val viewmodel = hiltViewModel<TimestampEditorViewModel>()
     val sheetState = rememberModalBottomSheetState()

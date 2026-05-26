@@ -2,14 +2,21 @@ package com.hai265.timestamper.ui.screens
 
 import android.content.Context
 import androidx.lifecycle.SavedStateHandle
-import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import app.cash.sqldelight.driver.jdbc.sqlite.JdbcSqliteDriver
 import app.cash.turbine.test
+import com.hai265.timestamper.AppSqlDatabase
+import com.hai265.timestamper.Timestamps
+import com.hai265.timestamper.Videos
 import com.hai265.timestamper.common.ZERO
-import com.hai265.timestamper.data.database.AppDatabase
+import com.hai265.timestamper.data.database.SqlDelightTimestampsDao
+import com.hai265.timestamper.data.database.SqlDelightVideoDao
 import com.hai265.timestamper.data.database.Timestamp
 import com.hai265.timestamper.data.database.Video
+import com.hai265.timestamper.data.database.durationAdapter
+import com.hai265.timestamper.data.database.instantAdapter
+import com.hai265.timestamper.data.database.uuidAdapter
 import com.hai265.timestamper.data.network.YoutubeMetadata
 import com.hai265.timestamper.data.network.YoutubeMetadataApiService
 import com.hai265.timestamper.data.repos.PreferencesRepository
@@ -22,13 +29,12 @@ import junit.framework.TestCase.assertEquals
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.runTest
-import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import kotlin.jvm.java
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Instant
+import kotlin.uuid.Uuid
 
 @RunWith(AndroidJUnit4::class)
 class TimestampViewerViewModelTest {
@@ -41,10 +47,11 @@ class TimestampViewerViewModelTest {
 
     private lateinit var subject: TimestampViewerViewModel
 
-    private lateinit var db: AppDatabase
+    private lateinit var db: AppSqlDatabase
 
     private val videoId = "videoId"
     private val testVideo = Video(
+        id = Uuid.fromLongs(1, 1),
         youtubeId = videoId,
         videoTitle = "Test Video",
         thumbnail = "thumb",
@@ -52,21 +59,35 @@ class TimestampViewerViewModelTest {
         lastPlayed = 0.milliseconds
     )
     private val testTimestamps = listOf(
-        Timestamp(id = 1, videoId = videoId, time = 1000.milliseconds, description = "First")
+        Timestamp(
+            id = Uuid.fromLongs(1, 1),
+            videoId = Uuid.fromLongs(1, 1),
+            time = 1000.milliseconds,
+            description = "First"
+        )
     )
 
     @OptIn(ExperimentalCoroutinesApi::class)
     @Before
-    fun setup() {
+    fun setup() = runTest {
         val context = ApplicationProvider.getApplicationContext<Context>()
-        db = Room.inMemoryDatabaseBuilder(
-            context, AppDatabase::class.java
+        val driver = JdbcSqliteDriver(JdbcSqliteDriver.IN_MEMORY)
+        //TODO: Use powersync driver?
+        AppSqlDatabase.Schema.create(driver).await()
+        db = AppSqlDatabase(
+            driver = driver,
+            videosAdapter = Videos.Adapter(
+                uuidAdapter, instantAdapter, durationAdapter
+            ),
+            timestampsAdapter = Timestamps.Adapter(uuidAdapter, uuidAdapter, durationAdapter)
         )
-            .allowMainThreadQueries()
-            .build()
 
-        videoRepo = VideoRepository(db.videoDao(), db.timestampDao(), FakeYoutubeMetadata(), db)
-        timestampRepo = TimestampRepository(db.timestampDao())
+        videoRepo = VideoRepository(
+            SqlDelightVideoDao(db),
+            SqlDelightTimestampsDao(db),
+            FakeYoutubeMetadata(),
+        )
+        timestampRepo = TimestampRepository(SqlDelightTimestampsDao(db))
         preferencesRepo = PreferencesRepository(context.dataStore)
         savedStateHandle = SavedStateHandle(mapOf("id" to videoId))
         subject = TimestampViewerViewModel(
@@ -75,11 +96,6 @@ class TimestampViewerViewModelTest {
             timestampRepo = timestampRepo,
             preferencesRepository = preferencesRepo,
         )
-    }
-
-    @After
-    fun tearDown() {
-        db.close()
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)

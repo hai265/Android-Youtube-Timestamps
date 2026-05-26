@@ -17,6 +17,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import kotlin.uuid.Uuid
 
 private const val TAG = "VideoListScreenViewModel"
 
@@ -67,7 +68,7 @@ class VideoListScreenViewModel @Inject constructor(
         }
     }
 
-    suspend fun getTimestampsAsString(videoId: String): String {
+    suspend fun getTimestampsAsString(videoId: Uuid): String {
         val timestamps = timestampRepo.getTimestamps(videoId).first()
         return timestamps.joinToString(separator = "\n")
         { timestamp -> "${timestamp.time.formatDurationToHHMMSS()} ${timestamp.description}" }

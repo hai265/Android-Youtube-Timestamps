@@ -10,12 +10,13 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import javax.inject.Inject
 import kotlin.time.Duration
+import kotlin.uuid.Uuid
 
 
 sealed interface State {
     data object Initial : State
     data class AddTimestamp(
-        val videoId: String,
+        val videoId: Uuid,
         val time: Duration
     ) : State
 

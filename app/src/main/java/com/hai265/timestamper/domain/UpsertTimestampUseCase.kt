@@ -6,18 +6,14 @@ import com.hai265.timestamper.data.repos.VideoRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.async
 import javax.inject.Inject
+import kotlin.uuid.Uuid
 
 class UpsertTimestampUseCase @Inject constructor(
     private val timestampRepo: TimestampRepository,
     private val videoRepository: VideoRepository,
     private val externalScope: CoroutineScope,
 ) {
-    suspend fun invoke(timestamp: Timestamp): String {
-        videoRepository.updateLastEdited(timestamp.videoId)
-        return timestampRepo.addOrUpdateTimestamp(timestamp)
-    }
-
-    suspend fun invokeExternalScope(timestamp: Timestamp): String {
+    suspend fun invokeExternalScope(timestamp: Timestamp): Uuid {
         return externalScope.async {
             videoRepository.updateLastEdited(timestamp.videoId)
             timestampRepo.addOrUpdateTimestamp(timestamp)
