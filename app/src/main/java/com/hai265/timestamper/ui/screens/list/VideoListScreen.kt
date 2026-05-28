@@ -87,7 +87,11 @@ import kotlin.time.Instant
 //TODO: Duplicate file number append to extention e.g name.yaml(1) instead of name(1).yaml
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun VideoListScreen(onTapVideo: (id: String) -> Unit, windowSize: WindowWidthSizeClass) {
+fun VideoListScreen(
+    onTapVideo: (id: String) -> Unit,
+    onTapSignUp: () -> Unit,
+    windowSize: WindowWidthSizeClass
+) {
     val viewmodel: VideoListScreenViewModel = hiltViewModel()
     val state by viewmodel.state.collectAsState()
     var addVideoDialog by rememberSaveable { mutableStateOf(false) }
@@ -160,7 +164,7 @@ fun VideoListScreen(onTapVideo: (id: String) -> Unit, windowSize: WindowWidthSiz
                         exportLauncher.launch("timestamps-${Clock.System.now()}")
                     }, onTapImportVideo = {
                         importLauncher.launch(arrayOf("*/*"))
-                    })
+                    }, onTapSignUp = onTapSignUp)
                 },
                 scrollBehavior = scrollBehavior
             )
@@ -410,6 +414,7 @@ fun VideoDropdownMenu(
 fun MenuDropDown(
     onTapExportVideo: () -> Unit,
     onTapImportVideo: () -> Unit,
+    onTapSignUp: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     var expanded by remember { mutableStateOf(false) }
@@ -435,6 +440,13 @@ fun MenuDropDown(
                 onClick = {
                     expanded = false
                     onTapExportVideo()
+                }
+            )
+            DropdownMenuItem(
+                text = { Text("Sign Up") },
+                onClick = {
+                    expanded = false
+                    onTapSignUp()
                 }
             )
         }
