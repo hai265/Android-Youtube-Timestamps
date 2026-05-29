@@ -2,9 +2,9 @@ package com.hai265.timestamper.data.database.powersync
 
 import android.content.Context
 import com.hai265.timestamper.BuildConfig
+import com.hai265.timestamper.data.database.powersync.SupabaseConnector
 import com.powersync.DatabaseDriverFactory
 import com.powersync.PowerSyncDatabase
-import com.powersync.connector.supabase.SupabaseConnector
 import com.powersync.connectors.PowerSyncBackendConnector
 import dagger.Module
 import dagger.Provides

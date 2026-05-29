@@ -3,8 +3,8 @@ package com.powersync.demos
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import co.touchlab.kermit.Logger
+import com.hai265.timestamper.data.database.powersync.SupabaseConnector
 import com.powersync.PowerSyncDatabase
-import com.powersync.connector.supabase.SupabaseConnector
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.github.jan.supabase.auth.status.RefreshFailureCause
 import io.github.jan.supabase.auth.status.SessionStatus
