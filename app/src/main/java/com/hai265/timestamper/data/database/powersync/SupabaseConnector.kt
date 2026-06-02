@@ -1,7 +1,6 @@
 package com.hai265.timestamper.data.database.powersync
 
 import co.touchlab.kermit.Logger
-import com.hai265.timestamper.BuildConfig
 import com.powersync.PowerSyncDatabase
 import com.powersync.connectors.PowerSyncBackendConnector
 import com.powersync.connectors.PowerSyncCredentials
@@ -75,10 +74,10 @@ public open class SupabaseConnector(
     ) : this(
         supabaseClient =
             createSupabaseClient(supabaseUrl, supabaseKey) {
-                install(Auth.Companion)
-                install(Postgrest.Companion)
+                install(Auth)
+                install(Postgrest)
                 if (storageBucket != null) {
-                    install(Storage.Companion)
+                    install(Storage)
                 }
             },
         powerSyncEndpoint = powerSyncEndpoint,
@@ -86,15 +85,15 @@ public open class SupabaseConnector(
     )
 
     init {
-        require(supabaseClient.pluginManager.getPluginOrNull(Auth.Companion) != null) { "The Auth plugin must be installed on the Supabase client" }
+        require(supabaseClient.pluginManager.getPluginOrNull(Auth) != null) { "The Auth plugin must be installed on the Supabase client" }
         require(
-            supabaseClient.pluginManager.getPluginOrNull(Postgrest.Companion) != null,
+            supabaseClient.pluginManager.getPluginOrNull(Postgrest) != null,
         ) { "The Postgrest plugin must be installed on the Supabase client" }
 
         // This retrieves the error code from the response
         // as this is not accessible in the Supabase client RestException
         // to handle fatal Postgres errors
-        supabaseClient.httpClient.httpClient.plugin(HttpSend.Plugin).intercept { request ->
+        supabaseClient.httpClient.httpClient.plugin(HttpSend).intercept { request ->
             val resp = execute(request)
             val response = resp.response
             if (response.status.value >= 400) {
@@ -107,7 +106,7 @@ public open class SupabaseConnector(
                         )
                     errorCode = error["code"]
                 } catch (e: Exception) {
-                    Logger.Companion.e("Failed to parse error response: $e")
+                    Logger.e("Failed to parse error response: $e")
                 }
             }
             resp
@@ -159,23 +158,19 @@ public open class SupabaseConnector(
      */
     override suspend fun fetchCredentials(): PowerSyncCredentials =
         runWrapped {
-            return PowerSyncCredentials(
-                endpoint = BuildConfig.POWERSYNC_ENDPOINT,
-                token = BuildConfig.POWERSYNC_TOKEN,
+            check(supabaseClient.auth.sessionStatus.value is SessionStatus.Authenticated) { "Supabase client is not authenticated" }
+
+            // Use Supabase token for PowerSync
+            val session =
+                supabaseClient.auth.currentSessionOrNull()
+                    ?: error("Could not fetch Supabase credentials")
+
+            check(session.user != null) { "No user data" }
+
+            PowerSyncCredentials(
+                endpoint = powerSyncEndpoint,
+                token = session.accessToken, // Use the access token to authenticate against PowerSync
             )
-//            check(supabaseClient.auth.sessionStatus.value is SessionStatus.Authenticated) { "Supabase client is not authenticated" }
-//
-//            // Use Supabase token for PowerSync
-//            val session =
-//                supabaseClient.auth.currentSessionOrNull()
-//                    ?: error("Could not fetch Supabase credentials")
-//
-//            check(session.user != null) { "No user data" }
-//
-//            PowerSyncCredentials(
-//                endpoint = powerSyncEndpoint,
-//                token = session.accessToken, // Use the access token to authenticate against PowerSync
-//            )
         }
 
     /**
@@ -220,12 +215,12 @@ public open class SupabaseConnector(
      * By default, it discards the rest of a transaction when the error code indicates that this is a fatal postgres
      * error that can't be retried. Otherwise, it rethrows the exception so that the PowerSync SDK will retry.
      *
-     * @param tx The full [com.powersync.db.crud.CrudTransaction] we're in the process of uploading.
+     * @param tx The full [CrudTransaction] we're in the process of uploading.
      * @param entry The [CrudEntry] for which an upload has failed.
      * @param exception The [Exception] thrown by the Supabase client.
      * @param [errorCode] The postgres error code, if any.
      * @throws Exception If the upload should be retried. If this method doesn't throw, it should mark [tx] as complete
-     * by invoking [com.powersync.db.crud.CrudTransaction.complete]. In that case, the local write would be lost.
+     * by invoking [CrudTransaction.complete]. In that case, the local write would be lost.
      */
     public open suspend fun handleError(
         tx: CrudTransaction,
@@ -242,13 +237,13 @@ public open class SupabaseConnector(
              * If protecting against data loss is important, save the failing records
              * elsewhere instead of discarding, and/or notify the user.
              */
-            Logger.Companion.e("Data upload error: ${exception.message}")
-            Logger.Companion.e("Discarding entry: $entry")
+            Logger.e("Data upload error: ${exception.message}")
+            Logger.e("Discarding entry: $entry")
             tx.complete(null)
             return
         }
 
-        Logger.Companion.e("Data upload error - retrying last entry: $entry, $exception")
+        Logger.e("Data upload error - retrying last entry: $entry, $exception")
         throw exception
     }
 
