@@ -21,6 +21,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.hai265.timestamper.ui.screens.editor.TimestampViewerScreen
 import com.hai265.timestamper.ui.screens.list.VideoListScreen
+import com.hai265.timestamper.ui.screens.signin.LogInScreen
 import com.hai265.timestamper.ui.screens.signin.SignUpScreen
 import kotlinx.serialization.Serializable
 
@@ -33,7 +34,11 @@ sealed interface Navigables {
 
     @Serializable
     object SignUpScreen : Navigables
+
+    @Serializable
+    object LogInScreen : Navigables
 }
+
 
 @Composable
 fun App(
@@ -83,11 +88,18 @@ private fun NavGraph(
             TimestampViewerScreen(windowSize = windowSize)
         }
         composable<Navigables.SignUpScreen> {
-            SignUpScreen(onClickLogin = { TODO() }, onSignUpSuccess = {
-                navController.navigateSingleTopTo(
-                    Navigables.ListScreen
-                )
-            })
+            SignUpScreen(
+                onClickLogin = { navController.navigateSingleTopTo(Navigables.LogInScreen) },
+                onSignUpSuccess = {
+                    navController.navigateSingleTopTo(
+                        Navigables.ListScreen
+                    )
+                })
+        }
+        composable<Navigables.LogInScreen> {
+            LogInScreen(
+                onClickSignUp = { navController.navigateSingleTopTo(Navigables.SignUpScreen) },
+                onLogInSuccess = { navController.navigateSingleTopTo(Navigables.ListScreen) })
         }
     }
 }

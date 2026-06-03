@@ -4,8 +4,10 @@ import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
@@ -30,17 +32,17 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.powersync.demos.AuthViewModel
+import io.github.jan.supabase.exceptions.BadRequestRestException
 import kotlinx.coroutines.launch
 
 @Composable
-internal fun SignUpScreen(
-    onClickLogin: () -> Unit,
-    onSignUpSuccess: () -> Unit,
+internal fun LogInScreen(
+    onClickSignUp: () -> Unit,
+    onLogInSuccess: () -> Unit,
 ) {
     val viewModel: AuthViewModel = hiltViewModel()
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
-    var confirmPassword by remember { mutableStateOf("") }
     var errorMessage by remember { mutableStateOf<String?>(null) }
     var isLoading by remember { mutableStateOf(false) }
 
@@ -57,7 +59,7 @@ internal fun SignUpScreen(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
-            "Sign Up",
+            "Sign In",
             style = MaterialTheme.typography.headlineMedium,
             modifier = Modifier.padding(bottom = 32.dp)
         )
@@ -82,17 +84,6 @@ internal fun SignUpScreen(
                 .padding(bottom = 16.dp)
         )
 
-        TextField(
-            value = confirmPassword,
-            onValueChange = { confirmPassword = it },
-            label = { Text("Confirm Password") },
-            visualTransformation = PasswordVisualTransformation(),
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 16.dp)
-        )
-
         if (errorMessage != null) {
             Text(
                 text = errorMessage!!,
@@ -106,18 +97,17 @@ internal fun SignUpScreen(
                 coroutineScope.launch {
                     isLoading = true
                     errorMessage = null
-                    if (password != confirmPassword) {
-                        errorMessage = "Passwords do not match"
-                        isLoading = false
-                        return@launch
-                    }
                     try {
-                        viewModel.signUp(email, password)
-                        Toast.makeText(context, "Successfully signed up!", Toast.LENGTH_SHORT)
+                        viewModel.signIn(email, password)
+                        Toast.makeText(context, "Successfully logged in!", Toast.LENGTH_SHORT)
                             .show()
-                        onSignUpSuccess()
+                        onLogInSuccess()
                     } catch (e: Exception) {
-                        errorMessage = e.message ?: "An error occurred during sign-up"
+                        if (e is BadRequestRestException) {
+                            errorMessage = "Invalid email or password"
+                        } else {
+                            errorMessage = e.message ?: "An error occurred during sign-in"
+                        }
                     } finally {
                         isLoading = false
                     }
@@ -126,14 +116,18 @@ internal fun SignUpScreen(
             modifier = Modifier.align(Alignment.End),
             enabled = !isLoading
         ) {
-            Text(if (isLoading) "Signing Up..." else "Sign Up")
+            Text(if (isLoading) "Signing In..." else "Sign In")
         }
 
+        Spacer(modifier = Modifier.height(16.dp))
+
         TextButton(
-            onClick = onClickLogin,
+            onClick = {
+                onClickSignUp()
+            },
             modifier = Modifier.align(Alignment.CenterHorizontally)
         ) {
-            Text("Already have an account? Sign In")
+            Text("Don't have an account? Sign Up")
         }
     }
 
