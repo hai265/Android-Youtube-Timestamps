@@ -28,7 +28,8 @@ class AuthRepository @Inject constructor(
         email: String,
         password: String,
     ) {
-        supabase.signUp(email, password)
+        //TODO: Disabled because supabase is rate limited
+//        supabase.signUp(email, password)
     }
 
     suspend fun signOut() {

@@ -1,5 +1,6 @@
 package com.hai265.timestamper.ui.screens.signin
 
+import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -23,6 +24,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
@@ -33,6 +35,7 @@ import kotlinx.coroutines.launch
 @Composable
 internal fun SignUpScreen(
     onClickLogin: () -> Unit,
+    onSignUpSuccess: () -> Unit,
 ) {
     val viewModel: AuthViewModel = hiltViewModel()
     var email by remember { mutableStateOf("") }
@@ -43,6 +46,7 @@ internal fun SignUpScreen(
 
     val coroutineScope = rememberCoroutineScope()
     val scrollState = rememberScrollState()
+    val context = LocalContext.current
 
     Column(
         modifier = Modifier
@@ -113,6 +117,9 @@ internal fun SignUpScreen(
                         errorMessage = e.message ?: "An error occurred during sign-up"
                     } finally {
                         isLoading = false
+                        Toast.makeText(context, "Successfully signed up!", Toast.LENGTH_SHORT)
+                            .show()
+                        onSignUpSuccess()
                     }
                 }
             },

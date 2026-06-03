@@ -83,7 +83,11 @@ private fun NavGraph(
             TimestampViewerScreen(windowSize = windowSize)
         }
         composable<Navigables.SignUpScreen> {
-            SignUpScreen(onClickLogin = {})
+            SignUpScreen(onClickLogin = { TODO() }, onSignUpSuccess = {
+                navController.navigateSingleTopTo(
+                    Navigables.ListScreen
+                )
+            })
         }
     }
 }
