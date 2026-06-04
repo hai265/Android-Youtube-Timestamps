@@ -55,7 +55,7 @@ class VideoListScreenViewModel @Inject constructor(
             )
 
     suspend fun addVideo(url: String): VideoResult {
-        return repo.addVideo(url, authRepository.userId.value)
+        return repo.addVideo(url)
     }
 
     fun deleteVideo(video: Video) =

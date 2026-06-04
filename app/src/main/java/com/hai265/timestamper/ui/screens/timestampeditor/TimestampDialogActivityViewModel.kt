@@ -35,7 +35,7 @@ class TimestampDialogActivityViewModel @Inject constructor(
     val state = _state.asStateFlow()
 
     suspend fun addVideo(url: String) {
-        val videoResult = repo.addVideo(url, authRepository.userId.value)
+        val videoResult = repo.addVideo(url)
         when (videoResult) {
             is VideoResult.InvalidUrl -> {
                 _state.update { State.Finished }

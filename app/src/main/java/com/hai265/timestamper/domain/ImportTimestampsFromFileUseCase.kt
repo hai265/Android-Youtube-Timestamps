@@ -25,8 +25,7 @@ class ImportTimestampsFromFileUseCase @Inject constructor(
 
     private suspend fun addTimestamps(videoWithTimestamps: List<VideoWithTimestamps>) {
         videoRepository.importVideosWithTimestamps(
-            videoWithTimestamps,
-            authRepository.userId.value
+            videoWithTimestamps
         )
     }
 }

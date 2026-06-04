@@ -49,7 +49,7 @@ class VideoRepository @Inject constructor(
     // 1. url is invalid
     // 2. video already added
     @OptIn(ExperimentalUuidApi::class)
-    suspend fun addVideo(url: String, userId: Uuid?): VideoResult {
+    suspend fun addVideo(url: String): VideoResult {
         val youtubeId = getYouTubeIdFromUrl(url) ?: return VideoResult.InvalidUrl(url)
         //return if video already exists
         getVideoByYoutubeId(youtubeId)?.id?.let { return VideoResult.VideoAlreadyExists(it) }
@@ -81,8 +81,7 @@ class VideoRepository @Inject constructor(
     }
 
     suspend fun importVideosWithTimestamps(
-        videoWithTimestamps: List<VideoWithTimestamps>,
-        userId: Uuid?
+        videoWithTimestamps: List<VideoWithTimestamps>
     ) {
         //TODO: one transaction
         videoWithTimestamps.forEach { (video, timestamps) ->
