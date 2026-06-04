@@ -96,6 +96,7 @@ fun VideoListScreen(
     val state by viewmodel.state.collectAsState()
     var addVideoDialog by rememberSaveable { mutableStateOf(false) }
     var videoToDeleteDialog by remember { mutableStateOf<Video?>(null) }
+    var signOutDialog by remember { mutableStateOf(false) }
 
     val context = LocalContext.current
     val listState = rememberLazyGridState()
@@ -160,11 +161,17 @@ fun VideoListScreen(
                     Text("Videos")
                 },
                 actions = {
-                    MenuDropDown(onTapExportVideo = {
-                        exportLauncher.launch("timestamps-${Clock.System.now()}")
-                    }, onTapImportVideo = {
-                        importLauncher.launch(arrayOf("*/*"))
-                    }, onTapSignUp = onTapSignUp)
+                    MenuDropDown(
+                        onTapExportVideo = {
+                            exportLauncher.launch("timestamps-${Clock.System.now()}")
+                        },
+                        onTapImportVideo = {
+                            importLauncher.launch(arrayOf("*/*"))
+                        },
+                        onTapSignUp = onTapSignUp,
+                        onTapSignOut = { signOutDialog = true },
+                        isSignedIn = state.isLoggedIn
+                    )
                 },
                 scrollBehavior = scrollBehavior
             )
@@ -232,6 +239,12 @@ fun VideoListScreen(
                 ).show()
                 videoToDeleteDialog = null
             }
+        )
+    }
+
+    if (signOutDialog) {
+        SignOutConfirmationDialog(
+            onDismissRequest = { signOutDialog = false }, onConfirmation = { viewmodel.signOut() }
         )
     }
 }
@@ -415,6 +428,8 @@ fun MenuDropDown(
     onTapExportVideo: () -> Unit,
     onTapImportVideo: () -> Unit,
     onTapSignUp: () -> Unit,
+    onTapSignOut: () -> Unit,
+    isSignedIn: Boolean,
     modifier: Modifier = Modifier,
 ) {
     var expanded by remember { mutableStateOf(false) }
@@ -442,13 +457,23 @@ fun MenuDropDown(
                     onTapExportVideo()
                 }
             )
-            DropdownMenuItem(
-                text = { Text("Sign Up") },
-                onClick = {
-                    expanded = false
-                    onTapSignUp()
-                }
-            )
+            if (isSignedIn) {
+                DropdownMenuItem(
+                    text = { Text("Sign Out") },
+                    onClick = {
+                        expanded = false
+                        onTapSignOut()
+                    }
+                )
+            } else {
+                DropdownMenuItem(
+                    text = { Text("Sign Up") },
+                    onClick = {
+                        expanded = false
+                        onTapSignUp()
+                    }
+                )
+            }
         }
     }
 }
@@ -553,6 +578,38 @@ fun DeleteConfirmationDialog(
     )
 }
 
+@Composable
+fun SignOutConfirmationDialog(
+    onDismissRequest: () -> Unit,
+    onConfirmation: () -> Unit,
+) {
+    AlertDialog(
+        text = {
+            Text(text = "Are you sure you want to sign out?")
+        }, onDismissRequest = {
+            onDismissRequest()
+        },
+        confirmButton = {
+            TextButton(
+                onClick = {
+                    onConfirmation()
+                    onDismissRequest()
+                }
+            ) {
+                Text("Confirm")
+            }
+        },
+        dismissButton = {
+            TextButton(
+                onClick = {
+                    onDismissRequest()
+                }
+            ) {
+                Text("Cancel")
+            }
+        }
+    )
+}
 
 @Preview
 @Composable

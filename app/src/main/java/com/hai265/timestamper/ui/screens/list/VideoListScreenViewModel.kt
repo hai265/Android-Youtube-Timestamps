@@ -13,8 +13,8 @@ import com.hai265.timestamper.domain.ImportTimestampsFromFileUseCase
 import com.hai265.timestamper.ui.screens.editor.formatDurationToHHMMSS
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -25,6 +25,7 @@ private const val TAG = "VideoListScreenViewModel"
 data class ListScreenState(
     val videos: List<Video> = listOf(),
     val syncing: Boolean = false,
+    val isLoggedIn: Boolean = false,
 )
 
 @HiltViewModel
@@ -36,17 +37,22 @@ class VideoListScreenViewModel @Inject constructor(
     private val exportTimestampsToFileUseCase: ExportTimestampsToFileUseCase,
 ) : ViewModel() {
 
-    val state = repo.getVideos()
-        .map { videos ->
-            ListScreenState(videos = videos.sortedByDescending { it.lastEdited }, syncing = false)
-        }
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5000L),
-            initialValue = ListScreenState(
-                syncing = false
+    val state =
+        combine(repo.getVideos(), authRepository.userId)
+        { videos, userId ->
+            ListScreenState(
+                videos = videos.sortedByDescending { it.lastEdited },
+                syncing = false,
+                isLoggedIn = userId != null
             )
-        )
+        }
+            .stateIn(
+                scope = viewModelScope,
+                started = SharingStarted.WhileSubscribed(5000L),
+                initialValue = ListScreenState(
+                    syncing = false
+                )
+            )
 
     suspend fun addVideo(url: String): VideoResult {
         return repo.addVideo(url, authRepository.userId.value)
@@ -74,6 +80,12 @@ class VideoListScreenViewModel @Inject constructor(
         val timestamps = timestampRepo.getTimestamps(videoId).first()
         return timestamps.joinToString(separator = "\n")
         { timestamp -> "${timestamp.time.formatDurationToHHMMSS()} ${timestamp.description}" }
+    }
+
+    fun signOut() {
+        viewModelScope.launch {
+            authRepository.signOut()
+        }
     }
 
 }
