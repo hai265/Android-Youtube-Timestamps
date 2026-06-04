@@ -1,8 +1,14 @@
+package com.hai265.timestamper.data
+
 import app.cash.sqldelight.db.SqlDriver
 import app.cash.sqldelight.driver.jdbc.sqlite.JdbcSqliteDriver
+import com.ha265.timestamper.data.fakes.fakeTimestamp1
+import com.ha265.timestamper.data.fakes.fakeTimestamp2
+import com.ha265.timestamper.data.fakes.fakeTimestamp3
+import com.ha265.timestamper.data.fakes.fakeVideo1
+import com.ha265.timestamper.data.fakes.fakeVideo2
 import com.hai265.timestamper.Timestamps
 import com.hai265.timestamper.Videos
-import com.hai265.timestamper.data.AppSqlDatabase
 import com.hai265.timestamper.data.database.SqlDelightTimestampsDao
 import com.hai265.timestamper.data.database.SqlDelightVideoDao
 import com.hai265.timestamper.data.database.VideoWithTimestamps
@@ -13,11 +19,7 @@ import com.hai265.timestamper.data.network.YoutubeMetadata
 import com.hai265.timestamper.data.network.YoutubeMetadataApiService
 import com.hai265.timestamper.data.repos.VideoRepository
 import com.hai265.timestamper.data.repos.VideoResult
-import com.hai265.timestamper.ui.fakes.fakeTimestamp1
-import com.hai265.timestamper.ui.fakes.fakeTimestamp2
-import com.hai265.timestamper.ui.fakes.fakeTimestamp3
-import com.hai265.timestamper.ui.fakes.fakeVideo1
-import com.hai265.timestamper.ui.fakes.fakeVideo2
+
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest

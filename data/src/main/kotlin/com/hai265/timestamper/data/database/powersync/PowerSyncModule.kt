@@ -1,7 +1,7 @@
 package com.hai265.timestamper.data.database.powersync
 
-import BuildConfig
 import android.content.Context
+import com.hai265.timestamper.data.BuildConfig
 import com.powersync.DatabaseDriverFactory
 import com.powersync.PowerSyncDatabase
 import com.powersync.connectors.PowerSyncBackendConnector

@@ -48,6 +48,8 @@ material3 = "1.4.0"
 google-services = "4.4.4"
 sqldelight = "2.3.2"
 powersync = "1.12.0"
+appcompat = "1.7.1"
+material = "1.14.0"
 
 [libraries]
 android-driver = { module = "app.cash.sqldelight:android-driver", version.ref = "sqldelight" }
@@ -115,7 +117,6 @@ sqldelight-coroutines-extensions = { module = "app.cash.sqldelight:coroutines-ex
 powersync-core = { module = "com.powersync:core", version.ref = "powersync" }
 powersync-room = { module = "com.powersync:integration-room", version.ref = "powersync" }
 powersync-integration-supabase = { module = "com.powersync:connector-supabase", version.ref = "powersync" }
-
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
 kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
@@ -125,3 +126,4 @@ ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 kotlin-parcelize = { id = "org.jetbrains.kotlin.plugin.parcelize" }
 google-services = { id = "com.google.gms.google-services", version.ref = "google-services" }
 sqldelight = { id = "app.cash.sqldelight", version.ref = "sqldelight" }
+android-library = { id = "com.android.library", version.ref = "agp" }

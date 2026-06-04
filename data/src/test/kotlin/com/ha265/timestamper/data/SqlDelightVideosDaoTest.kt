@@ -1,9 +1,9 @@
+package com.hai265.timestamper.data
+
 import app.cash.sqldelight.db.SqlDriver
 import app.cash.sqldelight.driver.jdbc.sqlite.JdbcSqliteDriver
 import com.hai265.timestamper.Timestamps
 import com.hai265.timestamper.Videos
-import com.hai265.timestamper.common.ZERO
-import com.hai265.timestamper.data.AppSqlDatabase
 import com.hai265.timestamper.data.database.SqlDelightVideoDao
 import com.hai265.timestamper.data.database.Timestamp
 import com.hai265.timestamper.data.database.Video
@@ -21,6 +21,9 @@ import org.junit.runners.JUnit4
 import kotlin.time.Duration
 import kotlin.time.Instant
 import kotlin.uuid.Uuid
+
+val Instant.Companion.ZERO: Instant
+    get() = Instant.fromEpochSeconds(0L)
 
 @RunWith(JUnit4::class)
 class SqlDelightVideosDaoTest {
