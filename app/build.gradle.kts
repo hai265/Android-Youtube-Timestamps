@@ -142,6 +142,7 @@ dependencies {
     implementation(libs.android.driver)
     implementation(libs.sqldelight.coroutines.extensions)
     implementation(libs.integration.sqldelight)
+    implementation(project(":data"))
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(platform(libs.androidx.compose.bom))
