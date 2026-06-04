@@ -32,7 +32,12 @@ abstract class DatabaseModule {
                 //TODO: Create AppSqlDatabase once
                 AppSqlDatabase(
                     driver = driver,
-                    videosAdapter = Videos.Adapter(uuidAdapter, instantAdapter, durationAdapter),
+                    videosAdapter = Videos.Adapter(
+                        uuidAdapter,
+                        uuidAdapter,
+                        instantAdapter,
+                        durationAdapter
+                    ),
                     timestampsAdapter = Timestamps.Adapter(
                         uuidAdapter,
                         uuidAdapter,
@@ -47,7 +52,12 @@ abstract class DatabaseModule {
             return SqlDelightVideoDao(
                 AppSqlDatabase(
                     driver = driver,
-                    videosAdapter = Videos.Adapter(uuidAdapter, instantAdapter, durationAdapter),
+                    videosAdapter = Videos.Adapter(
+                        uuidAdapter,
+                        uuidAdapter,
+                        instantAdapter,
+                        durationAdapter
+                    ),
                     timestampsAdapter = Timestamps.Adapter(
                         uuidAdapter,
                         uuidAdapter,

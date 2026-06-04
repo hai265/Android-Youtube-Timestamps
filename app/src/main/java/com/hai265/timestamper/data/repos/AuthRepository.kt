@@ -3,25 +3,36 @@ package com.hai265.timestamper.data.repos
 import co.touchlab.kermit.Logger
 import com.hai265.timestamper.data.database.powersync.SupabaseConnector
 import io.github.jan.supabase.auth.status.SessionStatus
-import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import javax.inject.Inject
+import javax.inject.Singleton
+import kotlin.uuid.Uuid
 
+@Singleton
 class AuthRepository @Inject constructor(
     private val supabase: SupabaseConnector,
 ) {
-    val currentUserIdFlow: Flow<String?> = supabase.sessionStatus.map {
-        when (it) {
-            is SessionStatus.Authenticated -> it.session.user?.id
-            else -> null
-        }
-    }
+    var userId: StateFlow<Uuid?> = supabase.sessionStatus.map { status ->
+        (status as? SessionStatus.Authenticated)?.session?.user?.id?.let { Uuid.parse(it) }
+    }.stateIn(
+        scope = CoroutineScope(SupervisorJob() + Dispatchers.IO),
+        started = SharingStarted.Eagerly,
+        initialValue = null
+    )
 
     suspend fun signIn(
         email: String,
         password: String,
     ) {
         supabase.login(email, password)
+        userId.first { it != null }
     }
 
     suspend fun signUp(

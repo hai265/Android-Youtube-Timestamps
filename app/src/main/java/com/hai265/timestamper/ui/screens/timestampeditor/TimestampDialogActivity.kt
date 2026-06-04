@@ -17,7 +17,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlin.uuid.Uuid
 
-//TODO: FIX ADD FROM DIALOG FROM SHARE NOT WORK
 @AndroidEntryPoint
 class TimestampDialogActivity : FragmentActivity() {
     private val viewmodel: TimestampDialogActivityViewModel by viewModels()

@@ -21,7 +21,7 @@ interface VideoDao {
     suspend fun updateLastPlayed(videoId: Uuid, timestamp: Long)
 
     @Upsert
-    suspend fun addVideo(video: Video)
+    suspend fun addVideo(video: Video, userId: Uuid?)
 
     @Delete
     suspend fun deleteVideo(video: Video)

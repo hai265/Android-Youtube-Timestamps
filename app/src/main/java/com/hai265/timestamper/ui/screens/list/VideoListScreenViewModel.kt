@@ -4,6 +4,7 @@ import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.hai265.timestamper.data.database.Video
+import com.hai265.timestamper.data.repos.AuthRepository
 import com.hai265.timestamper.data.repos.TimestampRepository
 import com.hai265.timestamper.data.repos.VideoRepository
 import com.hai265.timestamper.data.repos.VideoResult
@@ -30,6 +31,7 @@ data class ListScreenState(
 class VideoListScreenViewModel @Inject constructor(
     private val repo: VideoRepository,
     private val timestampRepo: TimestampRepository,
+    private val authRepository: AuthRepository,
     private val importTimestampsFromFileUseCase: ImportTimestampsFromFileUseCase,
     private val exportTimestampsToFileUseCase: ExportTimestampsToFileUseCase,
 ) : ViewModel() {
@@ -47,7 +49,7 @@ class VideoListScreenViewModel @Inject constructor(
         )
 
     suspend fun addVideo(url: String): VideoResult {
-        return repo.addVideo(url)
+        return repo.addVideo(url, authRepository.userId.value)
     }
 
     fun deleteVideo(video: Video) =

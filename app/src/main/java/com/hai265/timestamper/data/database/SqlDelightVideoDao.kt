@@ -67,9 +67,10 @@ class SqlDelightVideoDao(private val database: AppSqlDatabase) : VideoDao {
     }
 
     @OptIn(ExperimentalUuidApi::class)
-    override suspend fun addVideo(video: Video) {
+    override suspend fun addVideo(video: Video, userId: Uuid?) {
         queries.addVideo(
             id = video.id,
+            user_id = userId,
             youtube_id = video.youtubeId,
             video_title = video.videoTitle ?: "",
             thumbnail = video.thumbnail,

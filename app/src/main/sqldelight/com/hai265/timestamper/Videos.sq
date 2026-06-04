@@ -1,5 +1,6 @@
 CREATE TABLE videos(
 id TEXT AS kotlin.uuid.Uuid  PRIMARY KEY NOT NULL,
+user_id TEXT AS kotlin.uuid.Uuid,
 youtube_id TEXT NOT NULL,
 video_title TEXT NOT NULL,
 thumbnail TEXT NOT NULL,
@@ -26,13 +27,14 @@ WHERE youtube_id = :id ;
 addVideo:
 INSERT INTO videos(
     id,
+    user_id,
     youtube_id,
     video_title,
     thumbnail,
     last_edited,
     last_played
 )
-VALUES (?,?, ?, ?, ?, ?);
+VALUES (?, ?,?, ?, ?, ?, ?);
 
 getAllVideosWithTimestamps:
 SELECT * FROM videos
