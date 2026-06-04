@@ -11,8 +11,6 @@ plugins {
     alias(libs.plugins.ksp)
     alias(libs.plugins.hilt)
     alias(libs.plugins.kotlin.parcelize)
-//    alias(libs.plugins.google.services)
-    alias(libs.plugins.sqldelight)
 }
 
 extensions.configure<ApplicationExtension> {
@@ -42,26 +40,6 @@ extensions.configure<ApplicationExtension> {
         debug {
             enableUnitTestCoverage = true
             enableAndroidTestCoverage = true
-            buildConfigField(
-                "String", "POWERSYNC_TOKEN",
-                "\"${localProps["powersync.dev.token"]}\""
-            )
-            buildConfigField(
-                "String", "POWERSYNC_ENDPOINT",
-                "\"${localProps["powersync.endpoint"]}\""
-            )
-            buildConfigField(
-                "String", "SUPABASE_ENDPOINT",
-                "\"${localProps["supabase.endpoint"]}\""
-            )
-            buildConfigField(
-                "String", "SUPABASE_KEY",
-                "\"${localProps["supabase.key"]}\""
-            )
-            buildConfigField(
-                "String", "SUPABASE_STORAGE_BUCKET",
-                "\"${localProps["supabase.storage.bucket"]}\""
-            )
         }
     }
     compileOptions {
@@ -72,17 +50,6 @@ extensions.configure<ApplicationExtension> {
     buildFeatures {
         compose = true
         buildConfig = true
-    }
-}
-
-sqldelight {
-    databases {
-        linkSqlite.set(false)
-        create("AppSqlDatabase") {
-            generateAsync.set(true)
-            deriveSchemaFromMigrations.set(false)
-            dialect("app.cash.sqldelight:sqlite-3-38-dialect:2.0.2")
-        }
     }
 }
 
@@ -102,8 +69,6 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
-    implementation(libs.retrofit2.kotlinx.serialization.converter)
-    implementation(libs.retrofit)
     implementation(libs.coil3.compose)
     implementation(libs.coil3.okhttp3)
     implementation(libs.okhttp3)
@@ -122,39 +87,26 @@ dependencies {
     implementation(libs.androidx.compose.material3.window.size.class1)
     implementation(libs.androidx.compose.material3)
     ksp(libs.hilt.android.compiler)
-    ksp(libs.androidx.room.compiler)
     implementation(libs.androidx.hilt.navigation.compose)
     implementation(libs.androidx.navigation.compose)
-    implementation(libs.androidx.room.ktx)
+    implementation(libs.powersync.integration.supabase)
     testImplementation(libs.junit)
     implementation(libs.androidx.datastore.preferences)
     implementation(libs.logging.interceptor)
     implementation(libs.kotlinx.datetime)
     implementation(libs.kotlinx.serialization.core)
-//    implementation(platform(libs.firebase.bom))
-//    implementation(libs.firebase.firestore)
-    implementation(libs.powersync.core)
-    implementation(libs.powersync.room)
-    implementation(libs.androidx.sqlite.bundled)
-    implementation(libs.powersync.integration.supabase)
-    implementation(libs.postgrest.kt)
     implementation(libs.kotlinx.io.core)
     implementation(libs.android.driver)
-    implementation(libs.sqldelight.coroutines.extensions)
-    implementation(libs.integration.sqldelight)
     implementation(project(":data"))
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.ui.test.junit4)
-    androidTestImplementation(libs.android.driver)
     androidTestImplementation(libs.turbine)
-    androidTestImplementation(libs.sqllite.driver)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
     testImplementation(libs.kotlinx.coroutines.test)
     testImplementation(libs.mockk)
     testImplementation(libs.kotlin.test)
     testImplementation(libs.kotlin.test.junit)
-    testImplementation(libs.sqllite.driver)
 }

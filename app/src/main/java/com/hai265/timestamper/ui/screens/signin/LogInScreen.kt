@@ -103,6 +103,7 @@ internal fun LogInScreen(
                             .show()
                         onLogInSuccess()
                     } catch (e: Exception) {
+                        //TODO: Expose my own errors instead of supabase's
                         if (e is BadRequestRestException) {
                             errorMessage = "Invalid email or password"
                         } else {

@@ -2,6 +2,7 @@ package com.hai265.timestamper.data.repos
 
 import co.touchlab.kermit.Logger
 import com.hai265.timestamper.data.database.powersync.SupabaseConnector
+import com.powersync.PowerSyncDatabase
 import io.github.jan.supabase.auth.status.SessionStatus
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -17,6 +18,7 @@ import kotlin.uuid.Uuid
 
 @Singleton
 class AuthRepository @Inject constructor(
+    private val powerSyncDatabase: PowerSyncDatabase,
     private val supabase: SupabaseConnector,
 ) {
     var userId: StateFlow<Uuid?> = supabase.sessionStatus.map { status ->
@@ -48,5 +50,13 @@ class AuthRepository @Inject constructor(
         } catch (e: Exception) {
             Logger.e("Error signing out: $e")
         }
+    }
+
+    suspend fun connect() {
+        powerSyncDatabase.connect(supabase)
+    }
+
+    suspend fun disconnect() {
+        powerSyncDatabase.disconnect()
     }
 }

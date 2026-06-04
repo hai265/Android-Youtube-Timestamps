@@ -1,7 +1,7 @@
 package com.powersync.demos
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
-import co.touchlab.kermit.Logger
 import com.hai265.timestamper.data.repos.AuthRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
@@ -35,7 +35,7 @@ class AuthViewModel @Inject constructor(
         try {
             authRepository.signOut()
         } catch (e: Exception) {
-            Logger.e("Error signing out: $e")
+            Log.e("AuthViewModel", "\"Error signing out: \$e")
         }
     }
 }
