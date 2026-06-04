@@ -10,7 +10,6 @@ val schema = Schema(
             name = "videos",
             columns = listOf(
                 Column.text("video_title"),
-                Column.text("user_id"),
                 Column.text("thumbnail"),
                 Column.text("last_edited"),
                 Column.integer("last_played"),

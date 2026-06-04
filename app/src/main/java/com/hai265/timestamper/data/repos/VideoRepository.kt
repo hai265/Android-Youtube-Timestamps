@@ -75,8 +75,7 @@ class VideoRepository @Inject constructor(
                 thumbnail = metadata.thumbnail,
                 lastEdited = Clock.System.now(),
                 lastPlayed = Duration.ZERO,
-            ),
-            userId
+            )
         )
         return VideoResult.Success(newVideoId)
     }
@@ -88,7 +87,7 @@ class VideoRepository @Inject constructor(
         //TODO: one transaction
         videoWithTimestamps.forEach { (video, timestamps) ->
             if (videoDao.getVideoByYoutubeId(video.youtubeId) == null) {
-                videoDao.addVideo(video, userId)
+                videoDao.addVideo(video)
             }
             timestamps.forEach {
                 timestmapDao.upsertTimestamp(it)
