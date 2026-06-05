@@ -113,6 +113,8 @@ dependencies {
     implementation(libs.android.driver)
     implementation(libs.sqldelight.coroutines.extensions)
     implementation(libs.integration.sqldelight)
+    implementation(platform(libs.koin.bom))
+    implementation(libs.koin.core)
 
     testImplementation(libs.kotlinx.coroutines.test)
     testImplementation(libs.mockk)

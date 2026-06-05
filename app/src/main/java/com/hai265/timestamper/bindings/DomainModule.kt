@@ -1,4 +1,4 @@
-package com.hai265.timestamper.domain
+package com.hai265.timestamper.bindings
 
 import android.content.ContentResolver
 import android.content.Context

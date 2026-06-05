@@ -4,12 +4,14 @@ import android.content.ContentResolver
 import android.net.Uri
 import com.hai265.timestamper.data.repos.VideoRepository
 import kotlinx.serialization.json.Json
+import org.koin.java.KoinJavaComponent.inject
 import javax.inject.Inject
 
 class ExportTimestampsToFileUseCase @Inject constructor(
     val videoRepository: VideoRepository,
-    val contentResolver: ContentResolver,
 ) {
+    private val contentResolver: ContentResolver by inject(ContentResolver::class.java)
+
     suspend operator fun invoke(uri: Uri) {
         contentResolver.openOutputStream(uri)?.use { writer ->
             writer.write(getVideosAndTimestampsAsJsonString().toByteArray())

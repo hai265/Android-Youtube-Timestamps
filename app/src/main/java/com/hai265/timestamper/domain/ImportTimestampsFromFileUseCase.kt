@@ -3,16 +3,15 @@ package com.hai265.timestamper.domain
 import android.content.ContentResolver
 import android.net.Uri
 import com.hai265.timestamper.data.database.VideoWithTimestamps
-import com.hai265.timestamper.data.repos.AuthRepository
 import com.hai265.timestamper.data.repos.VideoRepository
 import kotlinx.serialization.json.Json
+import org.koin.java.KoinJavaComponent.inject
 import javax.inject.Inject
 
 class ImportTimestampsFromFileUseCase @Inject constructor(
     val videoRepository: VideoRepository,
-    val authRepository: AuthRepository,
-    val contentResolver: ContentResolver,
 ) {
+    private val contentResolver: ContentResolver by inject(ContentResolver::class.java)
     suspend operator fun invoke(uri: Uri) {
         contentResolver.openInputStream(uri)?.use { inputStream ->
             inputStream.bufferedReader().use { jsonString ->
