@@ -1,7 +1,5 @@
 package com.hai265.timestamper.data.database.powersync
 
-import android.net.http.HttpResponseCache.install
-import android.os.AsyncTask.execute
 import co.touchlab.kermit.Logger
 import com.powersync.PowerSyncDatabase
 import com.powersync.connectors.PowerSyncBackendConnector

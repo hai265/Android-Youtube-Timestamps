@@ -154,7 +154,7 @@ class VideoRepositoryTest {
     }
 
     @Test
-    fun testImportVideosWithTimestamps_appearInRoomDatabase() = runTest {
+    fun testImportVideosWithTimestamps_appearInDatabase() = runTest {
 
         subject.importVideosWithTimestamps(videoWithTimestamps)
 

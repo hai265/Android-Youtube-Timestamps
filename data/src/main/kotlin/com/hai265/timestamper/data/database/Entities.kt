@@ -1,8 +1,6 @@
 package com.hai265.timestamper.data.database
 
 import android.os.Parcelable
-import androidx.room.Embedded
-import androidx.room.Relation
 import kotlinx.parcelize.Parcelize
 import kotlinx.serialization.Serializable
 import kotlin.time.Duration
@@ -32,10 +30,6 @@ data class Timestamp @OptIn(ExperimentalUuidApi::class) constructor(
 
 @Serializable
 data class VideoWithTimestamps(
-    @Embedded val video: Video,
-    @Relation(
-        parentColumn = "video_id",
-        entityColumn = "video_id",
-    )
+    val video: Video,
     val timestamps: List<Timestamp>
 )
