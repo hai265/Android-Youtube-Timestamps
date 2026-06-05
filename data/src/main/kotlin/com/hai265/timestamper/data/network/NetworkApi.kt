@@ -13,6 +13,7 @@ import kotlinx.serialization.json.Json
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
+import org.koin.dsl.module
 import retrofit2.Retrofit
 import retrofit2.http.GET
 import retrofit2.http.Query
@@ -93,5 +94,32 @@ abstract class NetworkModule {
         fun providesYoutubeMetadataApiService(retrofit: Retrofit): YoutubeMetadataApiService {
             return YoutubeMetadataApiServiceImpl.create(retrofit)
         }
+    }
+}
+
+internal val networkModule = module {
+    single<Retrofit> {
+        val json = Json {
+            ignoreUnknownKeys = true
+        }
+
+        Retrofit.Builder()
+            .baseUrl(BASE_URL)
+            .addConverterFactory(json.asConverterFactory("application/json".toMediaType()))
+            .client(get<OkHttpClient>())
+            .build()
+    }
+    single<OkHttpClient> {
+        val logging = HttpLoggingInterceptor().apply {
+            level = HttpLoggingInterceptor.Level.BODY
+        }
+
+        OkHttpClient.Builder()
+            .addInterceptor(logging)
+            .build()
+    }
+
+    single<YoutubeMetadataApiService> {
+        YoutubeMetadataApiServiceImpl.create(get<Retrofit>())
     }
 }

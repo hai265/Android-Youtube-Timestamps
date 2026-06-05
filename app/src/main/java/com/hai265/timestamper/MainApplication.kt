@@ -7,6 +7,7 @@ import coil3.SingletonImageLoader
 import coil3.memory.MemoryCache
 import coil3.request.crossfade
 import com.hai265.timestamper.bindings.appModule
+import com.hai265.timestamper.data.database.dataModule
 import com.hai265.timestamper.data.repos.AuthRepository
 import dagger.Module
 import dagger.Provides
@@ -19,6 +20,7 @@ import kotlinx.coroutines.launch
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
 import org.koin.core.context.GlobalContext.startKoin
+import org.koin.core.logger.Level
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -42,9 +44,9 @@ class MainApplication : Application(), SingletonImageLoader.Factory {
             }
         }
         startKoin {
-            androidLogger()
+            androidLogger(Level.DEBUG)
             androidContext(this@MainApplication)
-            modules(appModule)
+            modules(appModule, dataModule)
         }
     }
 

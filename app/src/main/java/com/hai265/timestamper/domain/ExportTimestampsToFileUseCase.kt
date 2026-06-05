@@ -8,8 +8,9 @@ import org.koin.java.KoinJavaComponent.inject
 import javax.inject.Inject
 
 class ExportTimestampsToFileUseCase @Inject constructor(
-    val videoRepository: VideoRepository,
 ) {
+    //TODO: move to constructor
+    private val videoRepository: VideoRepository by inject(VideoRepository::class.java)
     private val contentResolver: ContentResolver by inject(ContentResolver::class.java)
 
     suspend operator fun invoke(uri: Uri) {

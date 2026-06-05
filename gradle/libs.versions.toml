@@ -51,9 +51,11 @@ powersync = "1.12.0"
 appcompat = "1.7.1"
 material = "1.14.0"
 koin-bom = "4.2.1"
+koin-plugin = "1.0.0"
 
 [libraries]
 android-driver = { module = "app.cash.sqldelight:android-driver", version.ref = "sqldelight" }
+koin-annotations = { module = "io.insert-koin:koin-annotations" }
 sqllite-driver = { module = "app.cash.sqldelight:sqlite-driver", version.ref = "sqldelight" }
 androidx-activity-ktx = { module = "androidx.activity:activity-ktx", version.ref = "activityKtx" }
 androidx-compose-bom = { module = "androidx.compose:compose-bom", version.ref = "composeBomVersion" }
@@ -137,3 +139,4 @@ kotlin-parcelize = { id = "org.jetbrains.kotlin.plugin.parcelize" }
 google-services = { id = "com.google.gms.google-services", version.ref = "google-services" }
 sqldelight = { id = "app.cash.sqldelight", version.ref = "sqldelight" }
 android-library = { id = "com.android.library", version.ref = "agp" }
+koin-compiler = { id = "io.insert-koin.compiler.plugin", version.ref = "koin-plugin" }

@@ -11,6 +11,7 @@ plugins {
     alias(libs.plugins.ksp)
     alias(libs.plugins.hilt)
     alias(libs.plugins.kotlin.parcelize)
+    alias(libs.plugins.koin.compiler)
 }
 
 extensions.configure<ApplicationExtension> {
@@ -102,6 +103,7 @@ dependencies {
     implementation(libs.koin.compose)
     implementation(libs.koin.compose.viewmodel)
     implementation(libs.koin.compose.navigation3)
+    implementation(libs.koin.annotations)
     implementation(project(":data"))
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

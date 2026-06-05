@@ -11,6 +11,7 @@ plugins {
     alias(libs.plugins.kotlin.parcelize)
     alias(libs.plugins.sqldelight)
     alias(libs.plugins.kotlin.serialization)
+    alias(libs.plugins.koin.compiler)
 }
 
 android {
@@ -115,6 +116,11 @@ dependencies {
     implementation(libs.integration.sqldelight)
     implementation(platform(libs.koin.bom))
     implementation(libs.koin.core)
+    implementation(libs.koin.android)
+    implementation(libs.koin.compose)
+    implementation(libs.koin.compose.viewmodel)
+    implementation(libs.koin.compose.navigation3)
+    implementation(libs.koin.annotations)
 
     testImplementation(libs.kotlinx.coroutines.test)
     testImplementation(libs.mockk)

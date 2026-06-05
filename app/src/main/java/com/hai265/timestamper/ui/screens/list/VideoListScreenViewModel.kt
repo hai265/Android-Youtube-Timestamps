@@ -17,6 +17,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import org.koin.java.KoinJavaComponent.inject
 import javax.inject.Inject
 import kotlin.uuid.Uuid
 
@@ -34,8 +35,10 @@ class VideoListScreenViewModel @Inject constructor(
     private val timestampRepo: TimestampRepository,
     private val authRepository: AuthRepository,
     private val importTimestampsFromFileUseCase: ImportTimestampsFromFileUseCase,
-    private val exportTimestampsToFileUseCase: ExportTimestampsToFileUseCase,
 ) : ViewModel() {
+    val exportTimestampsToFileUseCase: ExportTimestampsToFileUseCase by inject(
+        ExportTimestampsToFileUseCase::class.java
+    )
 
     val state =
         combine(repo.getVideos(), authRepository.userId)
