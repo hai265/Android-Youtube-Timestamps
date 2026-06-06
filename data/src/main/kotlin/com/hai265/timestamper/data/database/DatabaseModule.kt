@@ -17,6 +17,11 @@ import kotlinx.coroutines.CoroutineScope
 import org.koin.dsl.module
 import javax.inject.Singleton
 
+//Dumb holder I have to use since ksp can't recognize AppSqlDatabase.
+class DatabaseHolder(
+    val database: AppSqlDatabase
+)
+
 @Module
 @InstallIn(SingletonComponent::class)
 abstract class DatabaseModule {
@@ -31,28 +36,9 @@ abstract class DatabaseModule {
         }
 
         @Provides
-        fun providesTimestampDao(driver: SqlDriver): TimestampDao {
-            return SqlDelightTimestampsDao(
-                //TODO: Create AppSqlDatabase once
-                AppSqlDatabase(
-                    driver = driver,
-                    videosAdapter = Videos.Adapter(
-                        uuidAdapter,
-                        instantAdapter,
-                        durationAdapter
-                    ),
-                    timestampsAdapter = Timestamps.Adapter(
-                        uuidAdapter,
-                        uuidAdapter,
-                        durationAdapter
-                    ),
-                )
-            )
-        }
-
-        @Provides
-        fun providesVideoDao(driver: SqlDriver): VideoDao {
-            return SqlDelightVideoDao(
+        @Singleton
+        fun provideDatabaseHolder(driver: SqlDriver): DatabaseHolder {
+            return DatabaseHolder(
                 AppSqlDatabase(
                     driver = driver,
                     videosAdapter = Videos.Adapter(
@@ -66,6 +52,20 @@ abstract class DatabaseModule {
                         durationAdapter
                     )
                 )
+            )
+        }
+
+        @Provides
+        fun providesTimestampDao(databaseHolder: DatabaseHolder): TimestampDao {
+            return SqlDelightTimestampsDao(
+                databaseHolder.database
+            )
+        }
+
+        @Provides
+        fun providesVideoDao(databaseHolder: DatabaseHolder): VideoDao {
+            return SqlDelightVideoDao(
+                databaseHolder.database
             )
         }
     }
