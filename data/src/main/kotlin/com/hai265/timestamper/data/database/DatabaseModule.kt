@@ -72,7 +72,6 @@ abstract class DatabaseModule {
 }
 
 val dataModule = module {
-
     includes(networkModule, powersyncModule)
     single<SqlDriver> {
         PowerSyncDriver(

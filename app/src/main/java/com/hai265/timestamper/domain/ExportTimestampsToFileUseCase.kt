@@ -13,10 +13,12 @@ class ExportTimestampsToFileUseCase @Inject constructor(
     private val videoRepository: VideoRepository by inject(VideoRepository::class.java)
     private val contentResolver: ContentResolver by inject(ContentResolver::class.java)
 
-    suspend operator fun invoke(uri: Uri) {
-        contentResolver.openOutputStream(uri)?.use { writer ->
-            writer.write(getVideosAndTimestampsAsJsonString().toByteArray())
-        }
+    suspend operator fun invoke(uri: Uri): String {
+        //TODO: KOIN TESTING
+//        contentResolver.openOutputStream(uri)?.use { writer ->
+//            writer.write(getVideosAndTimestampsAsJsonString().toByteArray())
+//        }
+        return getVideosAndTimestampsAsJsonString()
     }
 
     private suspend fun getVideosAndTimestampsAsJsonString(): String {
