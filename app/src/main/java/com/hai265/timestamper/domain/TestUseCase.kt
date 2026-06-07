@@ -1,4 +1,4 @@
-package com.hai265.timestamper.data.domain
+package com.hai265.timestamper.domain
 
 import com.hai265.timestamper.data.repos.VideoRepository
 
