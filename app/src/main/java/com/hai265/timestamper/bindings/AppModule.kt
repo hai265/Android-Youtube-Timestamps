@@ -25,7 +25,7 @@ val appModule = module {
         CoroutineScope(SupervisorJob())
     }
     viewModel<TestViewModel> {
-        TestViewModel(get(), get(), get(), get())
+        TestViewModel(get(), get(), get(), get(), get())
     }
     factory {
         TestUseCase(videoRepository = get())

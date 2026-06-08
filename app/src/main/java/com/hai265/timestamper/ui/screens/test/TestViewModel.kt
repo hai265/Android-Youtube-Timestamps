@@ -3,6 +3,7 @@ package com.hai265.timestamper.ui.screens.test
 import androidx.core.net.toUri
 import androidx.lifecycle.ViewModel
 import com.hai265.timestamper.data.database.Video
+import com.hai265.timestamper.data.repos.AuthRepository
 import com.hai265.timestamper.domain.ExportTimestampsToFileUseCase
 import com.hai265.timestamper.domain.ImportTimestampsFromFileUseCase
 import com.hai265.timestamper.domain.TestUseCase
@@ -23,6 +24,7 @@ class TestViewModel(
     private val importTimestampsFromFileUseCase: ImportTimestampsFromFileUseCase,
     private val testUseCase: TestUseCase,
     private val upsertTimestampUseCase: UpsertTimestampUseCase,
+    private val authRepository: AuthRepository,
 ) : ViewModel() {
 
 
