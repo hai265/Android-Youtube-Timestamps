@@ -1,5 +1,9 @@
 package com.hai265.timestamper.data.database
 
+import android.content.Context
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.preferencesDataStore
 import app.cash.sqldelight.db.SqlDriver
 import com.hai265.timestamper.Timestamps
 import com.hai265.timestamper.Videos
@@ -7,6 +11,7 @@ import com.hai265.timestamper.data.AppSqlDatabase
 import com.hai265.timestamper.data.database.powersync.powersyncModule
 import com.hai265.timestamper.data.network.networkModule
 import com.hai265.timestamper.data.repos.AuthRepository
+import com.hai265.timestamper.data.repos.PreferencesRepository
 import com.hai265.timestamper.data.repos.TimestampRepository
 import com.hai265.timestamper.data.repos.VideoRepository
 import com.powersync.PowerSyncDatabase
@@ -16,6 +21,7 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.CoroutineScope
+import org.koin.android.ext.koin.androidContext
 import org.koin.dsl.module
 import javax.inject.Singleton
 
@@ -23,6 +29,9 @@ import javax.inject.Singleton
 class DatabaseHolder(
     val database: AppSqlDatabase
 )
+
+val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "settings")
+
 
 @Module
 @InstallIn(SingletonComponent::class)
@@ -117,4 +126,5 @@ val dataModule = module {
         )
     }
     single { AuthRepository(get(), get()) }
+    single { PreferencesRepository(androidContext().dataStore) }
 }

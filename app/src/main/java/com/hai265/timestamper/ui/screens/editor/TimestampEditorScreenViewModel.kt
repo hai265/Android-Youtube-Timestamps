@@ -11,7 +11,6 @@ import com.hai265.timestamper.data.repos.PreferencesRepository
 import com.hai265.timestamper.data.repos.TimestampRepository
 import com.hai265.timestamper.data.repos.VideoRepository
 import com.hai265.timestamper.ui.Navigables
-import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -24,7 +23,6 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.sample
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 import kotlin.time.Duration
 
 data class TimestampEditorState(
@@ -39,8 +37,7 @@ data class Preferences(
 )
 
 @OptIn(FlowPreview::class)
-@HiltViewModel
-class TimestampViewerViewModel @Inject constructor(
+class TimestampViewerViewModel(
     savedStateHandle: SavedStateHandle,
     private val videoRepo: VideoRepository,
     private val timestampRepo: TimestampRepository,

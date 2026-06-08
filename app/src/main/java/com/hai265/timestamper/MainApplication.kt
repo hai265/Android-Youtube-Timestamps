@@ -1,6 +1,10 @@
 package com.hai265.timestamper
 
 import android.app.Application
+import android.content.Context
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.preferencesDataStore
 import coil3.ImageLoader
 import coil3.PlatformContext
 import coil3.SingletonImageLoader
@@ -26,6 +30,8 @@ import javax.inject.Singleton
 
 @HiltAndroidApp
 class MainApplication : Application(), SingletonImageLoader.Factory {
+    val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "settings")
+
     @Inject
     lateinit var scope: CoroutineScope
 

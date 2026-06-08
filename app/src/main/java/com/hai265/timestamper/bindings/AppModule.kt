@@ -6,6 +6,7 @@ import com.hai265.timestamper.domain.ExportTimestampsToFileUseCase
 import com.hai265.timestamper.domain.ImportTimestampsFromFileUseCase
 import com.hai265.timestamper.domain.TestUseCase
 import com.hai265.timestamper.domain.UpsertTimestampUseCase
+import com.hai265.timestamper.ui.screens.editor.TimestampViewerViewModel
 import com.hai265.timestamper.ui.screens.list.VideoListScreenViewModel
 import com.hai265.timestamper.ui.screens.signin.AuthViewModel
 import com.hai265.timestamper.ui.screens.test.TestViewModel
@@ -27,14 +28,17 @@ val appModule = module {
     single<CoroutineScope> {
         CoroutineScope(SupervisorJob())
     }
-    viewModel<TestViewModel> {
+    viewModel {
         TestViewModel(get(), get(), get(), get(), get())
     }
-    viewModel<AuthViewModel> {
+    viewModel {
         AuthViewModel(get())
     }
-    viewModel<VideoListScreenViewModel> {
+    viewModel {
         VideoListScreenViewModel(get(), get(), get(), get(), get())
+    }
+    viewModel {
+        TimestampViewerViewModel(get(), get(), get(), get())
     }
     viewModel<TimestampEditorViewModel> {
         TimestampEditorViewModel(get())

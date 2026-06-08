@@ -69,7 +69,6 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
-import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.hai265.timestamper.R
 import com.hai265.timestamper.data.database.Timestamp
 import com.hai265.timestamper.ui.fakes.fakeTimestamp1
@@ -80,6 +79,7 @@ import com.hai265.timestamper.ui.screens.youtubeplayer.YouTubePlayerController
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.parcelize.Parcelize
+import org.koin.compose.viewmodel.koinViewModel
 import java.util.Locale
 import kotlin.time.Duration
 import kotlin.uuid.Uuid
@@ -95,7 +95,7 @@ TODO:
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TimestampViewerScreen(windowSize: WindowWidthSizeClass) {
-    val viewmodel = hiltViewModel<TimestampViewerViewModel>()
+    val viewmodel: TimestampViewerViewModel = koinViewModel()
     val state by viewmodel.state.collectAsState()
     val preferences by viewmodel.preferences.collectAsState()
     var showSettingsDialog by rememberSaveable { mutableStateOf(false) }
