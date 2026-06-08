@@ -80,6 +80,7 @@ import kotlinx.datetime.format.MonthNames
 import kotlinx.datetime.format.Padding
 import kotlinx.datetime.format.char
 import kotlinx.datetime.toLocalDateTime
+import org.koin.compose.viewmodel.koinViewModel
 import kotlin.time.Clock
 import kotlin.time.Instant
 
@@ -92,7 +93,7 @@ fun VideoListScreen(
     onTapSignUp: () -> Unit,
     windowSize: WindowWidthSizeClass
 ) {
-    val viewmodel: VideoListScreenViewModel = hiltViewModel()
+    val viewmodel: VideoListScreenViewModel = koinViewModel()
     val state by viewmodel.state.collectAsState()
     var addVideoDialog by rememberSaveable { mutableStateOf(false) }
     var videoToDeleteDialog by remember { mutableStateOf<Video?>(null) }

@@ -74,7 +74,6 @@ private fun NavGraph(
         }
     ) {
         composable<Navigables.ListScreen> {
-            Column {
                 VideoListScreen(
                     onTapVideo = { id ->
                         navController.navigateSingleTopTo(
@@ -86,8 +85,6 @@ private fun NavGraph(
                     onTapSignUp = { navController.navigateSingleTopTo(Navigables.SignUpScreen) },
                     windowSize = windowSize
                 )
-                TestComposable()
-            }
         }
         composable<Navigables.VideoScreen> {
             TimestampViewerScreen(windowSize = windowSize)

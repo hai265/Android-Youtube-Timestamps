@@ -1,4 +1,4 @@
-package com.powersync.demos
+package com.hai265.timestamper.ui.screens.signin
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
@@ -12,8 +12,7 @@ sealed class AuthState {
     data object SignedIn : AuthState()
 }
 
-@HiltViewModel
-class AuthViewModel @Inject constructor(
+class AuthViewModel(
     private val authRepository: AuthRepository,
 ) : ViewModel() {
 

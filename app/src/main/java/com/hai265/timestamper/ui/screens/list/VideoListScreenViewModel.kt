@@ -11,13 +11,11 @@ import com.hai265.timestamper.data.repos.VideoResult
 import com.hai265.timestamper.domain.ExportTimestampsToFileUseCase
 import com.hai265.timestamper.domain.ImportTimestampsFromFileUseCase
 import com.hai265.timestamper.ui.screens.editor.formatDurationToHHMMSS
-import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 import kotlin.uuid.Uuid
 
 private const val TAG = "VideoListScreenViewModel"
@@ -28,8 +26,7 @@ data class ListScreenState(
     val isLoggedIn: Boolean = false,
 )
 
-@HiltViewModel
-class VideoListScreenViewModel @Inject constructor(
+class VideoListScreenViewModel(
     private val repo: VideoRepository,
     private val timestampRepo: TimestampRepository,
     private val authRepository: AuthRepository,

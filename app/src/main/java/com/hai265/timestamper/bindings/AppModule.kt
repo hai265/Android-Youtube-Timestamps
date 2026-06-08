@@ -6,8 +6,9 @@ import com.hai265.timestamper.domain.ExportTimestampsToFileUseCase
 import com.hai265.timestamper.domain.ImportTimestampsFromFileUseCase
 import com.hai265.timestamper.domain.TestUseCase
 import com.hai265.timestamper.domain.UpsertTimestampUseCase
+import com.hai265.timestamper.ui.screens.list.VideoListScreenViewModel
+import com.hai265.timestamper.ui.screens.signin.AuthViewModel
 import com.hai265.timestamper.ui.screens.test.TestViewModel
-import com.powersync.demos.AuthViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
 import org.koin.android.ext.koin.androidContext
@@ -30,6 +31,9 @@ val appModule = module {
     }
     viewModel<AuthViewModel> {
         AuthViewModel(get())
+    }
+    viewModel<VideoListScreenViewModel> {
+        VideoListScreenViewModel(get(), get(), get(), get(), get())
     }
     factory {
         TestUseCase(videoRepository = get())
