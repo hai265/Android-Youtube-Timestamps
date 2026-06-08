@@ -2,14 +2,11 @@ package com.hai265.timestamper.ui.screens.timestampeditor
 
 import androidx.lifecycle.ViewModel
 import com.hai265.timestamper.data.getYoutubeTimestampFromUrl
-import com.hai265.timestamper.data.repos.AuthRepository
 import com.hai265.timestamper.data.repos.VideoRepository
 import com.hai265.timestamper.data.repos.VideoResult
-import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
-import javax.inject.Inject
 import kotlin.time.Duration
 import kotlin.uuid.Uuid
 
@@ -25,10 +22,8 @@ sealed interface State {
 }
 
 
-@HiltViewModel
-class TimestampDialogActivityViewModel @Inject constructor(
+class TimestampDialogActivityViewModel(
     private val repo: VideoRepository,
-    private val authRepository: AuthRepository,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow<State>(State.Initial)

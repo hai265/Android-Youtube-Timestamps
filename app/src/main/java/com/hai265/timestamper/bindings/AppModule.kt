@@ -10,6 +10,7 @@ import com.hai265.timestamper.ui.screens.editor.TimestampViewerViewModel
 import com.hai265.timestamper.ui.screens.list.VideoListScreenViewModel
 import com.hai265.timestamper.ui.screens.signin.AuthViewModel
 import com.hai265.timestamper.ui.screens.test.TestViewModel
+import com.hai265.timestamper.ui.screens.timestampeditor.TimestampDialogActivityViewModel
 import com.hai265.timestamper.ui.screens.timestampeditor.TimestampEditorViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
@@ -40,8 +41,11 @@ val appModule = module {
     viewModel {
         TimestampViewerViewModel(get(), get(), get(), get())
     }
-    viewModel<TimestampEditorViewModel> {
+    viewModel {
         TimestampEditorViewModel(get())
+    }
+    viewModel {
+        TimestampDialogActivityViewModel(get())
     }
     factory {
         TestUseCase(videoRepository = get())

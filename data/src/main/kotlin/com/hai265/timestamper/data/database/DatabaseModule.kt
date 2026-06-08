@@ -127,4 +127,5 @@ val dataModule = module {
     }
     single { AuthRepository(get(), get()) }
     single { PreferencesRepository(androidContext().dataStore) }
+
 }
