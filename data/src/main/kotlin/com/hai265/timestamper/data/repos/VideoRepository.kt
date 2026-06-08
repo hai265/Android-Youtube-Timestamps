@@ -7,10 +7,11 @@ import com.hai265.timestamper.data.database.VideoWithTimestamps
 import com.hai265.timestamper.data.getYouTubeIdFromUrl
 import com.hai265.timestamper.data.getYoutubeThumbnail
 import com.hai265.timestamper.data.network.YoutubeMetadataApiService
+import io.ktor.client.plugins.ClientRequestException
+import io.ktor.http.HttpStatusCode
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.withContext
-import retrofit2.HttpException
 import java.io.IOException
 import kotlin.time.Clock
 import kotlin.time.Duration
@@ -55,10 +56,10 @@ class VideoRepository(
             youtubeMetadataApi.getYoutubeMetadata(url)
         } catch (e: IOException) {
             return VideoResult.NetworkError(e.message)
-        } catch (e: HttpException) {
-            val message = when (e.code()) {
-                400 -> "Video Doesn't Exist"
-                403 -> "Video Is Private"
+        } catch (e: ClientRequestException) {
+            val message = when (e.response.status) {
+                HttpStatusCode.BadRequest -> "Video Doesn't Exist"
+                HttpStatusCode.Forbidden -> "Video Is Private"
                 else -> e.message
             }
             return VideoResult.NetworkError(message)

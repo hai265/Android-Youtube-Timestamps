@@ -1,5 +1,6 @@
 package com.hai265.timestamper.data
 
+import android.net.http.HttpException
 import app.cash.sqldelight.db.SqlDriver
 import app.cash.sqldelight.driver.jdbc.sqlite.JdbcSqliteDriver
 import com.ha265.timestamper.data.fakes.fakeTimestamp1
@@ -19,10 +20,10 @@ import com.hai265.timestamper.data.network.YoutubeMetadata
 import com.hai265.timestamper.data.network.YoutubeMetadataApiService
 import com.hai265.timestamper.data.repos.VideoRepository
 import com.hai265.timestamper.data.repos.VideoResult
-
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
+import okhttp3.Response
 import okhttp3.ResponseBody.Companion.toResponseBody
 import org.junit.After
 import org.junit.Assert.assertEquals
@@ -31,8 +32,6 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
-import retrofit2.HttpException
-import retrofit2.Response
 
 
 const val VIDEO_URL = "https://www.youtube.com/watch?v=videoid"

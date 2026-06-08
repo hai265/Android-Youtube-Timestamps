@@ -92,8 +92,6 @@ dependencies {
     implementation(libs.androidx.core.ktx)
     testImplementation(libs.junit)
     implementation(platform(libs.androidx.compose.bom))
-    implementation(libs.retrofit2.kotlinx.serialization.converter)
-    implementation(libs.retrofit)
     implementation(libs.okhttp3)
     implementation(libs.jetbrains.kotlinx.serialization.json)
     implementation(libs.lifecycle.viewmodel.compose)
