@@ -31,13 +31,14 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.powersync.demos.AuthViewModel
 import kotlinx.coroutines.launch
+import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
 internal fun SignUpScreen(
     onClickLogin: () -> Unit,
     onSignUpSuccess: () -> Unit,
 ) {
-    val viewModel: AuthViewModel = hiltViewModel()
+    val viewModel: AuthViewModel = koinViewModel()
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var confirmPassword by remember { mutableStateOf("") }

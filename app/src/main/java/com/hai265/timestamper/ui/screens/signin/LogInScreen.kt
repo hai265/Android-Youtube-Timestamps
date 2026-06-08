@@ -34,13 +34,14 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.powersync.demos.AuthViewModel
 import io.github.jan.supabase.exceptions.BadRequestRestException
 import kotlinx.coroutines.launch
+import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
 internal fun LogInScreen(
     onClickSignUp: () -> Unit,
     onLogInSuccess: () -> Unit,
 ) {
-    val viewModel: AuthViewModel = hiltViewModel()
+    val viewModel: AuthViewModel = koinViewModel()
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var errorMessage by remember { mutableStateOf<String?>(null) }

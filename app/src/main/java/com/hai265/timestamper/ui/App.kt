@@ -10,6 +10,7 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
+import androidx.compose.foundation.layout.Column
 import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -20,6 +21,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.hai265.timestamper.ui.screens.editor.TimestampViewerScreen
+import com.hai265.timestamper.ui.screens.list.VideoListScreen
 import com.hai265.timestamper.ui.screens.signin.LogInScreen
 import com.hai265.timestamper.ui.screens.signin.SignUpScreen
 import com.hai265.timestamper.ui.screens.test.TestComposable
@@ -72,18 +74,20 @@ private fun NavGraph(
         }
     ) {
         composable<Navigables.ListScreen> {
-            TestComposable()
-//            VideoListScreen(
-//                onTapVideo = { id ->
-//                    navController.navigateSingleTopTo(
-//                        Navigables.VideoScreen(
-//                            id
-//                        )
-//                    )
-//                },
-//                onTapSignUp = { navController.navigateSingleTopTo(Navigables.SignUpScreen) },
-//                windowSize = windowSize
-//            )
+            Column {
+                VideoListScreen(
+                    onTapVideo = { id ->
+                        navController.navigateSingleTopTo(
+                            Navigables.VideoScreen(
+                                id
+                            )
+                        )
+                    },
+                    onTapSignUp = { navController.navigateSingleTopTo(Navigables.SignUpScreen) },
+                    windowSize = windowSize
+                )
+                TestComposable()
+            }
         }
         composable<Navigables.VideoScreen> {
             TimestampViewerScreen(windowSize = windowSize)
