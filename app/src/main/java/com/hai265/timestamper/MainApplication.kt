@@ -24,6 +24,11 @@ class MainApplication : Application(), SingletonImageLoader.Factory {
 
     override fun onCreate() {
         super.onCreate()
+        startKoin {
+            androidLogger(Level.DEBUG)
+            androidContext(this@MainApplication)
+            modules(appModule, dataModule)
+        }
         scope.launch {
             authRepo.userId.collect { userID ->
                 if (userID == null) {
@@ -32,11 +37,6 @@ class MainApplication : Application(), SingletonImageLoader.Factory {
                     authRepo.connect()
                 }
             }
-        }
-        startKoin {
-            androidLogger(Level.DEBUG)
-            androidContext(this@MainApplication)
-            modules(appModule, dataModule)
         }
     }
 
