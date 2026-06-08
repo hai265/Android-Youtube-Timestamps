@@ -32,11 +32,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
-import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.hai265.timestamper.data.database.Timestamp
 import com.hai265.timestamper.ui.screens.editor.formatDurationToHHMMSS
 import kotlinx.coroutines.DisposableHandle
 import kotlinx.coroutines.launch
+import org.koin.compose.viewmodel.koinViewModel
 import kotlin.uuid.Uuid
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -46,7 +46,7 @@ fun TimestampEditorSheet(
     onDismiss: () -> Unit,
     onAddTimestamp: (Uuid) -> Unit,
 ) {
-    val viewmodel = hiltViewModel<TimestampEditorViewModel>()
+    val viewmodel: TimestampEditorViewModel = koinViewModel()
     val sheetState = rememberModalBottomSheetState()
     val scope = rememberCoroutineScope()
     val focusRequester = remember { FocusRequester() }

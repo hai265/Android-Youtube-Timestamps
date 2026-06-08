@@ -8,7 +8,7 @@ import kotlinx.coroutines.async
 import javax.inject.Inject
 import kotlin.uuid.Uuid
 
-class UpsertTimestampUseCase @Inject constructor(
+class UpsertTimestampUseCase(
     private val timestampRepo: TimestampRepository,
     private val videoRepository: VideoRepository,
     private val externalScope: CoroutineScope,

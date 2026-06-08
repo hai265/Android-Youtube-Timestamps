@@ -7,8 +7,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlin.uuid.Uuid
 
-@HiltViewModel
-class TimestampEditorViewModel @Inject constructor(
+class TimestampEditorViewModel(
     private val upsertTimestampUseCase: UpsertTimestampUseCase,
 ) : ViewModel() {
 
