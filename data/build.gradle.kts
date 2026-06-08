@@ -7,7 +7,6 @@ val localProps = Properties().apply {
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.ksp)
-    alias(libs.plugins.hilt)
     alias(libs.plugins.kotlin.parcelize)
     alias(libs.plugins.sqldelight)
     alias(libs.plugins.kotlin.serialization)
@@ -98,9 +97,7 @@ dependencies {
     implementation(libs.okhttp3)
     implementation(libs.jetbrains.kotlinx.serialization.json)
     implementation(libs.lifecycle.viewmodel.compose)
-    implementation(libs.hilt)
     implementation(libs.core.ktx)
-    ksp(libs.hilt.android.compiler)
     testImplementation(libs.junit)
     implementation(libs.androidx.datastore.preferences)
     implementation(libs.logging.interceptor)

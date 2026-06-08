@@ -6,10 +6,9 @@ import com.hai265.timestamper.data.database.TimestampDao
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.withContext
-import javax.inject.Inject
 import kotlin.uuid.Uuid
 
-class TimestampRepository @Inject constructor(
+class TimestampRepository(
     private val timestampDao: TimestampDao
 ) {
     fun getTimestamps(videoId: Uuid): Flow<List<Timestamp>> {

@@ -12,12 +12,9 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
-import javax.inject.Inject
-import javax.inject.Singleton
 import kotlin.uuid.Uuid
 
-@Singleton
-class AuthRepository @Inject constructor(
+class AuthRepository(
     private val powerSyncDatabase: PowerSyncDatabase,
     private val supabase: SupabaseConnector,
 ) {

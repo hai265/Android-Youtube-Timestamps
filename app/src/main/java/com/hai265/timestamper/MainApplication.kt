@@ -1,10 +1,6 @@
 package com.hai265.timestamper
 
 import android.app.Application
-import android.content.Context
-import androidx.datastore.core.DataStore
-import androidx.datastore.preferences.core.Preferences
-import androidx.datastore.preferences.preferencesDataStore
 import coil3.ImageLoader
 import coil3.PlatformContext
 import coil3.SingletonImageLoader
@@ -13,30 +9,18 @@ import coil3.request.crossfade
 import com.hai265.timestamper.bindings.appModule
 import com.hai265.timestamper.data.database.dataModule
 import com.hai265.timestamper.data.repos.AuthRepository
-import dagger.Module
-import dagger.Provides
-import dagger.hilt.InstallIn
-import dagger.hilt.android.HiltAndroidApp
-import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
+import org.koin.android.ext.android.inject
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
 import org.koin.core.context.GlobalContext.startKoin
 import org.koin.core.logger.Level
-import javax.inject.Inject
-import javax.inject.Singleton
 
-@HiltAndroidApp
 class MainApplication : Application(), SingletonImageLoader.Factory {
-    val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "settings")
+    private val scope: CoroutineScope by inject()
 
-    @Inject
-    lateinit var scope: CoroutineScope
-
-    @Inject
-    lateinit var authRepo: AuthRepository
+    private val authRepo: AuthRepository by inject()
 
     override fun onCreate() {
         super.onCreate()
@@ -72,13 +56,4 @@ class MainApplication : Application(), SingletonImageLoader.Factory {
 //            }
             .build()
     }
-}
-
-@InstallIn(SingletonComponent::class)
-@Module
-object CoroutinesScopesModule {
-    @Singleton
-    @Provides
-    fun providesApplicationCoroutineScope(
-    ): CoroutineScope = CoroutineScope(SupervisorJob())
 }

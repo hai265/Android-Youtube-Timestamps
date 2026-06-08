@@ -11,8 +11,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.withContext
 import retrofit2.HttpException
 import java.io.IOException
-import javax.inject.Inject
-import javax.inject.Singleton
 import kotlin.time.Clock
 import kotlin.time.Duration
 import kotlin.uuid.ExperimentalUuidApi
@@ -26,8 +24,7 @@ sealed interface VideoResult {
     data class NetworkError(val errorMessage: String?) : VideoResult
 }
 
-@Singleton
-class VideoRepository @Inject constructor(
+class VideoRepository(
     val videoDao: VideoDao,
     val timestmapDao: TimestampDao,
     val youtubeMetadataApi: YoutubeMetadataApiService,

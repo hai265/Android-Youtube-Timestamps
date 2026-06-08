@@ -11,13 +11,11 @@ import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.lifecycleScope
 import com.hai265.timestamper.data.database.Timestamp
 import com.hai265.timestamper.ui.theme.AppTheme
-import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
 import kotlin.uuid.Uuid
 
-@AndroidEntryPoint
 class TimestampDialogActivity : FragmentActivity() {
     private val viewmodel: TimestampDialogActivityViewModel by inject()
 

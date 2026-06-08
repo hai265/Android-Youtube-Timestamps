@@ -5,9 +5,8 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
-import javax.inject.Inject
 
-class PreferencesRepository @Inject constructor(private val dataStore: DataStore<Preferences>) {
+class PreferencesRepository(private val dataStore: DataStore<Preferences>) {
 
 
     fun <T> get(key: Preferences.Key<T>, default: T): Flow<T> =

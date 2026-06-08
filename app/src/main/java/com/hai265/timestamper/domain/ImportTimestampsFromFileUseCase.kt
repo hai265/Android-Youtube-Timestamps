@@ -6,9 +6,8 @@ import com.hai265.timestamper.data.database.VideoWithTimestamps
 import com.hai265.timestamper.data.repos.VideoRepository
 import kotlinx.serialization.json.Json
 import org.koin.java.KoinJavaComponent.inject
-import javax.inject.Inject
 
-class ImportTimestampsFromFileUseCase @Inject constructor(
+class ImportTimestampsFromFileUseCase(
     val videoRepository: VideoRepository,
 ) {
     private val contentResolver: ContentResolver by inject(ContentResolver::class.java)

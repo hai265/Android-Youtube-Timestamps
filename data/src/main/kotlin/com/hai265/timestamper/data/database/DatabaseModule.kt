@@ -14,73 +14,11 @@ import com.hai265.timestamper.data.repos.AuthRepository
 import com.hai265.timestamper.data.repos.PreferencesRepository
 import com.hai265.timestamper.data.repos.TimestampRepository
 import com.hai265.timestamper.data.repos.VideoRepository
-import com.powersync.PowerSyncDatabase
 import com.powersync.integrations.sqldelight.PowerSyncDriver
-import dagger.Module
-import dagger.Provides
-import dagger.hilt.InstallIn
-import dagger.hilt.components.SingletonComponent
-import kotlinx.coroutines.CoroutineScope
 import org.koin.android.ext.koin.androidContext
 import org.koin.dsl.module
-import javax.inject.Singleton
-
-//Dumb holder I have to use since ksp can't recognize AppSqlDatabase.
-class DatabaseHolder(
-    val database: AppSqlDatabase
-)
 
 val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "settings")
-
-
-@Module
-@InstallIn(SingletonComponent::class)
-abstract class DatabaseModule {
-    companion object {
-        @Provides
-        @Singleton
-        fun provideSqlDriver(
-            powerSyncDatabase: PowerSyncDatabase,
-            externalScope: CoroutineScope,
-        ): SqlDriver {
-            return PowerSyncDriver(powerSyncDatabase, externalScope)
-        }
-
-        @Provides
-        @Singleton
-        fun provideDatabaseHolder(driver: SqlDriver): DatabaseHolder {
-            return DatabaseHolder(
-                AppSqlDatabase(
-                    driver = driver,
-                    videosAdapter = Videos.Adapter(
-                        uuidAdapter,
-                        instantAdapter,
-                        durationAdapter
-                    ),
-                    timestampsAdapter = Timestamps.Adapter(
-                        uuidAdapter,
-                        uuidAdapter,
-                        durationAdapter
-                    )
-                )
-            )
-        }
-
-        @Provides
-        fun providesTimestampDao(databaseHolder: DatabaseHolder): TimestampDao {
-            return SqlDelightTimestampsDao(
-                databaseHolder.database
-            )
-        }
-
-        @Provides
-        fun providesVideoDao(databaseHolder: DatabaseHolder): VideoDao {
-            return SqlDelightVideoDao(
-                databaseHolder.database
-            )
-        }
-    }
-}
 
 val dataModule = module {
     includes(networkModule, powersyncModule)

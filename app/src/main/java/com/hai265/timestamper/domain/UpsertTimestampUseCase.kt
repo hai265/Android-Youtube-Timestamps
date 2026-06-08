@@ -5,7 +5,6 @@ import com.hai265.timestamper.data.repos.TimestampRepository
 import com.hai265.timestamper.data.repos.VideoRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.async
-import javax.inject.Inject
 import kotlin.uuid.Uuid
 
 class UpsertTimestampUseCase(

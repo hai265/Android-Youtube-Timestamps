@@ -3,8 +3,6 @@ package com.hai265.timestamper.ui.screens.signin
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import com.hai265.timestamper.data.repos.AuthRepository
-import dagger.hilt.android.lifecycle.HiltViewModel
-import javax.inject.Inject
 
 sealed class AuthState {
     data object SignedOut : AuthState()

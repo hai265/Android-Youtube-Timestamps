@@ -5,9 +5,8 @@ import android.net.Uri
 import com.hai265.timestamper.data.repos.VideoRepository
 import kotlinx.serialization.json.Json
 import org.koin.java.KoinJavaComponent.inject
-import javax.inject.Inject
 
-class ExportTimestampsToFileUseCase @Inject constructor(
+class ExportTimestampsToFileUseCase(
 ) {
     //TODO: move to constructor
     private val videoRepository: VideoRepository by inject(VideoRepository::class.java)
