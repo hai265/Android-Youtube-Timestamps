@@ -6,6 +6,7 @@ import com.hai265.timestamper.data.database.Video
 import com.hai265.timestamper.domain.ExportTimestampsToFileUseCase
 import com.hai265.timestamper.domain.ImportTimestampsFromFileUseCase
 import com.hai265.timestamper.domain.TestUseCase
+import com.hai265.timestamper.domain.UpsertTimestampUseCase
 import org.koin.core.annotation.KoinViewModel
 
 private const val TAG = "VideoListScreenViewModel"
@@ -21,6 +22,7 @@ class TestViewModel(
     private val exportTimestampsFromFileUseCase: ExportTimestampsToFileUseCase,
     private val importTimestampsFromFileUseCase: ImportTimestampsFromFileUseCase,
     private val testUseCase: TestUseCase,
+    private val upsertTimestampUseCase: UpsertTimestampUseCase,
 ) : ViewModel() {
 
 

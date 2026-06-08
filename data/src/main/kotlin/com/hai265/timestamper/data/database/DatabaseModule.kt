@@ -6,6 +6,7 @@ import com.hai265.timestamper.Videos
 import com.hai265.timestamper.data.AppSqlDatabase
 import com.hai265.timestamper.data.database.powersync.powersyncModule
 import com.hai265.timestamper.data.network.networkModule
+import com.hai265.timestamper.data.repos.TimestampRepository
 import com.hai265.timestamper.data.repos.VideoRepository
 import com.powersync.PowerSyncDatabase
 import com.powersync.integrations.sqldelight.PowerSyncDriver
@@ -107,6 +108,11 @@ val dataModule = module {
             videoDao = get(),
             timestmapDao = get(),
             youtubeMetadataApi = get(),
+        )
+    }
+    single {
+        TimestampRepository(
+            get()
         )
     }
 }
