@@ -5,6 +5,7 @@ import com.hai265.timestamper.data.database.Video
 import com.hai265.timestamper.data.database.VideoDao
 import com.hai265.timestamper.data.database.VideoWithTimestamps
 import com.hai265.timestamper.data.getYouTubeIdFromUrl
+import com.hai265.timestamper.data.getYoutubeThumbnail
 import com.hai265.timestamper.data.network.YoutubeMetadataApiService
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -69,7 +70,7 @@ class VideoRepository(
                 id = newVideoId,
                 youtubeId = youtubeId,
                 videoTitle = metadata.title,
-                thumbnail = metadata.thumbnail,
+                thumbnail = getYoutubeThumbnail(youtubeId),
                 lastEdited = Clock.System.now(),
                 lastPlayed = Duration.ZERO,
             )

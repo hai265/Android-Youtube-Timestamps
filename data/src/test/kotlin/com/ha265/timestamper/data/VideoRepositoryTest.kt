@@ -77,7 +77,7 @@ class VideoRepositoryTest {
         val video = subject.getVideos().first().first()
         assert(result is VideoResult.Success)
         assertEquals("title", video.videoTitle)
-        assertEquals("thumbnail", video.thumbnail)
+        assertEquals("https://img.youtube.com/vi/videoid/maxresdefault.jpg", video.thumbnail)
     }
 
     @Test
