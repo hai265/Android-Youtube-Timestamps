@@ -3,6 +3,16 @@ package com.hai265.timestamper.data.network
 import com.hai265.timestamper.data.getYouTubeIdFromUrl
 import com.hai265.timestamper.data.getYoutubeThumbnail
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
+import io.ktor.client.HttpClient
+import io.ktor.client.call.body
+import io.ktor.client.plugins.DefaultRequest
+import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
+import io.ktor.client.plugins.logging.DEFAULT
+import io.ktor.client.plugins.logging.LogLevel
+import io.ktor.client.plugins.logging.Logger
+import io.ktor.client.plugins.logging.Logging
+import io.ktor.client.request.get
+import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
@@ -13,7 +23,6 @@ import org.koin.dsl.module
 import retrofit2.Retrofit
 import retrofit2.http.GET
 import retrofit2.http.Query
-
 
 //test url: https://www.youtube.com/oembed?url=https%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3DdQw4w9WgXcQ
 private const val BASE_URL = "https://www.youtube.com/"
@@ -48,6 +57,18 @@ class YoutubeMetadataApiServiceImpl private constructor(private val api: Youtube
     }
 }
 
+class YoutubeMetadataApiServiceImplKtor(private val httpClient: HttpClient) :
+    YoutubeMetadataApiService {
+
+    override suspend fun getYoutubeMetadata(videoUrl: String): YoutubeMetadata {
+        return httpClient.get("oembed") {
+            url {
+                parameters.append("url", videoUrl)
+            }
+        }.body()
+    }
+}
+
 
 @Serializable
 data class YoutubeMetadata(
@@ -79,6 +100,25 @@ internal val networkModule = module {
     }
 
     single<YoutubeMetadataApiService> {
-        YoutubeMetadataApiServiceImpl.create(get<Retrofit>())
+//        YoutubeMetadataApiServiceImpl.create(get<Retrofit>())
+        YoutubeMetadataApiServiceImplKtor(get())
+    }
+
+    single {
+        HttpClient(io.ktor.client.engine.okhttp.OkHttp) {
+            install(Logging) {
+                logger = Logger.DEFAULT
+                level = LogLevel.HEADERS
+            }
+            install(DefaultRequest) {
+                url(BASE_URL)
+            }
+            install(ContentNegotiation) {
+                json(Json {
+                    ignoreUnknownKeys = true
+                }
+                )
+            }
+        }
     }
 }

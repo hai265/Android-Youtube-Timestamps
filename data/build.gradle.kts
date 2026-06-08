@@ -118,6 +118,13 @@ dependencies {
     implementation(libs.koin.compose.viewmodel)
     implementation(libs.koin.compose.navigation3)
     implementation(libs.koin.annotations)
+    implementation(libs.ktor.client.core)
+    implementation(libs.ktor.client.okhttp)
+    implementation(libs.ktor.client.logging)
+    implementation(libs.ktor.client.content.negotiation)
+    implementation(libs.ktor.serialization.kotlinx.json)
+    implementation(libs.slf4j.android)
+    implementation(platform(libs.ktor.bom))
 
     testImplementation(libs.kotlinx.coroutines.test)
     testImplementation(libs.mockk)
