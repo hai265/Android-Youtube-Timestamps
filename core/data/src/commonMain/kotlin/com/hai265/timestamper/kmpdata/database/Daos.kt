@@ -1,4 +1,4 @@
-package com.hai265.timestamper.kmpdata.database
+package com.hai265.timestamper.data.database
 
 import kotlinx.coroutines.flow.Flow
 import kotlin.time.Instant

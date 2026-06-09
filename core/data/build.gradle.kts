@@ -12,7 +12,7 @@ kotlin {
     // which platforms this KMP module supports.
     // See: https://kotlinlang.org/docs/multiplatform-discover-project.html#targets
     android {
-        namespace = "com.hai265.timestamper.kmpdata"
+        namespace = "com.hai265.timestamper.data"
         compileSdk {
             version = release(37)
         }
@@ -111,7 +111,7 @@ sqldelight {
     databases {
         linkSqlite.set(false)
         create("AppSqlDatabase") {
-            packageName.set("com.hai265.timestamper.kmpdata")
+            packageName.set("com.hai265.timestamper.data")
             generateAsync.set(true)
             deriveSchemaFromMigrations.set(false)
             dialect("app.cash.sqldelight:sqlite-3-38-dialect:2.0.2")
