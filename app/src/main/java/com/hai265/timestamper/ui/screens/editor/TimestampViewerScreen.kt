@@ -2,7 +2,6 @@ package com.hai265.timestamper.ui.screens.editor
 
 import android.content.pm.ActivityInfo
 import android.content.res.Configuration
-import android.os.Parcelable
 import android.view.ViewTreeObserver
 import androidx.activity.compose.LocalActivity
 import androidx.compose.animation.animateColorAsState
@@ -78,7 +77,6 @@ import com.hai265.timestamper.ui.screens.youtubeplayer.ComposeYouTubePlayer
 import com.hai265.timestamper.ui.screens.youtubeplayer.YouTubePlayerController
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import kotlinx.parcelize.Parcelize
 import org.koin.compose.viewmodel.koinViewModel
 import java.util.Locale
 import kotlin.time.Duration
@@ -99,7 +97,8 @@ fun TimestampViewerScreen(windowSize: WindowWidthSizeClass) {
     val state by viewmodel.state.collectAsState()
     val preferences by viewmodel.preferences.collectAsState()
     var showSettingsDialog by rememberSaveable { mutableStateOf(false) }
-    var bottomSheetState by rememberSaveable { mutableStateOf<BottomSheetState>(BottomSheetState.Hidden) }
+    //TODO: Change to rememberSavable so timestmap editor appears on rotation
+    var bottomSheetState by remember { mutableStateOf<BottomSheetState>(BottomSheetState.Hidden) }
     val scope = rememberCoroutineScope()
 
     val video = state.video
@@ -452,8 +451,7 @@ fun Duration.formatDurationToHHMMSS(): String =
         }
     }
 
-@Parcelize
-sealed interface BottomSheetState : Parcelable {
+sealed interface BottomSheetState {
     object Hidden : BottomSheetState
     data class EditTimestamp(val timestamp: Timestamp) : BottomSheetState
 }

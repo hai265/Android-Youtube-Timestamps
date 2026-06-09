@@ -61,7 +61,7 @@ private fun NavGraph(
 ) {
     NavHost(
         navController = navController,
-        startDestination = Navigables.TestScreen,
+        startDestination = Navigables.ListScreen,
         enterTransition = {
             slideIntoContainer(
                 AnimatedContentTransitionScope.SlideDirection.Start,
