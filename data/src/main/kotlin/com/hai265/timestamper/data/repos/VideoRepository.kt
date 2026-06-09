@@ -7,12 +7,10 @@ import com.hai265.timestamper.data.database.VideoWithTimestamps
 import com.hai265.timestamper.data.getYouTubeIdFromUrl
 import com.hai265.timestamper.data.getYoutubeThumbnail
 import com.hai265.timestamper.data.network.YoutubeMetadataApiService
-import io.ktor.client.plugins.ClientRequestException
-import io.ktor.http.HttpStatusCode
+import com.hai265.timestamper.data.network.YoutubeMetadataResult
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.withContext
-import java.io.IOException
 import kotlin.time.Clock
 import kotlin.time.Duration
 import kotlin.uuid.ExperimentalUuidApi
@@ -52,17 +50,18 @@ class VideoRepository(
         val youtubeId = getYouTubeIdFromUrl(url) ?: return VideoResult.InvalidUrl(url)
         //return if video already exists
         getVideoByYoutubeId(youtubeId)?.id?.let { return VideoResult.VideoAlreadyExists(it) }
-        val metadata = try {
-            youtubeMetadataApi.getYoutubeMetadata(url)
-        } catch (e: IOException) {
-            return VideoResult.NetworkError(e.message)
-        } catch (e: ClientRequestException) {
-            val message = when (e.response.status) {
-                HttpStatusCode.BadRequest -> "Video Doesn't Exist"
-                HttpStatusCode.Forbidden -> "Video Is Private"
-                else -> e.message
+        val metadata = when (val metadataResult = youtubeMetadataApi.getYoutubeMetadata(url)) {
+            is YoutubeMetadataResult.HttpError -> {
+                val message = when (metadataResult.statusCode) {
+                    400 -> "Video Doesn't Exist"
+                    403 -> "Video Is Private"
+                    else -> metadataResult.message
+                }
+                return VideoResult.NetworkError(message)
             }
-            return VideoResult.NetworkError(message)
+
+            is YoutubeMetadataResult.NetworkError -> return VideoResult.NetworkError(metadataResult.message)
+            is YoutubeMetadataResult.Success -> metadataResult.metadata
         }
 
         val newVideoId = Uuid.random()

@@ -1,6 +1,5 @@
 package com.hai265.timestamper.data
 
-import android.net.http.HttpException
 import app.cash.sqldelight.db.SqlDriver
 import app.cash.sqldelight.driver.jdbc.sqlite.JdbcSqliteDriver
 import com.ha265.timestamper.data.fakes.fakeTimestamp1
@@ -18,13 +17,12 @@ import com.hai265.timestamper.data.database.instantAdapter
 import com.hai265.timestamper.data.database.uuidAdapter
 import com.hai265.timestamper.data.network.YoutubeMetadata
 import com.hai265.timestamper.data.network.YoutubeMetadataApiService
+import com.hai265.timestamper.data.network.YoutubeMetadataResult
 import com.hai265.timestamper.data.repos.VideoRepository
 import com.hai265.timestamper.data.repos.VideoResult
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
-import okhttp3.Response
-import okhttp3.ResponseBody.Companion.toResponseBody
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotEquals
@@ -81,7 +79,8 @@ class VideoRepositoryTest {
 
     @Test
     fun testAddVideo_IoExceptionReturnsNetworkError() = runTest {
-        youtubeMetaApi.shouldThrow = kotlinx.io.IOException("error message")
+        youtubeMetaApi.shouldThrow = YoutubeMetadataResult.NetworkError("error message")
+
 
         val result = subject.addVideo(VIDEO_URL)
 
@@ -91,8 +90,6 @@ class VideoRepositoryTest {
 
     @Test
     fun testAddVideo_InvalidUrl() = runTest {
-        youtubeMetaApi.shouldThrow = kotlinx.io.IOException("error message")
-
         val result = subject.addVideo("invalid_url")
 
         assert(result is VideoResult.InvalidUrl)
@@ -101,27 +98,18 @@ class VideoRepositoryTest {
 
     @Test
     fun testAddVideo_NetworkExceptionReturnsNetworkError() = runTest {
-        youtubeMetaApi.shouldThrow = HttpException(
-            Response.error<String>(
-                404,
-                "".toResponseBody()
-            )
-        )
+        youtubeMetaApi.shouldThrow = YoutubeMetadataResult.HttpError(404, "404 message")
 
         val result = subject.addVideo(VIDEO_URL)
 
         assert(result is VideoResult.NetworkError)
-        assertEquals("HTTP 404 Response.error()", (result as VideoResult.NetworkError).errorMessage)
+        assertEquals("404 message", (result as VideoResult.NetworkError).errorMessage)
     }
 
     @Test
     fun testAddVideo_NetworkException400ReturnsNetworkErrorVideoDoesntExist() = runTest {
-        youtubeMetaApi.shouldThrow = HttpException(
-            Response.error<String>(
-                400,
-                "".toResponseBody()
-            )
-        )
+        youtubeMetaApi.shouldThrow = YoutubeMetadataResult.HttpError(400, "")
+
 
         val result = subject.addVideo(VIDEO_URL)
 
@@ -131,12 +119,8 @@ class VideoRepositoryTest {
 
     @Test
     fun testAddVideo_NetworkException403ReturnsNetworkErrorVideoIsPrivate() = runTest {
-        youtubeMetaApi.shouldThrow = HttpException(
-            Response.error<String>(
-                403,
-                "".toResponseBody()
-            )
-        )
+        youtubeMetaApi.shouldThrow = YoutubeMetadataResult.HttpError(403, "")
+
 
         val result = subject.addVideo(VIDEO_URL)
 
@@ -235,16 +219,16 @@ class VideoRepositoryTest {
 
 class FakeYoutubeMetadataApiService : YoutubeMetadataApiService {
 
-    var shouldThrow: Throwable? = null
+    var shouldThrow: YoutubeMetadataResult? = null
 
     var response = YoutubeMetadata(
         title = "title",
         thumbnail = "thumbnail"
     )
 
-    override suspend fun getYoutubeMetadata(videoUrl: String): YoutubeMetadata {
-        shouldThrow?.let { throw it }
-        return response
+    override suspend fun getYoutubeMetadata(videoUrl: String): YoutubeMetadataResult {
+        shouldThrow?.let { return it }
+        return YoutubeMetadataResult.Success(response)
     }
 }
 
