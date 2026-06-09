@@ -8,7 +8,6 @@ plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.ksp)
     alias(libs.plugins.kotlin.parcelize)
-    alias(libs.plugins.sqldelight)
     alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.koin.compiler)
 }
@@ -76,18 +75,6 @@ kotlin {
     }
 }
 
-sqldelight {
-    databases {
-        linkSqlite.set(false)
-        create("AppSqlDatabase") {
-            generateAsync.set(true)
-            deriveSchemaFromMigrations.set(false)
-            dialect("app.cash.sqldelight:sqlite-3-38-dialect:2.0.2")
-        }
-    }
-}
-
-
 dependencies {
     implementation(libs.androidx.core.ktx)
     testImplementation(libs.junit)
@@ -123,9 +110,9 @@ dependencies {
     implementation(libs.ktor.serialization.kotlinx.json)
     implementation(libs.slf4j.android)
     implementation(platform(libs.ktor.bom))
+    implementation(project(":core:data"))
 
     testImplementation(libs.kotlinx.coroutines.test)
     testImplementation(libs.kotlin.test)
     testImplementation(libs.kotlin.test.junit)
-    testImplementation(libs.sqllite.driver)
 }

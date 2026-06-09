@@ -3,7 +3,7 @@ package com.hai265.timestamper.data.database
 import app.cash.sqldelight.coroutines.asFlow
 import app.cash.sqldelight.coroutines.mapToList
 import com.hai265.timestamper.Timestamps
-import com.hai265.timestamper.kmpdata.AppSqlDatabase
+import com.hai265.timestamper.data.AppSqlDatabase
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 import kotlinx.coroutines.flow.Flow

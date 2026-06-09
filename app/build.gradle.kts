@@ -101,7 +101,7 @@ dependencies {
     implementation(libs.koin.compose.navigation3)
     implementation(libs.koin.annotations)
     implementation(project(":data"))
-//    implementation(project(":core:kmpdata"))
+    implementation(project(":core:data"))
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(platform(libs.androidx.compose.bom))
