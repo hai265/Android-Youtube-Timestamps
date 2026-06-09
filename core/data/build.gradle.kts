@@ -1,7 +1,11 @@
+import org.gradle.declarative.dsl.schema.FqName.Empty.packageName
+
 plugins {
     alias(libs.plugins.kotlin.multiplatform)
     alias(libs.plugins.android.kotlin.multiplatform.library)
     alias(libs.plugins.android.lint)
+    alias(libs.plugins.sqldelight)
+    alias(libs.plugins.kotlin.serialization)
 }
 
 kotlin {
@@ -99,4 +103,16 @@ kotlin {
         }
     }
 
+}
+
+sqldelight {
+    databases {
+        linkSqlite.set(false)
+        create("AppSqlDatabase") {
+            packageName.set("com.hai265.timestamper.data")
+            generateAsync.set(true)
+            deriveSchemaFromMigrations.set(false)
+            dialect("app.cash.sqldelight:sqlite-3-38-dialect:2.0.2")
+        }
+    }
 }
