@@ -15,7 +15,7 @@ plugins {
 
 extensions.configure<ApplicationExtension> {
     namespace = "com.hai265.timestamper"
-    compileSdk = 36
+    compileSdk = 37
 
     defaultConfig {
         applicationId = "com.hai265.timestamper"
@@ -101,6 +101,7 @@ dependencies {
     implementation(libs.koin.compose.navigation3)
     implementation(libs.koin.annotations)
     implementation(project(":data"))
+    implementation(project(":core:data"))
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(platform(libs.androidx.compose.bom))

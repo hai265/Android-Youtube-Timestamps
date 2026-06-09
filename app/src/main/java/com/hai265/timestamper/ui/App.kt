@@ -10,7 +10,6 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
-import androidx.compose.foundation.layout.Column
 import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -39,6 +38,9 @@ sealed interface Navigables {
 
     @Serializable
     object LogInScreen : Navigables
+
+    @Serializable
+    object TestScreen : Navigables
 }
 
 
@@ -59,7 +61,7 @@ private fun NavGraph(
 ) {
     NavHost(
         navController = navController,
-        startDestination = Navigables.ListScreen,
+        startDestination = Navigables.TestScreen,
         enterTransition = {
             slideIntoContainer(
                 AnimatedContentTransitionScope.SlideDirection.Start,
@@ -74,17 +76,17 @@ private fun NavGraph(
         }
     ) {
         composable<Navigables.ListScreen> {
-                VideoListScreen(
-                    onTapVideo = { id ->
-                        navController.navigateSingleTopTo(
-                            Navigables.VideoScreen(
-                                id
-                            )
+            VideoListScreen(
+                onTapVideo = { id ->
+                    navController.navigateSingleTopTo(
+                        Navigables.VideoScreen(
+                            id
                         )
-                    },
-                    onTapSignUp = { navController.navigateSingleTopTo(Navigables.SignUpScreen) },
-                    windowSize = windowSize
-                )
+                    )
+                },
+                onTapSignUp = { navController.navigateSingleTopTo(Navigables.SignUpScreen) },
+                windowSize = windowSize
+            )
         }
         composable<Navigables.VideoScreen> {
             TimestampViewerScreen(windowSize = windowSize)
@@ -102,6 +104,9 @@ private fun NavGraph(
             LogInScreen(
                 onClickSignUp = { navController.navigateSingleTopTo(Navigables.SignUpScreen) },
                 onLogInSuccess = { navController.navigateSingleTopTo(Navigables.ListScreen) })
+        }
+        composable<Navigables.TestScreen> {
+            TestComposable()
         }
     }
 }
