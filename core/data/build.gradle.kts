@@ -67,6 +67,12 @@ kotlin {
                 implementation(libs.sqldelight.coroutines.extensions)
                 implementation(libs.integration.sqldelight)
                 implementation(libs.kotlinx.datetime)
+
+                implementation(libs.ktor.client.core)
+                implementation(libs.ktor.client.logging)
+                implementation(libs.ktor.client.content.negotiation)
+                implementation(libs.ktor.serialization.kotlinx.json)
+                implementation(project.dependencies.platform(libs.ktor.bom))
             }
         }
 
@@ -81,6 +87,9 @@ kotlin {
                 // Add Android-specific dependencies here. Note that this source set depends on
                 // commonMain by default and will correctly pull the Android artifacts of any KMP
                 // dependencies declared in commonMain.
+                implementation(libs.slf4j.android)
+                implementation(libs.ktor.client.okhttp)
+
             }
         }
 
