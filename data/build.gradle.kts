@@ -125,7 +125,6 @@ dependencies {
     implementation(platform(libs.ktor.bom))
 
     testImplementation(libs.kotlinx.coroutines.test)
-    testImplementation(libs.mockk)
     testImplementation(libs.kotlin.test)
     testImplementation(libs.kotlin.test.junit)
     testImplementation(libs.sqllite.driver)

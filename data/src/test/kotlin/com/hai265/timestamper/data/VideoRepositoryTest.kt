@@ -28,13 +28,10 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotEquals
 import org.junit.Before
 import org.junit.Test
-import org.junit.runner.RunWith
-import org.junit.runners.JUnit4
 
 
 const val VIDEO_URL = "https://www.youtube.com/watch?v=videoid"
 
-@RunWith(JUnit4::class)
 class VideoRepositoryTest {
     private lateinit var youtubeMetaApi: FakeYoutubeMetadataApiService
     private lateinit var driver: SqlDriver

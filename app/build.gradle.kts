@@ -109,7 +109,6 @@ dependencies {
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
     testImplementation(libs.kotlinx.coroutines.test)
-    testImplementation(libs.mockk)
     testImplementation(libs.kotlin.test)
     testImplementation(libs.kotlin.test.junit)
 }

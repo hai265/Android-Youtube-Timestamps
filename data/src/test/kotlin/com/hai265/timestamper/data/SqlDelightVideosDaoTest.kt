@@ -16,8 +16,6 @@ import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
-import org.junit.runner.RunWith
-import org.junit.runners.JUnit4
 import kotlin.time.Duration
 import kotlin.time.Instant
 import kotlin.uuid.Uuid
@@ -25,7 +23,6 @@ import kotlin.uuid.Uuid
 val Instant.Companion.ZERO: Instant
     get() = Instant.fromEpochSeconds(0L)
 
-@RunWith(JUnit4::class)
 class SqlDelightVideosDaoTest {
 
     private lateinit var db: AppSqlDatabase
