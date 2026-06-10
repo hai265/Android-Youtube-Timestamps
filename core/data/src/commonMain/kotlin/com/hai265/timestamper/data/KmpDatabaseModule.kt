@@ -12,6 +12,7 @@ import com.hai265.timestamper.data.database.instantAdapter
 import com.hai265.timestamper.data.database.uuidAdapter
 import com.hai265.timestamper.data.network.networkModule
 import com.hai265.timestamper.data.prefs.preferencesModule
+import com.hai265.timestamper.data.repos.AuthRepository
 import com.hai265.timestamper.data.repos.PreferencesRepository
 import com.hai265.timestamper.data.repos.TimestampRepository
 import com.hai265.timestamper.data.repos.VideoRepository
@@ -61,7 +62,6 @@ val kmpDataModule = module {
             get()
         )
     }
-//    single { AuthRepository(get(), get()) }
+    single { AuthRepository(get(), get()) }
     single { PreferencesRepository(get()) }
-
 }

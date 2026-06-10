@@ -80,6 +80,10 @@ kotlin {
                 implementation(libs.koin.compose.navigation3)
                 implementation(libs.koin.annotations)
                 implementation(libs.androidx.datastore.preferences)
+                implementation(libs.powersync.core)
+                implementation(libs.powersync.integration.supabase)
+                implementation(libs.postgrest.kt)
+                implementation(libs.kermit)
             }
         }
 

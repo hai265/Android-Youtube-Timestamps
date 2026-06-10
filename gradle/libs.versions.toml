@@ -13,6 +13,7 @@ coroutinesExtensions = "2.0.2"
 datastore = "1.2.1"
 firebaseBom = "34.13.0"
 fragmentKtx = "1.8.9"
+kermit = "2.1.0"
 kotlin = "2.3.20"
 coreKtx = "1.18.0"
 junit = "4.13.2"
@@ -56,6 +57,7 @@ core = "1.7.0"
 
 [libraries]
 android-driver = { module = "app.cash.sqldelight:android-driver", version.ref = "sqldelight" }
+kermit = { module = "co.touchlab:kermit", version.ref = "kermit" }
 ktor-bom = { module = "io.ktor:ktor-bom", version.ref = "ktor" }
 ktor-client-content-negotiation = { module = "io.ktor:ktor-client-content-negotiation" }
 ktor-client-core = { module = "io.ktor:ktor-client-core" }
