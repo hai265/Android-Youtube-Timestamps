@@ -79,6 +79,7 @@ kotlin {
                 implementation(libs.koin.compose.viewmodel)
                 implementation(libs.koin.compose.navigation3)
                 implementation(libs.koin.annotations)
+                implementation(libs.androidx.datastore.preferences)
             }
         }
 

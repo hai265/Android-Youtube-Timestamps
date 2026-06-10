@@ -7,8 +7,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
 class PreferencesRepository(private val dataStore: DataStore<Preferences>) {
-
-
     fun <T> get(key: Preferences.Key<T>, default: T): Flow<T> =
         dataStore.data.map { it[key] ?: default }
 
