@@ -9,6 +9,7 @@ import com.hai265.timestamper.data.getYoutubeThumbnail
 import com.hai265.timestamper.data.network.YoutubeMetadataApiService
 import com.hai265.timestamper.data.network.YoutubeMetadataResult
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.IO
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.withContext
 import kotlin.time.Clock
