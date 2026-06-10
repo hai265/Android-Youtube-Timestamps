@@ -1,9 +1,15 @@
-package com.hai265.timestamper.data.database
+package com.hai265.timestamper.data
 
 import app.cash.sqldelight.db.SqlDriver
 import com.hai265.timestamper.Timestamps
 import com.hai265.timestamper.Videos
-import com.hai265.timestamper.data.AppSqlDatabase
+import com.hai265.timestamper.data.database.SqlDelightTimestampsDao
+import com.hai265.timestamper.data.database.SqlDelightVideoDao
+import com.hai265.timestamper.data.database.TimestampDao
+import com.hai265.timestamper.data.database.VideoDao
+import com.hai265.timestamper.data.database.durationAdapter
+import com.hai265.timestamper.data.database.instantAdapter
+import com.hai265.timestamper.data.database.uuidAdapter
 import com.hai265.timestamper.data.network.networkModule
 import com.hai265.timestamper.data.repos.TimestampRepository
 import com.hai265.timestamper.data.repos.VideoRepository
