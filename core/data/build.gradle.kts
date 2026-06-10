@@ -73,6 +73,12 @@ kotlin {
                 implementation(libs.ktor.client.content.negotiation)
                 implementation(libs.ktor.serialization.kotlinx.json)
                 implementation(project.dependencies.platform(libs.ktor.bom))
+                implementation(project.dependencies.platform(libs.koin.bom))
+                implementation(libs.koin.core)
+                implementation(libs.koin.compose)
+                implementation(libs.koin.compose.viewmodel)
+                implementation(libs.koin.compose.navigation3)
+                implementation(libs.koin.annotations)
             }
         }
 
@@ -89,6 +95,7 @@ kotlin {
                 // dependencies declared in commonMain.
                 implementation(libs.slf4j.android)
                 implementation(libs.ktor.client.okhttp)
+                implementation(libs.koin.android)
 
             }
         }
@@ -108,6 +115,7 @@ kotlin {
                 // part of KMP’s default source set hierarchy. Note that this source set depends
                 // on common by default and will correctly pull the iOS artifacts of any
                 // KMP dependencies declared in commonMain.
+                implementation(libs.ktor.client.darwin)
             }
         }
     }
