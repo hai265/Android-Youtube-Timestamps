@@ -1,7 +1,7 @@
 package com.hai265.timestamper.bindings
 
 import android.content.ContentResolver
-import com.hai265.timestamper.data.database.dataModule
+import com.hai265.timestamper.data.dataModule
 import com.hai265.timestamper.domain.ExportTimestampsToFileUseCase
 import com.hai265.timestamper.domain.ImportTimestampsFromFileUseCase
 import com.hai265.timestamper.domain.TestUseCase

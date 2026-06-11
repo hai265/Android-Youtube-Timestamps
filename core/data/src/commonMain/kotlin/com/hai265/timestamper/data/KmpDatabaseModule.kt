@@ -23,7 +23,7 @@ import com.powersync.connectors.PowerSyncBackendConnector
 import com.powersync.integrations.sqldelight.PowerSyncDriver
 import org.koin.dsl.module
 
-val kmpDataModule = module {
+val dataModule = module {
     includes(networkModule, preferencesModule, powersyncModule)
     single<SqlDriver> {
         PowerSyncDriver(

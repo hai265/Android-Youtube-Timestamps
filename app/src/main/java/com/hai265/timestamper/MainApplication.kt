@@ -7,7 +7,7 @@ import coil3.SingletonImageLoader
 import coil3.memory.MemoryCache
 import coil3.request.crossfade
 import com.hai265.timestamper.bindings.appModule
-import com.hai265.timestamper.data.database.dataModule
+import com.hai265.timestamper.data.dataModule
 import com.hai265.timestamper.data.repos.AuthRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
