@@ -25,3 +25,4 @@ dependencyResolutionManagement {
 rootProject.name = "Android Youtube Timestamps"
 include(":app")
 include(":core:data")
+include(":core:domain")
