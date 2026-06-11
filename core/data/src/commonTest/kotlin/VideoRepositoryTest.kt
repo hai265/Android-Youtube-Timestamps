@@ -57,7 +57,7 @@ class VideoRepositoryTest {
     fun setup() = runBlocking {
         youtubeMetaApi = FakeYoutubeMetadataApiService()
         //TODO: Use BundledSqliteDriver https://developer.android.com/kotlin/multiplatform/sqlite#migrate
-        driver = createSqlDriver()
+        driver = NativeSqliteDriver(AppSqlDatabase.Schema, null)
         AppSqlDatabase.Companion.Schema.create(driver).await()
         db = AppSqlDatabase.Companion(
             driver = driver,

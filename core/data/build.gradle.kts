@@ -99,6 +99,7 @@ kotlin {
                 implementation(libs.kotlin.test)
                 implementation(libs.kotlinx.coroutines.test)
                 implementation(libs.sqllite.driver)
+                implementation(libs.sqldelight.nativedriver)
             }
         }
 
