@@ -97,6 +97,8 @@ kotlin {
         commonTest {
             dependencies {
                 implementation(libs.kotlin.test)
+                implementation(libs.kotlinx.coroutines.test)
+                implementation(libs.sqllite.driver)
             }
         }
 
@@ -109,6 +111,12 @@ kotlin {
                 implementation(libs.ktor.client.okhttp)
                 implementation(libs.koin.android)
 
+            }
+        }
+
+        getByName("androidHostTest") {
+            dependencies {
+                implementation(libs.sqllite.driver)
             }
         }
 
