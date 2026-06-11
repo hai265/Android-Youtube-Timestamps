@@ -1,5 +1,4 @@
-package com.hai265.timestamper.data
-
+import com.hai265.timestamper.data.getYouTubeIdFromUrl
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNull
