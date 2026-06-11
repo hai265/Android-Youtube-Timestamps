@@ -1,9 +1,10 @@
-package com.hai265.timestamper.data.prefs
+package prefs
 
 import androidx.datastore.core.DataStore
 import androidx.datastore.core.okio.OkioStorage
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.PreferencesSerializer
+import com.hai265.timestamper.data.prefs.dataStoreFileName
 import kotlinx.cinterop.ExperimentalForeignApi
 import okio.FileSystem
 import okio.Path.Companion.toPath

@@ -11,6 +11,7 @@ import com.hai265.timestamper.data.database.VideoDao
 import com.hai265.timestamper.data.database.durationAdapter
 import com.hai265.timestamper.data.database.instantAdapter
 import com.hai265.timestamper.data.database.powersync.SupabaseConnector
+import com.hai265.timestamper.data.database.powersync.powersyncModule
 import com.hai265.timestamper.data.database.uuidAdapter
 import com.hai265.timestamper.data.network.networkModule
 import com.hai265.timestamper.data.prefs.preferencesModule
@@ -18,11 +19,12 @@ import com.hai265.timestamper.data.repos.AuthRepository
 import com.hai265.timestamper.data.repos.PreferencesRepository
 import com.hai265.timestamper.data.repos.TimestampRepository
 import com.hai265.timestamper.data.repos.VideoRepository
+import com.powersync.connectors.PowerSyncBackendConnector
 import com.powersync.integrations.sqldelight.PowerSyncDriver
 import org.koin.dsl.module
 
 val kmpDataModule = module {
-    includes(networkModule, preferencesModule)
+    includes(networkModule, preferencesModule, powersyncModule)
     single<SqlDriver> {
         PowerSyncDriver(
             db = get(),
@@ -75,4 +77,5 @@ val kmpDataModule = module {
             storageBucket = BuildConfig.SUPABASE_STORAGE_BUCKET
         )
     }
+    single<PowerSyncBackendConnector> { get<SupabaseConnector>() }
 }
