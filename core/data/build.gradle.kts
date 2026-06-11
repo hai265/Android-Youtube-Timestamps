@@ -1,9 +1,16 @@
+import java.util.Properties
+
+val localProps = Properties().apply {
+    load(rootProject.file("local.properties").inputStream())
+}
+
 plugins {
     alias(libs.plugins.kotlin.multiplatform)
     alias(libs.plugins.android.kotlin.multiplatform.library)
     alias(libs.plugins.android.lint)
     alias(libs.plugins.sqldelight)
     alias(libs.plugins.kotlin.serialization)
+    alias(libs.plugins.gmazoo.buildconfig)
 }
 
 kotlin {
@@ -139,4 +146,27 @@ sqldelight {
             dialect("app.cash.sqldelight:sqlite-3-38-dialect:2.0.2")
         }
     }
+}
+
+buildConfig {
+    buildConfigField(
+        "String", "POWERSYNC_TOKEN",
+        "\"${localProps["powersync.dev.token"]}\""
+    )
+    buildConfigField(
+        "String", "POWERSYNC_ENDPOINT",
+        "\"${localProps["powersync.endpoint"]}\""
+    )
+    buildConfigField(
+        "String", "SUPABASE_ENDPOINT",
+        "\"${localProps["supabase.endpoint"]}\""
+    )
+    buildConfigField(
+        "String", "SUPABASE_KEY",
+        "\"${localProps["supabase.key"]}\""
+    )
+    buildConfigField(
+        "String", "SUPABASE_STORAGE_BUCKET",
+        "\"${localProps["supabase.storage.bucket"]}\""
+    )
 }

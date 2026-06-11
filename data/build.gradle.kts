@@ -41,26 +41,6 @@ android {
         debug {
             enableUnitTestCoverage = true
             enableAndroidTestCoverage = true
-            buildConfigField(
-                "String", "POWERSYNC_TOKEN",
-                "\"${localProps["powersync.dev.token"]}\""
-            )
-            buildConfigField(
-                "String", "POWERSYNC_ENDPOINT",
-                "\"${localProps["powersync.endpoint"]}\""
-            )
-            buildConfigField(
-                "String", "SUPABASE_ENDPOINT",
-                "\"${localProps["supabase.endpoint"]}\""
-            )
-            buildConfigField(
-                "String", "SUPABASE_KEY",
-                "\"${localProps["supabase.key"]}\""
-            )
-            buildConfigField(
-                "String", "SUPABASE_STORAGE_BUCKET",
-                "\"${localProps["supabase.storage.bucket"]}\""
-            )
         }
     }
 
