@@ -27,7 +27,7 @@ val appModule = module {
         AuthViewModel(get())
     }
     viewModel {
-        VideoListScreenViewModel(get(), get(), get(), get(), get())
+        VideoListScreenViewModel(get(), get(), get(), get(), get(), get())
     }
     viewModel {
         TimestampViewerViewModel(get(), get(), get(), get())

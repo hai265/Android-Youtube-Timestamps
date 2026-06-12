@@ -64,6 +64,8 @@ kotlin {
         commonMain {
             dependencies {
                 implementation(libs.kotlin.stdlib)
+                implementation(libs.kotlinx.io.core)
+                implementation(libs.jetbrains.kotlinx.serialization.json)
                 implementation(project(":core:data"))
             }
         }

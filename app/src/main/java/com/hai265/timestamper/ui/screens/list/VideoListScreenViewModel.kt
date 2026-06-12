@@ -1,5 +1,6 @@
 package com.hai265.timestamper.ui.screens.list
 
+import android.content.ContentResolver
 import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -16,6 +17,8 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import kotlinx.io.asSink
+import kotlinx.io.buffered
 import kotlin.uuid.Uuid
 
 private const val TAG = "VideoListScreenViewModel"
@@ -31,7 +34,9 @@ class VideoListScreenViewModel(
     private val timestampRepo: TimestampRepository,
     private val authRepository: AuthRepository,
     private val importTimestampsFromFileUseCase: ImportTimestampsFromFileUseCase,
-    private val exportTimestampsToFileUseCase: ExportTimestampsToFileUseCase
+    private val exportTimestampsToFileUseCase: ExportTimestampsToFileUseCase,
+    //TODO: Replace contentResolver with expect
+    private val contentResolver: ContentResolver
 ) : ViewModel() {
     val state =
         combine(repo.getVideos(), authRepository.userId)
@@ -61,7 +66,9 @@ class VideoListScreenViewModel(
 
     fun exportVideo(uri: Uri) {
         viewModelScope.launch {
-            exportTimestampsToFileUseCase.invoke(uri)
+            contentResolver.openOutputStream(uri)?.asSink()?.let {
+                exportTimestampsToFileUseCase.invoke(it.buffered())
+            }
         }
         return
     }
