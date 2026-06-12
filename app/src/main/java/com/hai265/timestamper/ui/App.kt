@@ -23,7 +23,6 @@ import com.hai265.timestamper.ui.screens.editor.TimestampViewerScreen
 import com.hai265.timestamper.ui.screens.list.VideoListScreen
 import com.hai265.timestamper.ui.screens.signin.LogInScreen
 import com.hai265.timestamper.ui.screens.signin.SignUpScreen
-import com.hai265.timestamper.ui.screens.test.TestComposable
 import kotlinx.serialization.Serializable
 
 sealed interface Navigables {
@@ -38,9 +37,6 @@ sealed interface Navigables {
 
     @Serializable
     object LogInScreen : Navigables
-
-    @Serializable
-    object TestScreen : Navigables
 }
 
 
@@ -104,9 +100,6 @@ private fun NavGraph(
             LogInScreen(
                 onClickSignUp = { navController.navigateSingleTopTo(Navigables.SignUpScreen) },
                 onLogInSuccess = { navController.navigateSingleTopTo(Navigables.ListScreen) })
-        }
-        composable<Navigables.TestScreen> {
-            TestComposable()
         }
     }
 }

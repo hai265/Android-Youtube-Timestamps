@@ -2,12 +2,10 @@ package com.hai265.timestamper.bindings
 
 import android.content.ContentResolver
 import com.hai265.timestamper.data.dataModule
-import com.hai265.timestamper.domain.TestUseCase
 import com.hai265.timestamper.domain.domainModule
 import com.hai265.timestamper.ui.screens.editor.TimestampViewerViewModel
 import com.hai265.timestamper.ui.screens.list.VideoListScreenViewModel
 import com.hai265.timestamper.ui.screens.signin.AuthViewModel
-import com.hai265.timestamper.ui.screens.test.TestViewModel
 import com.hai265.timestamper.ui.screens.timestampeditor.TimestampDialogActivityViewModel
 import com.hai265.timestamper.ui.screens.timestampeditor.TimestampEditorViewModel
 import kotlinx.coroutines.CoroutineScope
@@ -26,9 +24,6 @@ val appModule = module {
         CoroutineScope(SupervisorJob())
     }
     viewModel {
-        TestViewModel(get(), get(), get(), get(), get())
-    }
-    viewModel {
         AuthViewModel(get())
     }
     viewModel {
@@ -42,8 +37,5 @@ val appModule = module {
     }
     viewModel {
         TimestampDialogActivityViewModel(get())
-    }
-    factory {
-        TestUseCase(videoRepository = get())
     }
 }
