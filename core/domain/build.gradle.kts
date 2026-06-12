@@ -64,7 +64,7 @@ kotlin {
         commonMain {
             dependencies {
                 implementation(libs.kotlin.stdlib)
-                // Add KMP dependencies here
+                implementation(project(":core:data"))
             }
         }
 
@@ -101,4 +101,7 @@ kotlin {
         }
     }
 
+    compilerOptions {
+        freeCompilerArgs.add("-opt-in=kotlin.uuid.ExperimentalUuidApi")
+    }
 }
