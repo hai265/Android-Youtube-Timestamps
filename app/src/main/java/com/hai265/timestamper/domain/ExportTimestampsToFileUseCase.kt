@@ -4,19 +4,16 @@ import android.content.ContentResolver
 import android.net.Uri
 import com.hai265.timestamper.data.repos.VideoRepository
 import kotlinx.serialization.json.Json
-import org.koin.java.KoinJavaComponent.inject
 
 class ExportTimestampsToFileUseCase(
+    private val videoRepository: VideoRepository,
+    private val contentResolver: ContentResolver
 ) {
-    //TODO: move to constructor
-    private val videoRepository: VideoRepository by inject(VideoRepository::class.java)
-    private val contentResolver: ContentResolver by inject(ContentResolver::class.java)
 
     suspend operator fun invoke(uri: Uri): String {
-        //TODO: KOIN TESTING
-//        contentResolver.openOutputStream(uri)?.use { writer ->
-//            writer.write(getVideosAndTimestampsAsJsonString().toByteArray())
-//        }
+        contentResolver.openOutputStream(uri)?.use { writer ->
+            writer.write(getVideosAndTimestampsAsJsonString().toByteArray())
+        }
         return getVideosAndTimestampsAsJsonString()
     }
 
