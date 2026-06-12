@@ -22,7 +22,10 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "Android Youtube Timestamps"
+rootProject.name = "Android-Youtube-Timestamps"
 include(":app")
 include(":core:data")
 include(":core:domain")
+include(":sharedUi")
+
+enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")

@@ -102,6 +102,7 @@ dependencies {
     implementation(libs.koin.annotations)
     implementation(project(":core:data"))
     implementation(project(":core:domain"))
+    implementation(projects.sharedUi)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(platform(libs.androidx.compose.bom))
