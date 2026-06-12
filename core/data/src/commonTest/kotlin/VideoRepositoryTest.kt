@@ -44,7 +44,6 @@ val videoWithTimestamps = listOf(
     )
 )
 
-expect fun createSqlDriver(): SqlDriver
 class VideoRepositoryTest {
     private lateinit var youtubeMetaApi: FakeYoutubeMetadataApiService
     private lateinit var driver: SqlDriver
