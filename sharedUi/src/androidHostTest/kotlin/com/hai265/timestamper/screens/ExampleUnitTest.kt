@@ -1,4 +1,4 @@
-package com.hai265.timestamper.sharedui
+package com.hai265.timestamper.screens
 
 import kotlin.test.Test
 import kotlin.test.assertEquals
