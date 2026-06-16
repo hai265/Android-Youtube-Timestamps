@@ -19,10 +19,10 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.hai265.timestamper.screens.signin.LogInScreen
+import com.hai265.timestamper.screens.signin.SignUpScreen
 import com.hai265.timestamper.ui.screens.editor.TimestampViewerScreen
 import com.hai265.timestamper.ui.screens.list.VideoListScreen
-import com.hai265.timestamper.ui.screens.signin.LogInScreen
-import com.hai265.timestamper.ui.screens.signin.SignUpScreen
 import kotlinx.serialization.Serializable
 
 sealed interface Navigables {

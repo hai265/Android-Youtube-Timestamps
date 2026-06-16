@@ -100,9 +100,10 @@ dependencies {
     implementation(libs.koin.compose.viewmodel)
     implementation(libs.koin.compose.navigation3)
     implementation(libs.koin.annotations)
-    implementation(project(":core:data"))
-    implementation(project(":core:domain"))
+    implementation(projects.core.data)
+    implementation(projects.core.domain)
     implementation(projects.sharedUi)
+
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(platform(libs.androidx.compose.bom))

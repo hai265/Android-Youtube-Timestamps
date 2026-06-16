@@ -35,7 +35,7 @@ import org.koin.compose.viewmodel.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-internal fun LogInScreen(
+fun LogInScreen(
     onClickSignUp: () -> Unit,
     onLogInSuccess: () -> Unit,
 ) {
