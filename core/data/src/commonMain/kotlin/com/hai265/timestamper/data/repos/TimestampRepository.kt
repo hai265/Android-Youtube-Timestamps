@@ -18,7 +18,7 @@ class TimestampRepository(
 
     suspend fun addOrUpdateTimestamp(timestamp: Timestamp): Uuid {
         return withContext(Dispatchers.IO) {
-            Logger.d(tag = "TimestampRepository") { "addOrUpdateTimestamp: " }
+            Logger.d(tag = "TimestampRepository") { "addOrUpdateTimestamp: ${timestamp.description}" }
             //Room's upsert returns =-1 if existing timestamp is updated, returns id otherwise
             val timestampId = timestampDao.upsertTimestamp(timestamp)
             timestampId

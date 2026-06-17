@@ -70,6 +70,8 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import com.hai265.timestamper.R
 import com.hai265.timestamper.data.database.Timestamp
+import com.hai265.timestamper.screens.editor.Preferences
+import com.hai265.timestamper.screens.editor.TimestampViewerViewModel
 import com.hai265.timestamper.screens.timestampeditor.TimestampEditorSheet
 import com.hai265.timestamper.ui.fakes.fakeTimestamp1
 import com.hai265.timestamper.ui.fakes.fakeTimestampList

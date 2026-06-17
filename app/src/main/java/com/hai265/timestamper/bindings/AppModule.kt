@@ -3,9 +3,9 @@ package com.hai265.timestamper.bindings
 import android.content.ContentResolver
 import com.hai265.timestamper.data.dataModule
 import com.hai265.timestamper.domain.domainModule
+import com.hai265.timestamper.screens.editor.TimestampViewerViewModel
 import com.hai265.timestamper.screens.signin.AuthViewModel
 import com.hai265.timestamper.screens.timestampeditor.TimestampEditorViewModel
-import com.hai265.timestamper.ui.screens.editor.TimestampViewerViewModel
 import com.hai265.timestamper.ui.screens.list.VideoListScreenViewModel
 import com.hai265.timestamper.ui.screens.timestampeditor.TimestampDialogActivityViewModel
 import kotlinx.coroutines.CoroutineScope
