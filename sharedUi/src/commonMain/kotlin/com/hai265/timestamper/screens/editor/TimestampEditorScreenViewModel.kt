@@ -1,4 +1,4 @@
-package com.hai265.timestamper.ui.screens.editor
+package com.hai265.timestamper.screens.editor
 
 import android.util.Log
 import androidx.lifecycle.SavedStateHandle
