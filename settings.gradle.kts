@@ -27,5 +27,6 @@ include(":app")
 include(":core:data")
 include(":core:domain")
 include(":sharedUi")
+include(":testModule")
 
 enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
