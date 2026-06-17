@@ -72,6 +72,7 @@ import com.hai265.timestamper.R
 import com.hai265.timestamper.data.database.Timestamp
 import com.hai265.timestamper.ui.fakes.fakeTimestamp1
 import com.hai265.timestamper.ui.fakes.fakeTimestampList
+import com.hai265.timestamper.ui.formatDurationToHHMMSS
 import com.hai265.timestamper.ui.screens.timestampeditor.TimestampEditorSheet
 import com.hai265.timestamper.ui.screens.youtubeplayer.ComposeYouTubePlayer
 import com.hai265.timestamper.ui.screens.youtubeplayer.YouTubePlayerController
@@ -441,15 +442,6 @@ fun keyboardAsState(): State<Boolean> {
     }
     return rememberUpdatedState(isImeVisible)
 }
-
-fun Duration.formatDurationToHHMMSS(): String =
-    this.toComponents { hours, minutes, seconds, _ ->
-        if (hours >= 1L) {
-            String.format(Locale.US, "%02d:%02d:%02d", hours, minutes, seconds)
-        } else {
-            String.format(Locale.US, "%02d:%02d", minutes, seconds)
-        }
-    }
 
 sealed interface BottomSheetState {
     object Hidden : BottomSheetState

@@ -11,7 +11,7 @@ import com.hai265.timestamper.data.repos.VideoRepository
 import com.hai265.timestamper.data.repos.VideoResult
 import com.hai265.timestamper.domain.ExportTimestampsToFileUseCase
 import com.hai265.timestamper.domain.ImportTimestampsFromFileUseCase
-import com.hai265.timestamper.ui.screens.editor.formatDurationToHHMMSS
+import com.hai265.timestamper.ui.formatDurationToHHMMSS
 import io.ktor.utils.io.streams.asInput
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine

@@ -1,5 +1,7 @@
-package com.hai265.timestamper.ui.screens.timestampeditor
+package com.hai265.timestamper.screens.timestampeditor
 
+import android_youtube_timestamps.sharedui.generated.resources.Res
+import android_youtube_timestamps.sharedui.generated.resources.check
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
@@ -7,8 +9,6 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.text.input.KeyboardActionHandler
 import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.foundation.text.input.rememberTextFieldState
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.Icon
@@ -33,9 +33,10 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.hai265.timestamper.data.database.Timestamp
-import com.hai265.timestamper.ui.formatDurationToHHMMSS
+import com.hai265.timestamper.screens.formatDurationToHHMMSS
 import kotlinx.coroutines.DisposableHandle
 import kotlinx.coroutines.launch
+import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.viewmodel.koinViewModel
 import kotlin.uuid.Uuid
 
@@ -128,7 +129,7 @@ private fun TimestampEditorSheetContent(
                 }, modifier = Modifier
                     .padding(start = 16.dp)
             ) {
-                Icon(Icons.Filled.Check, "Save")
+                Icon(painterResource(Res.drawable.check), "Save")
             }
         }
     }
