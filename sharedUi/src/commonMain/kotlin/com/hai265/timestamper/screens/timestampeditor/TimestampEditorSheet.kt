@@ -139,14 +139,14 @@ private fun TimestampEditorSheetContent(
 
 @Preview
 @Composable
-fun TimestampEditorSheetContentPreview() {
-        TimestampEditorSheetContent(
-            timestamp = fakeTimestamp1,
-            textFieldState = TextFieldState(),
-            focusRequester = FocusRequester(),
-            onSave = {},
-            hideSheet = {
-                DisposableHandle { }
-            }
-        )
+fun TestTimestampEditorSheetContentPreview() {
+    TimestampEditorSheetContent(
+        timestamp = fakeTimestamp1,
+        textFieldState = TextFieldState(),
+        focusRequester = FocusRequester(),
+        onSave = {},
+        hideSheet = {
+            DisposableHandle { }
+        }
+    )
 }

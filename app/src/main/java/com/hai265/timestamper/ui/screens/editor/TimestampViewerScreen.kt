@@ -70,16 +70,15 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import com.hai265.timestamper.R
 import com.hai265.timestamper.data.database.Timestamp
+import com.hai265.timestamper.screens.timestampeditor.TimestampEditorSheet
 import com.hai265.timestamper.ui.fakes.fakeTimestamp1
 import com.hai265.timestamper.ui.fakes.fakeTimestampList
 import com.hai265.timestamper.ui.formatDurationToHHMMSS
-import com.hai265.timestamper.ui.screens.timestampeditor.TimestampEditorSheet
 import com.hai265.timestamper.ui.screens.youtubeplayer.ComposeYouTubePlayer
 import com.hai265.timestamper.ui.screens.youtubeplayer.YouTubePlayerController
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.koin.compose.viewmodel.koinViewModel
-import java.util.Locale
 import kotlin.time.Duration
 import kotlin.uuid.Uuid
 
