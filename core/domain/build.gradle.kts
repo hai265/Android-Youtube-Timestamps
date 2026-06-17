@@ -12,9 +12,7 @@ kotlin {
     android {
         namespace = "com.hai265.timestamper.domain"
         compileSdk {
-            version = release(36) {
-                minorApiLevel = 1
-            }
+            version = release(37)
         }
         minSdk = 24
 

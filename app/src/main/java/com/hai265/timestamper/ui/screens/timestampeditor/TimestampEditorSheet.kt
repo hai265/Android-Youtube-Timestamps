@@ -31,8 +31,10 @@ import androidx.compose.ui.layout.onVisibilityChanged
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.hai265.timestamper.data.database.Timestamp
+import com.hai265.timestamper.screens.fakeTimestamp1
 import com.hai265.timestamper.ui.formatDurationToHHMMSS
 import kotlinx.coroutines.DisposableHandle
 import kotlinx.coroutines.launch
@@ -132,4 +134,18 @@ private fun TimestampEditorSheetContent(
             }
         }
     }
+}
+
+@Preview
+@Composable
+fun TimestampEditorSheetContentPreview() {
+    TimestampEditorSheetContent(
+        timestamp = fakeTimestamp1,
+        textFieldState = TextFieldState(),
+        focusRequester = FocusRequester(),
+        onSave = {},
+        hideSheet = {
+            DisposableHandle { }
+        }
+    )
 }

@@ -14,9 +14,7 @@ kotlin {
     android {
         namespace = "com.hai265.timestamper.screens"
         compileSdk {
-            version = release(36) {
-                minorApiLevel = 1
-            }
+            version = release(37)
         }
         minSdk = 24
 
@@ -28,6 +26,7 @@ kotlin {
         }.configure {
             instrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         }
+        androidResources.enable = true
     }
 
     // For iOS targets, this is also where you should
@@ -89,6 +88,7 @@ kotlin {
                 // Add Android-specific dependencies here. Note that this source set depends on
                 // commonMain by default and will correctly pull the Android artifacts of any KMP
                 // dependencies declared in commonMain.
+                implementation(libs.androidx.ui.tooling.preview)
             }
         }
 
