@@ -50,7 +50,6 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
-import androidx.window.core.layout.WindowSizeClass
 import com.hai265.timestamper.data.database.Timestamp
 import com.hai265.timestamper.screens.fakeTimestamp1
 import com.hai265.timestamper.screens.fakeTimestampList
@@ -81,7 +80,7 @@ TODO:
 */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TimestampViewerScreen(windowSize: WindowSizeClass) {
+fun TimestampViewerScreen() {
     val viewmodel: TimestampViewerViewModel = koinViewModel()
     val state by viewmodel.state.collectAsState()
     val preferences by viewmodel.preferences.collectAsState()
