@@ -1,6 +1,10 @@
 package com.hai265.timestamper.screens.editor
 
 
+import android_youtube_timestamps.sharedui.generated.resources.Res
+import android_youtube_timestamps.sharedui.generated.resources.add
+import android_youtube_timestamps.sharedui.generated.resources.close
+import android_youtube_timestamps.sharedui.generated.resources.settings
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.tween
@@ -27,6 +31,7 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FabPosition
 import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Switch
@@ -59,6 +64,7 @@ import com.hai265.timestamper.screens.youtubeplayer.ComposeYouTubePlayer
 import com.hai265.timestamper.screens.youtubeplayer.YouTubePlayerController
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
 import kotlin.time.Duration
@@ -66,7 +72,6 @@ import kotlin.uuid.Uuid
 
 /*
 COMPOSE MULTIPLATFORM TODO:
-     - Icons
      - Change layout based on window size
  */
 
@@ -140,8 +145,7 @@ fun TimestampViewerScreen() {
 
                 }
             }) {
-                //TODO:Icon
-//                Icon(Icons.Filled.Add, "Add")
+                Icon(painterResource(Res.drawable.add), "Add")
             }
         },
         floatingActionButtonPosition = FabPosition.End,
@@ -292,10 +296,10 @@ fun TimestampList(
                 ) {
                     Text("Editor Settings")
                     Spacer(modifier.size(4.dp))
-//                    Icon(
-//                        painter = painterResource(R.drawable.settings),
-//                        contentDescription = "Preferences",
-//                    )
+                    Icon(
+                        painter = painterResource(Res.drawable.settings),
+                        contentDescription = "Preferences",
+                    )
                 }
             }
         }
@@ -358,11 +362,11 @@ fun TimestampItem(
                 .clickable(onClick = onTimestampDescriptionUpdate)
         )
         //TODO:Icon
-//        Icon(
-//            painter = painterResource(R.drawable.close),
-//            contentDescription = "Delete Timestamp",
-//            modifier = Modifier.clickable(onClick = onClickDelete)
-//        )
+        Icon(
+            painter = painterResource(Res.drawable.close),
+            contentDescription = "Delete Timestamp",
+            modifier = Modifier.clickable(onClick = onClickDelete)
+        )
     }
 }
 
