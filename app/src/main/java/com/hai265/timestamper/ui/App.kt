@@ -19,26 +19,22 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.hai265.timestamper.screens.InsetsController
 import com.hai265.timestamper.screens.Navigables
+import com.hai265.timestamper.screens.OrientationController
 import com.hai265.timestamper.screens.signin.LogInScreen
 import com.hai265.timestamper.screens.signin.SignUpScreen
 import com.hai265.timestamper.ui.screens.list.VideoListScreen
 
-@Composable
-fun App(
-    windowSize: WindowWidthSizeClass,
-    navController: NavHostController = rememberNavController()
-) {
-    NavGraph(navController, windowSize)
-}
-
 //TODO: Introduct multiple back stacks for the character list and support list
 // reason: want to go  back to list page if I tap on the tab again
 @Composable
-private fun NavGraph(
-    navController: NavHostController,
+fun App(
     windowSize: WindowWidthSizeClass,
+    insetsController: InsetsController,
+    orientationController: OrientationController,
 ) {
+    val navController = rememberNavController()
     NavHost(
         navController = navController,
         startDestination = Navigables.ListScreen,
@@ -71,7 +67,10 @@ private fun NavGraph(
         composable<Navigables.VideoScreen> {
             //TODO: Replace with CMP version when finished
 //            TimestampViewerScreen(windowSize = windowSize)
-            com.hai265.timestamper.screens.editor.TimestampViewerScreen()
+            com.hai265.timestamper.screens.editor.TimestampViewerScreen(
+                insetsController = insetsController,
+                orientationController = orientationController
+            )
         }
         composable<Navigables.SignUpScreen> {
             SignUpScreen(

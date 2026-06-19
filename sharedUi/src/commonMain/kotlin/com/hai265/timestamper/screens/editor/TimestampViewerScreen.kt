@@ -90,7 +90,11 @@ TODO:
 */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TimestampViewerScreen(windowSizeClass: WindowSizeClass = currentWindowAdaptiveInfoV2().windowSizeClass) {
+fun TimestampViewerScreen(
+    windowSizeClass: WindowSizeClass = currentWindowAdaptiveInfoV2().windowSizeClass,
+    insetsController: InsetsController,
+    orientationController: OrientationController
+) {
     val viewmodel: TimestampViewerViewModel = koinViewModel()
     val state by viewmodel.state.collectAsState()
     val preferences by viewmodel.preferences.collectAsState()
@@ -101,8 +105,6 @@ fun TimestampViewerScreen(windowSizeClass: WindowSizeClass = currentWindowAdapti
 
     val video = state.video
     val controller = koinInject<YouTubePlayerController>()
-    val insetsController = koinInject<InsetsController>()
-    val orientationController = koinInject<OrientationController>()
     var newlyAddedTimestampId by rememberSaveable { mutableStateOf<Uuid?>(null) }
 
     val videoPlayer = remember(video) {
