@@ -38,6 +38,7 @@ import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.adaptive.currentWindowAdaptiveInfoV2
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -58,6 +59,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.window.core.layout.WindowSizeClass
 import com.hai265.timestamper.data.database.Timestamp
+import com.hai265.timestamper.screens.InsetsController
+import com.hai265.timestamper.screens.OrientationController
 import com.hai265.timestamper.screens.fakeTimestamp1
 import com.hai265.timestamper.screens.fakeTimestampList
 import com.hai265.timestamper.screens.formatDurationToHHMMSS
@@ -98,15 +101,10 @@ fun TimestampViewerScreen(windowSizeClass: WindowSizeClass = currentWindowAdapti
 
     val video = state.video
     val controller = koinInject<YouTubePlayerController>()
+    val insetsController = koinInject<InsetsController>()
+    val orientationController = koinInject<OrientationController>()
     var newlyAddedTimestampId by rememberSaveable { mutableStateOf<Uuid?>(null) }
 
-//    val configuration = LocalConfiguration.current
-//    val activity = LocalActivity.current
-//    val insetsController = remember {
-//        activity?.window?.let {
-//            WindowCompat.getInsetsController(it, it.decorView)
-//        }
-//    }
     val videoPlayer = remember(video) {
         movableContentOf {
             video?.let {
@@ -116,10 +114,12 @@ fun TimestampViewerScreen(windowSizeClass: WindowSizeClass = currentWindowAdapti
                     controller = controller,
                     startingTime = video.lastPlayed,
                     onFullScreen = {
-//                        activity?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
+                        orientationController.landscape()
+                        insetsController.hideSystemBars()
                     },
                     onExitFullScreen = {
-//                        activity?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
+                        orientationController.portrait()
+                        insetsController.showSystemBars()
                     },
                 )
             }
@@ -165,8 +165,8 @@ fun TimestampViewerScreen(windowSizeClass: WindowSizeClass = currentWindowAdapti
                 onCLickSettings = { showSettingsDialog = true }
             )
         }
-//        if (windowSize == WindowWidthSizeClass.Medium || windowSize == WindowWidthSizeClass.Expanded) {
         if (windowSizeClass.isWidthAtLeastBreakpoint(WindowSizeClass.WIDTH_DP_MEDIUM_LOWER_BOUND)) {
+            insetsController.hideSystemBars()
             val layoutDirection = LocalLayoutDirection.current
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Row(
@@ -197,6 +197,7 @@ fun TimestampViewerScreen(windowSizeClass: WindowSizeClass = currentWindowAdapti
                 ) { timestampsList(true) }
             }
         } else {
+            insetsController.showSystemBars()
             Column(
                 modifier = Modifier
                     .padding(bottom = innerPadding.calculateBottomPadding())
@@ -241,24 +242,11 @@ fun TimestampViewerScreen(windowSizeClass: WindowSizeClass = currentWindowAdapti
         }
     }
 
-    //TODO:Window
-//    when (configuration.orientation) {
-//        Configuration.ORIENTATION_LANDSCAPE -> {
-//            insetsController?.systemBarsBehavior =
-//                WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
-//            insetsController?.hide(WindowInsetsCompat.Type.systemBars())
-//        }
-//
-//        else -> {
-//            insetsController?.show(WindowInsetsCompat.Type.systemBars())
-//            insetsController?.isAppearanceLightStatusBars = false
-//        }
-//    }
-//    DisposableEffect(Unit) {
-//        onDispose {
-//            insetsController?.isAppearanceLightStatusBars = true
-//        }
-//    }
+    DisposableEffect(Unit) {
+        onDispose {
+            insetsController.showSystemBars()
+        }
+    }
 }
 
 
