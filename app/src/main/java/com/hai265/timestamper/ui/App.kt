@@ -22,6 +22,7 @@ import androidx.navigation.compose.rememberNavController
 import com.hai265.timestamper.screens.InsetsController
 import com.hai265.timestamper.screens.Navigables
 import com.hai265.timestamper.screens.OrientationController
+import com.hai265.timestamper.screens.editor.TimestampViewerScreen
 import com.hai265.timestamper.screens.signin.LogInScreen
 import com.hai265.timestamper.screens.signin.SignUpScreen
 import com.hai265.timestamper.ui.screens.list.VideoListScreen
@@ -65,9 +66,7 @@ fun App(
             )
         }
         composable<Navigables.VideoScreen> {
-            //TODO: Replace with CMP version when finished
-//            TimestampViewerScreen(windowSize = windowSize)
-            com.hai265.timestamper.screens.editor.TimestampViewerScreen(
+            TimestampViewerScreen(
                 insetsController = insetsController,
                 orientationController = orientationController
             )
