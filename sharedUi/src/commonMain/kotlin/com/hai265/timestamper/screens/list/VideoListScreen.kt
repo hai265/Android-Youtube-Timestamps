@@ -2,6 +2,8 @@ package com.hai265.timestamper.screens.list
 
 import android_youtube_timestamps.sharedui.generated.resources.Res
 import android_youtube_timestamps.sharedui.generated.resources.add
+import android_youtube_timestamps.sharedui.generated.resources.default_thumbnail
+import android_youtube_timestamps.sharedui.generated.resources.loading_thumbnail
 import android_youtube_timestamps.sharedui.generated.resources.menu
 import android_youtube_timestamps.sharedui.generated.resources.more_vert
 import androidx.compose.foundation.clickable
@@ -10,6 +12,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -58,6 +61,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.window.core.layout.WindowSizeClass
 import coil3.Uri
+import coil3.compose.AsyncImage
 import com.hai265.timestamper.data.database.Video
 import com.hai265.timestamper.screens.fakeVideo1
 import com.hai265.timestamper.screens.fakeVideoList
@@ -314,18 +318,15 @@ private fun VideoItem(
 //    }
     Column(modifier = modifier.clickable(onClick = onTap)) {
         //TODO: Coil  https://coil-kt.github.io/coil/network/
-//        AsyncImage(
-//            model = ImageRequest.Builder(LocalContext.current)
-//                .data(video.thumbnail)
-//                .crossfade(true)
-//                .build(),
-//            contentDescription = null,
-//            placeholder = painterResource(R.drawable.loading_thumbnail),
-//            error = painterResource(R.drawable.default_thumbnail),
-//            modifier = Modifier
-//                .fillMaxSize()
-//                .aspectRatio(16f / 9f)
-//        )
+        AsyncImage(
+            model = video.thumbnail,
+            contentDescription = null,
+            placeholder = painterResource(Res.drawable.loading_thumbnail),
+            error = painterResource(Res.drawable.default_thumbnail),
+            modifier = Modifier
+                .fillMaxSize()
+                .aspectRatio(16f / 9f)
+        )
         Row(
             modifier = Modifier
                 .fillMaxWidth()

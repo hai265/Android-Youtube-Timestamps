@@ -77,7 +77,9 @@ kotlin {
                 implementation(libs.koin.compose)
                 implementation(libs.koin.compose.viewmodel)
                 implementation(libs.postgrest.kt)
+                implementation(project.dependencies.platform(libs.ktor.bom))
                 implementation(libs.coil3.compose)
+                implementation(libs.coil.network.ktor3)
             }
         }
 
@@ -94,6 +96,7 @@ kotlin {
                 // dependencies declared in commonMain.
                 implementation(libs.androidx.ui.tooling.preview)
                 implementation(libs.androidyoutubeplayer)
+                implementation(libs.ktor.client.okhttp)
             }
         }
 
@@ -112,6 +115,7 @@ kotlin {
                 // part of KMP’s default source set hierarchy. Note that this source set depends
                 // on common by default and will correctly pull the iOS artifacts of any
                 // KMP dependencies declared in commonMain.
+                implementation(libs.ktor.client.darwin)
             }
         }
     }

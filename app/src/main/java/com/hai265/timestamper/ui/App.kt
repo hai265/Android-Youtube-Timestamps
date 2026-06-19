@@ -25,7 +25,6 @@ import com.hai265.timestamper.screens.OrientationController
 import com.hai265.timestamper.screens.editor.TimestampViewerScreen
 import com.hai265.timestamper.screens.signin.LogInScreen
 import com.hai265.timestamper.screens.signin.SignUpScreen
-import com.hai265.timestamper.ui.screens.list.VideoListScreen
 
 //TODO: Introduct multiple back stacks for the character list and support list
 // reason: want to go  back to list page if I tap on the tab again
@@ -53,18 +52,7 @@ fun App(
         }
     ) {
         composable<Navigables.ListScreen> {
-            VideoListScreen(
-                onTapVideo = { id ->
-                    navController.navigateSingleTopTo(
-                        Navigables.VideoScreen(
-                            id
-                        )
-                    )
-                },
-                onTapSignUp = { navController.navigateSingleTopTo(Navigables.SignUpScreen) },
-                windowSize = windowSize
-            )
-//            com.hai265.timestamper.screens.list.VideoListScreen(
+//            VideoListScreen(
 //                onTapVideo = { id ->
 //                    navController.navigateSingleTopTo(
 //                        Navigables.VideoScreen(
@@ -73,7 +61,18 @@ fun App(
 //                    )
 //                },
 //                onTapSignUp = { navController.navigateSingleTopTo(Navigables.SignUpScreen) },
+//                windowSize = windowSize
 //            )
+            com.hai265.timestamper.screens.list.VideoListScreen(
+                onTapVideo = { id ->
+                    navController.navigateSingleTopTo(
+                        Navigables.VideoScreen(
+                            id
+                        )
+                    )
+                },
+                onTapSignUp = { navController.navigateSingleTopTo(Navigables.SignUpScreen) },
+            )
         }
         composable<Navigables.VideoScreen> {
             TimestampViewerScreen(
