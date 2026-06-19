@@ -64,6 +64,16 @@ fun App(
                 onTapSignUp = { navController.navigateSingleTopTo(Navigables.SignUpScreen) },
                 windowSize = windowSize
             )
+//            com.hai265.timestamper.screens.list.VideoListScreen(
+//                onTapVideo = { id ->
+//                    navController.navigateSingleTopTo(
+//                        Navigables.VideoScreen(
+//                            id
+//                        )
+//                    )
+//                },
+//                onTapSignUp = { navController.navigateSingleTopTo(Navigables.SignUpScreen) },
+//            )
         }
         composable<Navigables.VideoScreen> {
             TimestampViewerScreen(

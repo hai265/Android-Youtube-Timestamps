@@ -77,6 +77,7 @@ kotlin {
                 implementation(libs.koin.compose)
                 implementation(libs.koin.compose.viewmodel)
                 implementation(libs.postgrest.kt)
+                implementation(libs.coil3.compose)
             }
         }
 

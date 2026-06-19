@@ -30,6 +30,15 @@ val appModule = module {
         VideoListScreenViewModel(get(), get(), get(), get(), get(), get())
     }
     viewModel {
+        com.hai265.timestamper.screens.list.VideoListScreenViewModel(
+            get(),
+            get(),
+            get(),
+            get(),
+            get(),
+        )
+    }
+    viewModel {
         TimestampViewerViewModel(get(), get(), get(), get())
     }
     viewModel {
