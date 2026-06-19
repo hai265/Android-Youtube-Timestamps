@@ -3,10 +3,13 @@ package com.hai265.timestamper.screens
 import kotlin.time.Duration
 
 fun Duration.formatDurationToHHMMSS(): String =
-    this.toComponents { hours, minutes, seconds, _ ->
+    toComponents { hours, minutes, seconds, _ ->
+        val mm = minutes.toString().padStart(2, '0')
+        val ss = seconds.toString().padStart(2, '0')
         if (hours >= 1L) {
-            "$hours:$minutes:$seconds"
+            val hh = hours.toString().padStart(2, '0')
+            "$hh:$mm:$ss"
         } else {
-            "$minutes:$seconds"
+            "$mm:$ss"
         }
     }

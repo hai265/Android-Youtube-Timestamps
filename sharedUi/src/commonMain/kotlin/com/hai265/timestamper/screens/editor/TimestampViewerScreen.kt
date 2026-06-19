@@ -75,11 +75,6 @@ import org.koin.compose.viewmodel.koinViewModel
 import kotlin.time.Duration
 import kotlin.uuid.Uuid
 
-/*
-COMPOSE MULTIPLATFORM TODO:
-     - Change layout based on window size
- */
-
 //https://www.figma.com/design/9GKdOD5q3yAT0mKgrcGmpf/Android-Youtube-Timestamp-Tool?node-id=1-6261&t=xjloAEfEmnkGJuPR-0
 
 /*
@@ -301,7 +296,7 @@ fun TimestampList(
                 onClickDelete = { onDelete(timestamp) },
                 onTimestampClick = onTimestampClick,
                 onTimestampDescriptionUpdate = { onDescriptionClick(timestamp) },
-                newlyAdded = timestamp.id == highlightedId, //TODO: debug edit timestamp not highlighting
+                newlyAdded = timestamp.id == highlightedId,
                 textSingleLine = textSingleLine
             )
         }
@@ -353,7 +348,6 @@ fun TimestampItem(
                 .weight(1f)
                 .clickable(onClick = onTimestampDescriptionUpdate)
         )
-        //TODO:Icon
         Icon(
             painter = painterResource(Res.drawable.close),
             contentDescription = "Delete Timestamp",
