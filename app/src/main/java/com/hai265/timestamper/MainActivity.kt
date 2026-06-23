@@ -14,7 +14,6 @@ import com.hai265.timestamper.screens.FileController
 import com.hai265.timestamper.screens.InsetsController
 import com.hai265.timestamper.screens.OrientationController
 import com.hai265.timestamper.screens.platformModule
-import com.hai265.timestamper.ui.theme.AppTheme
 import org.koin.android.scope.AndroidScopeComponent
 import org.koin.androidx.scope.activityScope
 import org.koin.core.context.loadKoinModules
@@ -34,24 +33,22 @@ class MainActivity : FragmentActivity(), AndroidScopeComponent {
 
 
         setContent {
-            AppTheme {
-                val customTheme = when {
-                    Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
-                        val context = LocalContext.current
-                        if (isSystemInDarkTheme()) dynamicDarkColorScheme(context) else dynamicLightColorScheme(
-                            context
-                        )
-                    }
-
-                    else -> null
+            val customTheme = when {
+                Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
+                    val context = LocalContext.current
+                    if (isSystemInDarkTheme()) dynamicDarkColorScheme(context) else dynamicLightColorScheme(
+                        context
+                    )
                 }
-                App(
-                    insetsController,
-                    orientationController,
-                    fileController,
-                    customTheme,
-                )
+
+                else -> null
             }
+            App(
+                insetsController,
+                orientationController,
+                fileController,
+                customTheme,
+            )
         }
     }
 }
