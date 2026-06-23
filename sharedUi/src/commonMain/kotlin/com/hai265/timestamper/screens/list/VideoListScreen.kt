@@ -72,7 +72,6 @@ import kotlinx.datetime.format.MonthNames
 import kotlinx.datetime.format.Padding
 import kotlinx.datetime.format.char
 import kotlinx.datetime.toLocalDateTime
-import kotlinx.io.Sink
 import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.viewmodel.koinViewModel
 import kotlin.time.Clock
@@ -115,32 +114,6 @@ fun VideoListScreen(
         }
     }
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
-    //TODO: Import / Export
-//    val exportLauncher = rememberLauncherForActivityResult(
-//        contract = ActivityResultContracts.CreateDocument("application/json")
-//    ) { uri ->
-//        uri?.let {
-//            viewmodel.exportVideo(uri)
-//            Toast.makeText(
-//                context,
-//                "Timestamps Successfully Exported",
-//                Toast.LENGTH_LONG
-//            ).show()
-//        }
-//    }
-//    val importLauncher = rememberLauncherForActivityResult(
-//        contract = ActivityResultContracts.OpenDocument()
-//    ) { uri ->
-//        uri?.let {
-//            viewmodel.importTimestamps(uri)
-//            //TODO: SUbscribe to mutable shared flow to launch toast
-//            Toast.makeText(
-//                context,
-//                "Timestamps Successfully Imported",
-//                Toast.LENGTH_LONG
-//            ).show()
-//        }
-//    }
     Scaffold(
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
@@ -155,18 +128,18 @@ fun VideoListScreen(
                 actions = {
                     MenuDropDown(
                         onTapExportVideo = {
-                            //TODO: Import / Export
                             coroutineScope.launch {
                                 val sink =
                                     fileController.createFile("timestamps-${Clock.System.now()}")
                                 viewmodel.exportVideo(sink)
+                                //TODO: Show toast when exported
                             }
                         },
                         onTapImportVideo = {
-                            //TODO: Import / Export
                             coroutineScope.launch {
                                 val source = fileController.openFilePicker()
                                 viewmodel.importTimestamps(source)
+                                //TODO: Show toast when exported
                             }
                         },
                         onTapSignUp = onTapSignUp,
@@ -191,11 +164,6 @@ fun VideoListScreen(
             videoList = state.videos,
             onTapVideo = onTapVideo,
             onDeleteVideo = { video -> videoToDeleteDialog = video },
-            onExportVideo = { video, sink ->
-                viewmodel.exportVideo(
-                    sink,
-                )
-            },
             onTapShareVideo = { video ->
                 coroutineScope.launch {
                     //TODO: Share Menu
@@ -258,7 +226,6 @@ private fun VideoListScreenContent(
     videoList: List<Video>,
     onTapVideo: (id: String) -> Unit,
     onDeleteVideo: (video: Video) -> Unit,
-    onExportVideo: (video: Video, sink: Sink) -> Unit,
     onTapShareVideo: (video: Video) -> Unit,
     listState: LazyGridState,
     gridNumCells: Int,
@@ -292,7 +259,6 @@ private fun VideoListScreenContent(
                     video = video,
                     onTap = { onTapVideo(video.youtubeId) },
                     onTapDeleteVideo = { onDeleteVideo(video) },
-                    onTapExportVideo = { sink -> onExportVideo(video, sink) },
                     onTapShareVideo = { onTapShareVideo(video) },
                     modifier = Modifier.fillMaxWidth()
                 )
@@ -306,25 +272,9 @@ private fun VideoItem(
     video: Video,
     onTap: () -> Unit,
     onTapDeleteVideo: () -> Unit,
-    onTapExportVideo: (Sink) -> Unit,
     onTapShareVideo: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-//    val context = LocalContext.current
-    //TODO: Import / Export
-//    val exportLauncher = rememberLauncherForActivityResult(
-//        contract = ActivityResultContracts.CreateDocument("application/json")
-//    ) { uri ->
-//        uri?.let {
-//            onTapExportVideo(uri)
-//            //TODO: Toast
-//            Toast.makeText(
-//                context,
-//                "Timestamps Successfully Exported",
-//                Toast.LENGTH_LONG
-//            ).show()
-//        }
-//    }
     Column(modifier = modifier.clickable(onClick = onTap)) {
         //TODO: Coil  https://coil-kt.github.io/coil/network/
         AsyncImage(
@@ -623,7 +573,6 @@ private fun VideoListPreviewContent() {
         onDeleteVideo = {},
         listState = LazyGridState(),
         gridNumCells = 1,
-        onExportVideo = { _, _ -> },
         paddingValues = PaddingValues.Zero,
         onTapShareVideo = {}
     )
@@ -636,7 +585,6 @@ private fun VideoItemPreview() {
         video = fakeVideo1,
         onTap = {},
         onTapDeleteVideo = {},
-        onTapExportVideo = {},
         onTapShareVideo = {})
 }
 

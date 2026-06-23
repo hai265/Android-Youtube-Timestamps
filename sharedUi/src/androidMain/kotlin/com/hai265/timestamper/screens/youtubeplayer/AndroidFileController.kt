@@ -21,9 +21,7 @@ class AndroidFileController(
     private var openContinuation: CancellableContinuation<Source>? = null
 
     // Register the Create Document picker (Allows renaming and choosing directory)
-    private val createFileLauncher = activity.activityResultRegistry.register(
-        "FileController_createFile",
-        activity,
+    private val createFileLauncher = activity.registerForActivityResult(
         ActivityResultContracts.CreateDocument("application/json")
     ) { uri ->
         val continuation = createContinuation
@@ -36,15 +34,11 @@ class AndroidFileController(
                 outputStream.asSink().buffered()
             ) { cause, _, _ -> continuation.resumeWithException(cause) }
 
-        } else {
-            continuation?.resumeWithException(IOException("File creation was cancelled by the user"))
         }
     }
 
     // Register the Open Document picker (Allows selecting an existing JSON file)
-    private val openFileLauncher = activity.activityResultRegistry.register(
-        "FileController_openFile",
-        activity,
+    private val openFileLauncher = activity.registerForActivityResult(
         ActivityResultContracts.OpenDocument()
     ) { uri ->
         val continuation = openContinuation
@@ -57,8 +51,6 @@ class AndroidFileController(
                 inputStream.asSource().buffered()
             ) { cause, _, _ -> continuation.resumeWithException(cause) }
 
-        } else {
-            continuation?.resumeWithException(IOException("File selection was cancelled by the user"))
         }
     }
 
