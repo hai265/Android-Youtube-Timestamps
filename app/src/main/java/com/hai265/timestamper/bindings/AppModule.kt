@@ -6,8 +6,8 @@ import com.hai265.timestamper.domain.domainModule
 import com.hai265.timestamper.screens.editor.TimestampViewerViewModel
 import com.hai265.timestamper.screens.list.VideoListScreenViewModel
 import com.hai265.timestamper.screens.signin.AuthViewModel
+import com.hai265.timestamper.screens.timestampeditor.TimestampDialogActivityViewModel
 import com.hai265.timestamper.screens.timestampeditor.TimestampEditorViewModel
-import com.hai265.timestamper.ui.screens.timestampeditor.TimestampDialogActivityViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
 import org.koin.android.ext.koin.androidContext

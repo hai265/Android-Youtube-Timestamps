@@ -1,4 +1,4 @@
-package com.hai265.timestamper.ui.screens.timestampeditor
+package com.hai265.timestamper.screens.timestampeditor
 
 import androidx.lifecycle.ViewModel
 import com.hai265.timestamper.data.getYoutubeTimestampFromUrl
