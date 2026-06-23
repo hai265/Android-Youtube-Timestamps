@@ -1,4 +1,4 @@
-package com.hai265.timestamper.ui
+package com.hai265.timestamper
 
 import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.AnimatedVisibility
@@ -10,7 +10,6 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
-import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -24,14 +23,12 @@ import com.hai265.timestamper.screens.InsetsController
 import com.hai265.timestamper.screens.Navigables
 import com.hai265.timestamper.screens.OrientationController
 import com.hai265.timestamper.screens.editor.TimestampViewerScreen
+import com.hai265.timestamper.screens.list.VideoListScreen
 import com.hai265.timestamper.screens.signin.LogInScreen
 import com.hai265.timestamper.screens.signin.SignUpScreen
 
-//TODO: Introduct multiple back stacks for the character list and support list
-// reason: want to go  back to list page if I tap on the tab again
 @Composable
 fun App(
-    windowSize: WindowWidthSizeClass,
     insetsController: InsetsController,
     orientationController: OrientationController,
     fileController: FileController,
@@ -65,7 +62,7 @@ fun App(
 //                onTapSignUp = { navController.navigateSingleTopTo(Navigables.SignUpScreen) },
 //                windowSize = windowSize
 //            )
-            com.hai265.timestamper.screens.list.VideoListScreen(
+            VideoListScreen(
                 onTapVideo = { id ->
                     navController.navigateSingleTopTo(
                         Navigables.VideoScreen(

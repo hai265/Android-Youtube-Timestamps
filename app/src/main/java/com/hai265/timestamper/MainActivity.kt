@@ -10,7 +10,6 @@ import com.hai265.timestamper.screens.FileController
 import com.hai265.timestamper.screens.InsetsController
 import com.hai265.timestamper.screens.OrientationController
 import com.hai265.timestamper.screens.platformModule
-import com.hai265.timestamper.ui.App
 import com.hai265.timestamper.ui.theme.AppTheme
 import org.koin.android.scope.AndroidScopeComponent
 import org.koin.androidx.scope.activityScope
@@ -34,7 +33,6 @@ class MainActivity : FragmentActivity(), AndroidScopeComponent {
             AppTheme {
                 val windowSize = calculateWindowSizeClass(this)
                 App(
-                    windowSize.widthSizeClass,
                     insetsController,
                     orientationController,
                     fileController
