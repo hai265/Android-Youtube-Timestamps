@@ -19,6 +19,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.hai265.timestamper.screens.FileController
 import com.hai265.timestamper.screens.InsetsController
 import com.hai265.timestamper.screens.Navigables
 import com.hai265.timestamper.screens.OrientationController
@@ -33,6 +34,7 @@ fun App(
     windowSize: WindowWidthSizeClass,
     insetsController: InsetsController,
     orientationController: OrientationController,
+    fileController: FileController,
 ) {
     val navController = rememberNavController()
     NavHost(
@@ -72,6 +74,7 @@ fun App(
                     )
                 },
                 onTapSignUp = { navController.navigateSingleTopTo(Navigables.SignUpScreen) },
+                fileController = fileController,
             )
         }
         composable<Navigables.VideoScreen> {

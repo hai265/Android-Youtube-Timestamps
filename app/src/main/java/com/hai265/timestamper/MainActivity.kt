@@ -6,6 +6,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
 import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
 import androidx.fragment.app.FragmentActivity
+import com.hai265.timestamper.screens.FileController
 import com.hai265.timestamper.screens.InsetsController
 import com.hai265.timestamper.screens.OrientationController
 import com.hai265.timestamper.screens.platformModule
@@ -22,17 +23,22 @@ class MainActivity : FragmentActivity(), AndroidScopeComponent {
     @OptIn(ExperimentalMaterial3WindowSizeClassApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
+        loadKoinModules(platformModule)
+        val fileController = scope.get<FileController>()
+        val insetsController = scope.get<InsetsController>()
+        val orientationController = scope.get<OrientationController>()
         enableEdgeToEdge()
 
-        loadKoinModules(platformModule)
 
         setContent {
             AppTheme {
                 val windowSize = calculateWindowSizeClass(this)
-                val insetsController = scope.get<InsetsController>()
-                val orientationController = scope.get<OrientationController>()
-                App(windowSize.widthSizeClass, insetsController, orientationController)
+                App(
+                    windowSize.widthSizeClass,
+                    insetsController,
+                    orientationController,
+                    fileController
+                )
             }
         }
     }

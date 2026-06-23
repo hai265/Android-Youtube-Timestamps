@@ -2,6 +2,7 @@ package com.hai265.timestamper.screens
 
 import android.app.Activity
 import androidx.core.view.WindowCompat
+import com.hai265.timestamper.screens.youtubeplayer.AndroidFileController
 import com.hai265.timestamper.screens.youtubeplayer.AndroidInsetsController
 import com.hai265.timestamper.screens.youtubeplayer.AndroidOrientationController
 import com.hai265.timestamper.screens.youtubeplayer.AndroidYoutubePlayerController
@@ -27,5 +28,6 @@ actual val platformModule = module {
             )
         }
         factory<OrientationController> { AndroidOrientationController(get()) }
+        factory<FileController> { AndroidFileController(get()) }
     }
 }

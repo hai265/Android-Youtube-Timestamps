@@ -60,9 +60,9 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.window.core.layout.WindowSizeClass
-import coil3.Uri
 import coil3.compose.AsyncImage
 import com.hai265.timestamper.data.database.Video
+import com.hai265.timestamper.screens.FileController
 import com.hai265.timestamper.screens.fakeVideo1
 import com.hai265.timestamper.screens.fakeVideoList
 import kotlinx.coroutines.launch
@@ -72,6 +72,7 @@ import kotlinx.datetime.format.MonthNames
 import kotlinx.datetime.format.Padding
 import kotlinx.datetime.format.char
 import kotlinx.datetime.toLocalDateTime
+import kotlinx.io.Sink
 import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.viewmodel.koinViewModel
 import kotlin.time.Clock
@@ -85,6 +86,7 @@ fun VideoListScreen(
     onTapVideo: (id: String) -> Unit,
     onTapSignUp: () -> Unit,
     windowSizeClass: WindowSizeClass = currentWindowAdaptiveInfoV2().windowSizeClass,
+    fileController: FileController
 ) {
     val viewmodel: VideoListScreenViewModel = koinViewModel()
     val state by viewmodel.state.collectAsState()
@@ -154,11 +156,18 @@ fun VideoListScreen(
                     MenuDropDown(
                         onTapExportVideo = {
                             //TODO: Import / Export
-//                            exportLauncher.launch("timestamps-${Clock.System.now()}")
+                            coroutineScope.launch {
+                                val sink =
+                                    fileController.createFile("timestamps-${Clock.System.now()}")
+                                viewmodel.exportVideo(sink)
+                            }
                         },
                         onTapImportVideo = {
                             //TODO: Import / Export
-//                            importLauncher.launch(arrayOf("*/*"))
+                            coroutineScope.launch {
+                                val source = fileController.openFilePicker()
+                                viewmodel.importTimestamps(source)
+                            }
                         },
                         onTapSignUp = onTapSignUp,
                         onTapSignOut = { signOutDialog = true },
@@ -182,9 +191,9 @@ fun VideoListScreen(
             videoList = state.videos,
             onTapVideo = onTapVideo,
             onDeleteVideo = { video -> videoToDeleteDialog = video },
-            onExportVideo = { video, uri ->
+            onExportVideo = { video, sink ->
                 viewmodel.exportVideo(
-                    uri,
+                    sink,
                 )
             },
             onTapShareVideo = { video ->
@@ -249,7 +258,7 @@ private fun VideoListScreenContent(
     videoList: List<Video>,
     onTapVideo: (id: String) -> Unit,
     onDeleteVideo: (video: Video) -> Unit,
-    onExportVideo: (video: Video, uri: Uri) -> Unit,
+    onExportVideo: (video: Video, sink: Sink) -> Unit,
     onTapShareVideo: (video: Video) -> Unit,
     listState: LazyGridState,
     gridNumCells: Int,
@@ -283,7 +292,7 @@ private fun VideoListScreenContent(
                     video = video,
                     onTap = { onTapVideo(video.youtubeId) },
                     onTapDeleteVideo = { onDeleteVideo(video) },
-                    onTapExportVideo = { uri -> onExportVideo(video, uri) },
+                    onTapExportVideo = { sink -> onExportVideo(video, sink) },
                     onTapShareVideo = { onTapShareVideo(video) },
                     modifier = Modifier.fillMaxWidth()
                 )
@@ -297,7 +306,7 @@ private fun VideoItem(
     video: Video,
     onTap: () -> Unit,
     onTapDeleteVideo: () -> Unit,
-    onTapExportVideo: (Uri) -> Unit,
+    onTapExportVideo: (Sink) -> Unit,
     onTapShareVideo: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
