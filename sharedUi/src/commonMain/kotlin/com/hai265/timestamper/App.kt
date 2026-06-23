@@ -10,6 +10,7 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
+import androidx.compose.material3.ColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -26,9 +27,22 @@ import com.hai265.timestamper.screens.editor.TimestampViewerScreen
 import com.hai265.timestamper.screens.list.VideoListScreen
 import com.hai265.timestamper.screens.signin.LogInScreen
 import com.hai265.timestamper.screens.signin.SignUpScreen
+import com.hai265.timestamper.theme.AppTheme
 
 @Composable
 fun App(
+    insetsController: InsetsController,
+    orientationController: OrientationController,
+    fileController: FileController,
+    customTheme: ColorScheme?
+) {
+    AppTheme(customColor = customTheme) {
+        AppContent(insetsController, orientationController, fileController)
+    }
+}
+
+@Composable
+private fun AppContent(
     insetsController: InsetsController,
     orientationController: OrientationController,
     fileController: FileController,

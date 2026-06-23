@@ -1,10 +1,14 @@
 package com.hai265.timestamper
 
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.material3.dynamicDarkColorScheme
+import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
-import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
+import androidx.compose.ui.platform.LocalContext
 import androidx.fragment.app.FragmentActivity
 import com.hai265.timestamper.screens.FileController
 import com.hai265.timestamper.screens.InsetsController
@@ -31,11 +35,21 @@ class MainActivity : FragmentActivity(), AndroidScopeComponent {
 
         setContent {
             AppTheme {
-                val windowSize = calculateWindowSizeClass(this)
+                val customTheme = when {
+                    Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
+                        val context = LocalContext.current
+                        if (isSystemInDarkTheme()) dynamicDarkColorScheme(context) else dynamicLightColorScheme(
+                            context
+                        )
+                    }
+
+                    else -> null
+                }
                 App(
                     insetsController,
                     orientationController,
-                    fileController
+                    fileController,
+                    customTheme,
                 )
             }
         }
