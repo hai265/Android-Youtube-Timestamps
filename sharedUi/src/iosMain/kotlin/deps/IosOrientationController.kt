@@ -4,10 +4,10 @@ import com.hai265.timestamper.screens.OrientationController
 
 class IosOrientationController : OrientationController {
     override fun landscape() {
-        TODO("Not yet implemented")
+        //TODO
     }
 
     override fun portrait() {
-        TODO("Not yet implemented")
+        //TODO
     }
 }
