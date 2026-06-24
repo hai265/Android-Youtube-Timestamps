@@ -1,10 +1,10 @@
 package com.hai265.timestamper.screens.editor
 
-import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
+import co.touchlab.kermit.Logger
 import com.hai265.timestamper.data.database.Timestamp
 import com.hai265.timestamper.data.database.Video
 import com.hai265.timestamper.data.repos.PreferencesRepository
@@ -116,6 +116,6 @@ class TimestampViewerViewModel(
 
     fun updateCurrentTime(duration: Duration) {
         _currentTime.value = duration
-        Log.d("TimestampEditorViewModel", "current time:${duration.inWholeSeconds} ")
+        Logger.withTag("TimestampEditorViewModel").d("current time:${duration.inWholeSeconds} ")
     }
 }
