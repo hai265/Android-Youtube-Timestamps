@@ -7,7 +7,6 @@ import coil3.SingletonImageLoader
 import coil3.memory.MemoryCache
 import coil3.request.crossfade
 import com.hai265.timestamper.bindings.appModule
-import com.hai265.timestamper.data.dataModule
 import com.hai265.timestamper.data.repos.AuthRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -27,7 +26,7 @@ class MainApplication : Application(), SingletonImageLoader.Factory {
         startKoin {
             androidLogger(Level.DEBUG)
             androidContext(this@MainApplication)
-            modules(appModule, dataModule)
+            modules(appModule)
         }
         scope.launch {
             authRepo.userId.collect { userID ->
