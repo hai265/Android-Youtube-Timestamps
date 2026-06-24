@@ -192,6 +192,7 @@ fun VideoListScreen(
                     val videoResult = viewmodel.addVideo(url)
                     //TODO: handleVideoResult
 //                    handleVideoResult(context, videoResult, { addVideoDialog = false })
+                    addVideoDialog = false
                 }
             },
         )
