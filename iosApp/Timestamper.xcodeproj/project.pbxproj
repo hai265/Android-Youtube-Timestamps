@@ -29,9 +29,22 @@
 		C25101CB2FEB1D1F00B9820A /* TimestamperUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TimestamperUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		C2A883DD2FEC5DEE00B1F9F7 /* PBXFileSystemSynchronizedBuildFileExceptionSet */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = C25101B32FEB1D1D00B9820A /* Timestamper */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		C25101B62FEB1D1D00B9820A /* Timestamper */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				C2A883DD2FEC5DEE00B1F9F7 /* PBXFileSystemSynchronizedBuildFileExceptionSet */,
+			);
 			path = Timestamper;
 			sourceTree = "<group>";
 		};
@@ -99,6 +112,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = C25101D52FEB1D1F00B9820A /* Build configuration list for PBXNativeTarget "Timestamper" */;
 			buildPhases = (
+				C24F20AC79E9F9BDEE97AD3F /* Compile Kotlin */,
 				C2780E012FEB219C00E90143 /* ShellScript */,
 				C25101B02FEB1D1D00B9820A /* Sources */,
 				C25101B12FEB1D1D00B9820A /* Frameworks */,
@@ -233,6 +247,16 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
+		C24F20AC79E9F9BDEE97AD3F /* Compile Kotlin */ = {
+			isa = PBXShellScriptBuildPhase;
+			inputPaths = (
+			);
+			name = "Compile Kotlin";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellScript = "if [ \"YES\" = \"$OVERRIDE_KOTLIN_BUILD_IDE_SUPPORTED\" ]; then\n  echo \"Skipping Gradle build task invocation due to OVERRIDE_KOTLIN_BUILD_IDE_SUPPORTED environment variable set to \\\"YES\\\"\"\n  exit 0\nfi\ncd \"$SRCROOT/..\"\n./gradlew :sharedUi:embedAndSignAppleFrameworkForXcode";
+		};
 		C2780E012FEB219C00E90143 /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
 			alwaysOutOfDate = 1;

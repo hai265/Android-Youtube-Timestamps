@@ -6,9 +6,15 @@
 //
 
 import SwiftUI
+import sharedUiKit
 
 @main
 struct TimestamperApp: App {
+
+    init() {
+        KoinInitIosKt.doInitKoinIos()
+    }
+
     var body: some Scene {
         WindowGroup {
             ContentView()
