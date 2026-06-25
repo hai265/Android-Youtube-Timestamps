@@ -63,6 +63,7 @@ import androidx.window.core.layout.WindowSizeClass
 import coil3.compose.AsyncImage
 import com.hai265.timestamper.data.database.Video
 import com.hai265.timestamper.screens.FileController
+import com.hai265.timestamper.screens.ShareTimestampsSheet
 import com.hai265.timestamper.screens.fakeVideo1
 import com.hai265.timestamper.screens.fakeVideoList
 import kotlinx.coroutines.launch
@@ -85,7 +86,8 @@ fun VideoListScreen(
     onTapVideo: (id: String) -> Unit,
     onTapSignUp: () -> Unit,
     windowSizeClass: WindowSizeClass = currentWindowAdaptiveInfoV2().windowSizeClass,
-    fileController: FileController
+    fileController: FileController,
+    shareTimestampSheet: ShareTimestampsSheet,
 ) {
     val viewmodel: VideoListScreenViewModel = koinViewModel()
     val state by viewmodel.state.collectAsState()
@@ -166,16 +168,7 @@ fun VideoListScreen(
             onDeleteVideo = { video -> videoToDeleteDialog = video },
             onTapShareVideo = { video ->
                 coroutineScope.launch {
-                    //TODO: Share Menu
-//                    val intent = Intent(Intent.ACTION_SEND).apply {
-//                        action = Intent.ACTION_SEND
-//                        putExtra(
-//                            Intent.EXTRA_TEXT,
-//                            viewmodel.getTimestampsAsString(video.id)
-//                        )
-//                        type = "text/plain"
-//                    }
-//                    context.startActivity(Intent.createChooser(intent, null))
+                    shareTimestampSheet(viewmodel.getTimestampsAsString(video.id))
                 }
             },
             listState = listState,

@@ -13,10 +13,9 @@ import androidx.fragment.app.FragmentActivity
 import com.hai265.timestamper.screens.FileController
 import com.hai265.timestamper.screens.InsetsController
 import com.hai265.timestamper.screens.OrientationController
-import com.hai265.timestamper.screens.platformModule
+import com.hai265.timestamper.screens.ShareTimestampsSheet
 import org.koin.android.scope.AndroidScopeComponent
 import org.koin.androidx.scope.activityScope
-import org.koin.core.context.loadKoinModules
 import org.koin.core.scope.Scope
 
 class MainActivity : FragmentActivity(), AndroidScopeComponent {
@@ -25,10 +24,10 @@ class MainActivity : FragmentActivity(), AndroidScopeComponent {
     @OptIn(ExperimentalMaterial3WindowSizeClassApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        loadKoinModules(platformModule)
         val fileController = scope.get<FileController>()
         val insetsController = scope.get<InsetsController>()
         val orientationController = scope.get<OrientationController>()
+        val shareTimestampSheet = scope.get<ShareTimestampsSheet>()
         enableEdgeToEdge()
 
 
@@ -47,6 +46,7 @@ class MainActivity : FragmentActivity(), AndroidScopeComponent {
                 insetsController,
                 orientationController,
                 fileController,
+                shareTimestampSheet,
                 customTheme,
             )
         }

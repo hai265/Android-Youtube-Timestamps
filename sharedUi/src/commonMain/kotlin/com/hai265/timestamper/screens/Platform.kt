@@ -22,4 +22,8 @@ interface FileController {
     suspend fun openFilePicker(): Source
 }
 
+interface ShareTimestampsSheet {
+    suspend operator fun invoke(timestamps: String)
+}
+
 expect val platformModule: Module

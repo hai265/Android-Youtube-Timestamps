@@ -23,6 +23,7 @@ import com.hai265.timestamper.screens.FileController
 import com.hai265.timestamper.screens.InsetsController
 import com.hai265.timestamper.screens.Navigables
 import com.hai265.timestamper.screens.OrientationController
+import com.hai265.timestamper.screens.ShareTimestampsSheet
 import com.hai265.timestamper.screens.editor.TimestampViewerScreen
 import com.hai265.timestamper.screens.list.VideoListScreen
 import com.hai265.timestamper.screens.signin.LogInScreen
@@ -34,10 +35,11 @@ fun App(
     insetsController: InsetsController,
     orientationController: OrientationController,
     fileController: FileController,
+    shareTimestampSheet: ShareTimestampsSheet,
     customTheme: ColorScheme?
 ) {
     AppTheme(customColor = customTheme) {
-        AppContent(insetsController, orientationController, fileController)
+        AppContent(insetsController, orientationController, fileController, shareTimestampSheet)
     }
 }
 
@@ -46,6 +48,7 @@ private fun AppContent(
     insetsController: InsetsController,
     orientationController: OrientationController,
     fileController: FileController,
+    shareTimestampSheet: ShareTimestampsSheet,
 ) {
     val navController = rememberNavController()
     NavHost(
@@ -86,6 +89,7 @@ private fun AppContent(
                 },
                 onTapSignUp = { navController.navigateSingleTopTo(Navigables.SignUpScreen) },
                 fileController = fileController,
+                shareTimestampSheet = shareTimestampSheet,
             )
         }
         composable<Navigables.VideoScreen> {
