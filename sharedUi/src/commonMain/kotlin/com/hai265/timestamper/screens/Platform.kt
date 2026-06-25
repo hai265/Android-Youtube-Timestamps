@@ -9,6 +9,7 @@ expect fun platform(): String
 interface InsetsController {
     fun hideSystemBars()
     fun showSystemBars()
+    fun reset()
 }
 
 interface OrientationController {

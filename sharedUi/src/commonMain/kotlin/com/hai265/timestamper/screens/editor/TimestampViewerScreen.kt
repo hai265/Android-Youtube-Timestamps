@@ -241,7 +241,7 @@ fun TimestampViewerScreen(
 
     DisposableEffect(Unit) {
         onDispose {
-            insetsController.showSystemBars()
+            insetsController.reset()
         }
     }
 }

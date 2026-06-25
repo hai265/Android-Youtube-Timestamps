@@ -23,8 +23,8 @@ actual val platformModule = module {
             AndroidInsetsController(
                 WindowCompat.getInsetsController(
                     get<Activity>().window,
-                    get<Activity>().window.decorView
-                )
+                    get<Activity>().window.decorView,
+                ), get()
             )
         }
         factory<OrientationController> { AndroidOrientationController(get()) }
