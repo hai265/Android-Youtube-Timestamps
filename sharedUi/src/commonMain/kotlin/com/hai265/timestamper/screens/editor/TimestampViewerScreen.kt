@@ -112,11 +112,9 @@ fun TimestampViewerScreen(
                     startingTime = video.lastPlayed,
                     onFullScreen = {
                         orientationController.landscape()
-                        insetsController.hideSystemBars()
                     },
                     onExitFullScreen = {
                         orientationController.portrait()
-                        insetsController.showSystemBars()
                     },
                 )
             }
