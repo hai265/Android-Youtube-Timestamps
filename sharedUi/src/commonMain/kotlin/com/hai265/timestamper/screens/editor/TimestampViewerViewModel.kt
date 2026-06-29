@@ -11,6 +11,7 @@ import com.hai265.timestamper.data.repos.PreferencesRepository
 import com.hai265.timestamper.data.repos.TimestampRepository
 import com.hai265.timestamper.data.repos.VideoRepository
 import com.hai265.timestamper.screens.Navigables
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -24,6 +25,7 @@ import kotlinx.coroutines.flow.sample
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlin.time.Duration
+import kotlin.time.Duration.Companion.seconds
 
 data class TimestampEditorState(
     val video: Video? = null,
@@ -42,6 +44,7 @@ class TimestampViewerViewModel(
     private val videoRepo: VideoRepository,
     private val timestampRepo: TimestampRepository,
     private val preferencesRepository: PreferencesRepository,
+    private val globalScope: CoroutineScope
 ) : ViewModel() {
     private val youtubeId = savedStateHandle.toRoute<Navigables.VideoScreen>().id
 
@@ -51,7 +54,7 @@ class TimestampViewerViewModel(
         viewModelScope.launch {
             _currentTime
                 .drop(1) //Drop default Duration.ZERO value
-                .sample(1000)
+                .sample(5.seconds)
                 .collect { lastWatchedTimestamp ->
                     state.value.video?.id?.let { videoId ->
                         videoRepo.updateVideoLastWatched(videoId, lastWatchedTimestamp)
@@ -117,5 +120,15 @@ class TimestampViewerViewModel(
     fun updateCurrentTime(duration: Duration) {
         _currentTime.value = duration
         Logger.withTag("TimestampEditorViewModel").d("current time:${duration.inWholeSeconds} ")
+    }
+
+    override fun onCleared() {
+        globalScope.launch {
+            state.value.video?.id?.let { videoId ->
+                videoRepo.updateVideoLastWatched(videoId, _currentTime.value)
+                Logger.withTag("TimestampEditorViewModel")
+                    .d("Update last watch time for ${videoId}: ${_currentTime.value}")
+            }
+        }
     }
 }

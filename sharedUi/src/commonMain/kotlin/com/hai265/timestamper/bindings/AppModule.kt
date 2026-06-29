@@ -31,7 +31,7 @@ val appModule = module {
         )
     }
     viewModel {
-        TimestampViewerViewModel(get(), get(), get(), get())
+        TimestampViewerViewModel(get(), get(), get(), get(), get())
     }
     viewModel {
         TimestampEditorViewModel(get())
