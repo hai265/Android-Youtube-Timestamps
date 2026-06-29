@@ -407,23 +407,24 @@ fun MenuDropDown(
                     onTapExportVideo()
                 }
             )
-            if (isSignedIn) {
-                DropdownMenuItem(
-                    text = { Text("Sign Out") },
-                    onClick = {
-                        expanded = false
-                        onTapSignOut()
-                    }
-                )
-            } else {
-                DropdownMenuItem(
-                    text = { Text("Sign Up") },
-                    onClick = {
-                        expanded = false
-                        onTapSignUp()
-                    }
-                )
-            }
+            //TODO: Add back when implement accounts
+//            if (isSignedIn) {
+//                DropdownMenuItem(
+//                    text = { Text("Sign Out") },
+//                    onClick = {
+//                        expanded = false
+//                        onTapSignOut()
+//                    }
+//                )
+//            } else {
+//                DropdownMenuItem(
+//                    text = { Text("Sign Up") },
+//                    onClick = {
+//                        expanded = false
+//                        onTapSignUp()
+//                    }
+//                )
+//            }
         }
     }
 }

@@ -68,17 +68,6 @@ private fun AppContent(
         }
     ) {
         composable<Navigables.ListScreen> {
-//            VideoListScreen(
-//                onTapVideo = { id ->
-//                    navController.navigateSingleTopTo(
-//                        Navigables.VideoScreen(
-//                            id
-//                        )
-//                    )
-//                },
-//                onTapSignUp = { navController.navigateSingleTopTo(Navigables.SignUpScreen) },
-//                windowSize = windowSize
-//            )
             VideoListScreen(
                 onTapVideo = { id ->
                     navController.navigateSingleTopTo(
