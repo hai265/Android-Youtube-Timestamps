@@ -9,6 +9,7 @@ import com.hai265.timestamper.data.repos.VideoRepository
 import com.hai265.timestamper.data.repos.VideoResult
 import com.hai265.timestamper.domain.ExportTimestampsToFileUseCase
 import com.hai265.timestamper.domain.ImportTimestampsFromFileUseCase
+import com.hai265.timestamper.domain.InvalidImportFileException
 import com.hai265.timestamper.screens.formatDurationToHHMMSS
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -65,7 +66,11 @@ class VideoListScreenViewModel(
 
     fun importTimestamps(source: Source) {
         viewModelScope.launch {
-            importTimestampsFromFileUseCase.invoke(source)
+            try {
+                importTimestampsFromFileUseCase.invoke(source)
+            } catch (e: InvalidImportFileException) {
+                //TODO: toast channel
+            }
         }
     }
 
