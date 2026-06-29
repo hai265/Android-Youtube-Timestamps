@@ -6,7 +6,7 @@
 Timestamp creator for Youtube videos. Easily create notes / timestamps at specific points in Youtube videos, either in this app or the Youtube App.
 
 ## Download
-See releases for the latest APK.
+See [releases](https://github.com/hai265/Android-Youtube-Timestamps/releases) for the latest APK.
 
 ## Features
 - Add timestamps from the Youtube app
