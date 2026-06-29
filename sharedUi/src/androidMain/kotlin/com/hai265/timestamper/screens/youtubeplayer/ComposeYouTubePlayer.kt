@@ -55,6 +55,7 @@ actual fun ComposeYouTubePlayer(
             YouTubePlayerView(ctx).apply {
                 enableAutomaticInitialization = false
 
+                //Comment this out to enable background playback
                 lifecycleOwner.lifecycle.addObserver(this)
 
                 val options = IFramePlayerOptions.Builder(ctx)
