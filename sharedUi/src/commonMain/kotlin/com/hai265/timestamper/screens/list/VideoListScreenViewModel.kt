@@ -11,6 +11,7 @@ import com.hai265.timestamper.domain.ExportTimestampsToFileUseCase
 import com.hai265.timestamper.domain.ImportTimestampsFromFileUseCase
 import com.hai265.timestamper.screens.formatDurationToHHMMSS
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.stateIn
@@ -21,11 +22,10 @@ import kotlin.uuid.Uuid
 
 private const val TAG = "VideoListScreenViewModel"
 
-data class ListScreenState(
-    val videos: List<Video> = listOf(),
-    val syncing: Boolean = false,
-    val isLoggedIn: Boolean = false,
-)
+sealed interface ListScreenState {
+    data object Initial : ListScreenState
+    data class Loaded(val videos: List<Video>) : ListScreenState
+}
 
 class VideoListScreenViewModel(
     private val repo: VideoRepository,
@@ -33,24 +33,18 @@ class VideoListScreenViewModel(
     private val authRepository: AuthRepository,
     private val importTimestampsFromFileUseCase: ImportTimestampsFromFileUseCase,
     private val exportTimestampsToFileUseCase: ExportTimestampsToFileUseCase,
-    //TODO: Replace contentResolver with expect
-//    private val contentResolver: ContentResolver
 ) : ViewModel() {
-    val state =
+    val state: StateFlow<ListScreenState> =
         combine(repo.getVideos(), authRepository.userId)
         { videos, userId ->
-            ListScreenState(
+            ListScreenState.Loaded(
                 videos = videos.sortedByDescending { it.lastEdited },
-                syncing = false,
-                isLoggedIn = userId != null
             )
         }
             .stateIn(
                 scope = viewModelScope,
                 started = SharingStarted.WhileSubscribed(5000L),
-                initialValue = ListScreenState(
-                    syncing = false
-                )
+                initialValue = ListScreenState.Initial
             )
 
     suspend fun addVideo(url: String): VideoResult {

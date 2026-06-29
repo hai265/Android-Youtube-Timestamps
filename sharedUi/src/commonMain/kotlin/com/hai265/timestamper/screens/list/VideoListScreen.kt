@@ -146,7 +146,7 @@ fun VideoListScreen(
                         },
                         onTapSignUp = onTapSignUp,
                         onTapSignOut = { signOutDialog = true },
-                        isSignedIn = state.isLoggedIn
+                        isSignedIn = false
                     )
                 },
                 scrollBehavior = scrollBehavior
@@ -162,19 +162,22 @@ fun VideoListScreen(
         },
         floatingActionButtonPosition = FabPosition.End,
     ) { innerPadding ->
-        VideoListScreenContent(
-            videoList = state.videos,
-            onTapVideo = onTapVideo,
-            onDeleteVideo = { video -> videoToDeleteDialog = video },
-            onTapShareVideo = { video ->
-                coroutineScope.launch {
-                    shareTimestampSheet(viewmodel.getTimestampsAsString(video.id))
-                }
-            },
-            listState = listState,
-            gridNumCells = gridNumCells,
-            paddingValues = innerPadding,
-        )
+        (state as? ListScreenState.Loaded)?.let {
+            VideoListScreenContent(
+                videoList = it.videos,
+                onTapVideo = onTapVideo,
+                onDeleteVideo = { video -> videoToDeleteDialog = video },
+                onTapShareVideo = { video ->
+                    coroutineScope.launch {
+                        shareTimestampSheet(viewmodel.getTimestampsAsString(video.id))
+                    }
+                },
+                listState = listState,
+                gridNumCells = gridNumCells,
+                paddingValues = innerPadding,
+            )
+        }
+
     }
 
     if (addVideoDialog) {
