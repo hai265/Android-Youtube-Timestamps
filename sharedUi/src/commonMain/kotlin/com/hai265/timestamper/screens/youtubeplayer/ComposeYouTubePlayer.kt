@@ -12,5 +12,6 @@ expect fun ComposeYouTubePlayer(
     startingTime: Duration,
     onFullScreen: () -> Unit,
     onExitFullScreen: () -> Unit,
+    onTapAddTimestamp: () -> Unit,
     modifier: Modifier = Modifier,
 )

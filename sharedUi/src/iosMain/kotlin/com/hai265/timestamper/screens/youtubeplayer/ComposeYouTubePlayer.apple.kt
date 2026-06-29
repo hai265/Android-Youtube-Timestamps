@@ -10,6 +10,7 @@ actual fun ComposeYouTubePlayer(
     startingTime: kotlin.time.Duration,
     onFullScreen: () -> Unit,
     onExitFullScreen: () -> Unit,
+    onTapAddTimestamp: () -> Unit,
     modifier: androidx.compose.ui.Modifier
 ) {
     Text("TODO")

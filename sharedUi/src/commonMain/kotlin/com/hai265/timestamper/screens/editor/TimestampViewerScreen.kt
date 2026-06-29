@@ -116,6 +116,17 @@ fun TimestampViewerScreen(
                     onExitFullScreen = {
                         orientationController.portrait()
                     },
+                    onTapAddTimestamp = {
+                        video.id.let {
+                            bottomSheetState = BottomSheetState.EditTimestamp(
+                                Timestamp(
+                                    id = Uuid.random(),
+                                    videoId = it,
+                                    time = state.playerTime
+                                )
+                            )
+                        }
+                    },
                 )
             }
         }
@@ -139,7 +150,6 @@ fun TimestampViewerScreen(
                             time = state.playerTime
                         )
                     )
-
                 }
             }) {
                 Icon(painterResource(Res.drawable.add), "Add")

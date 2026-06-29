@@ -6,6 +6,7 @@ import android.content.ContextWrapper
 import android.os.Bundle
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageButton
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Column
@@ -20,6 +21,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.compose.LocalLifecycleOwner
+import com.hai265.timestamper.screens.R
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.YouTubePlayer
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.listeners.AbstractYouTubePlayerListener
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.listeners.FullscreenListener
@@ -40,6 +42,7 @@ actual fun ComposeYouTubePlayer(
     startingTime: Duration,
     onFullScreen: () -> Unit,
     onExitFullScreen: () -> Unit,
+    onTapAddTimestamp: () -> Unit,
     modifier: Modifier,
 ) {
     val context = LocalContext.current
@@ -81,22 +84,35 @@ actual fun ComposeYouTubePlayer(
                     }
                 }
 
-                initialize(listener, options)
-
                 addFullscreenListener(object : FullscreenListener {
                     override fun onEnterFullscreen(
                         fullscreenView: View,
                         exitFullscreen: () -> Unit
                     ) {
                         val decor = activity?.window?.decorView as? ViewGroup ?: return
+
+                        val container = android.widget.FrameLayout(ctx).apply {
+                            addView(
+                                fullscreenView,
+                                ViewGroup.LayoutParams(
+                                    ViewGroup.LayoutParams.MATCH_PARENT,
+                                    ViewGroup.LayoutParams.MATCH_PARENT
+                                )
+                            )
+                            val view = android.view.LayoutInflater.from(ctx)
+                                .inflate(R.layout.player_custom_view, this, true)
+                            view.findViewById<ImageButton>(R.id.add_timestamp_button)
+                                .setOnClickListener { onTapAddTimestamp() }
+                        }
+
                         decor.addView(
-                            fullscreenView,
+                            container,
                             ViewGroup.LayoutParams(
                                 ViewGroup.LayoutParams.MATCH_PARENT,
                                 ViewGroup.LayoutParams.MATCH_PARENT
                             )
                         )
-                        fullScreenView = fullscreenView
+                        fullScreenView = container
                         onFullScreen()
                     }
 
@@ -111,6 +127,7 @@ actual fun ComposeYouTubePlayer(
                 enableBackgroundPlayback(true)
 
                 playerView = this
+                initialize(listener, options)
             }
         }
     )
@@ -140,6 +157,7 @@ class ComposeExampleActivity : ComponentActivity() {
                     startingTime = Duration.ZERO,
                     onFullScreen = {},
                     onExitFullScreen = {},
+                    onTapAddTimestamp = {},
                 )
 
             }
@@ -157,6 +175,7 @@ fun ComposeYoutubePlayerPreview() {
             controller = YouTubePlayerController.NoOp,
             startingTime = 120.toDuration(DurationUnit.SECONDS),
             onFullScreen = {},
+            onTapAddTimestamp = {},
             onExitFullScreen = {},
         )
     }
