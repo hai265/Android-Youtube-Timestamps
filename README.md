@@ -1,9 +1,16 @@
 <img width="1920" height="1080" alt="Copy of Umapyoi Github Image" src="https://github.com/user-attachments/assets/fa4a7bc5-de5b-426f-b595-14997c47ba4f" />
 
-# TimeStamper - Timestamp maker for Youtube
+> [!CAUTION]
+> The app is still under development, so there is a risk of data loss.
+# TimeStamper - Timestamp maker for Youtube (Android)
 Timestamp creator for Youtube videos. Easily create notes / timestamps at specific points in Youtube videos, either in this app or the Youtube App.
+
 ## Download
 See releases for the latest APK.
+
+## Features
+- Add timestamps from the Youtube app
+- Export formatted timestamps for use on Youtube (useful for creating video timestamps or in comments)
 
 ## Usage
 There are two main workflows:
