@@ -7,8 +7,10 @@ import android_youtube_timestamps.sharedui.generated.resources.remove
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.text.input.KeyboardActionHandler
 import androidx.compose.foundation.text.input.TextFieldState
@@ -81,6 +83,7 @@ fun TimestampEditorSheet(
         TimestampEditorSheetContent(
             textFieldState,
             currentTime,
+            timestamp.time,
             focusRequester,
             { description, time ->
                 scope.launch {
@@ -108,6 +111,7 @@ fun TimestampEditorSheet(
 private fun TimestampEditorSheetContent(
     textFieldState: TextFieldState,
     currentTime: Duration,
+    originalTime: Duration,
     focusRequester: FocusRequester,
     onSave: (description: String, time: Duration) -> Unit,
     hideSheet: () -> DisposableHandle,
@@ -121,15 +125,18 @@ private fun TimestampEditorSheetContent(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            Text(
-                text = "Timestamp: ${currentTime.formatDurationToHHMMSS()}",
-                color = MaterialTheme.colorScheme.primary,
-                fontWeight = FontWeight.Bold,
-                maxLines = 1,
-            )
-
-            //TODO: add a t
             Row {
+                Text(
+                    text = "Timestamp: ${currentTime.formatDurationToHHMMSS()}",
+                    color = MaterialTheme.colorScheme.primary,
+                    fontWeight = FontWeight.Bold,
+                    maxLines = 1,
+                )
+            }
+
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Spacer(modifier = Modifier.size(4.dp))
+                TimeOffsetIndicator(currentTime, originalTime)
                 IconButton(onClick = onTapMinus) {
                     Icon(painterResource(Res.drawable.remove), "Subtract Second")
                 }
@@ -178,6 +185,18 @@ private fun TimestampEditorSheetContent(
     }
 }
 
+@Composable
+fun TimeOffsetIndicator(currentTime: Duration, originalTime: Duration) {
+    val offset = (currentTime - originalTime)
+    if (offset != Duration.ZERO) {
+        Text(
+            text = if (offset.isNegative()) "${offset.inWholeSeconds}" else "+${offset.inWholeSeconds}",
+            color = if (offset.isNegative()) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary,
+            fontWeight = FontWeight.Bold,
+        )
+    }
+}
+
 @Preview
 @Composable
 fun TestTimestampEditorSheetContentPreview() {
@@ -185,6 +204,7 @@ fun TestTimestampEditorSheetContentPreview() {
         textFieldState = TextFieldState(),
         focusRequester = FocusRequester(),
         currentTime = Duration.ZERO,
+        originalTime = Duration.ZERO,
         onSave = { _, _ -> },
         hideSheet = {
             DisposableHandle { }
