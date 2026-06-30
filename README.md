@@ -1,7 +1,7 @@
 <img width="1920" height="1080" alt="Copy of Umapyoi Github Image" src="https://github.com/user-attachments/assets/fa4a7bc5-de5b-426f-b595-14997c47ba4f" />
 
 > [!CAUTION]
-> The app is still under development, so there is a risk of data loss.
+> The app is still under development, features will change and data loss may occur.
 # TimeStamper - Timestamp maker for Youtube (Android)
 Timestamp creator for Youtube videos. Easily create notes / timestamps at specific points in Youtube videos, either in this app or the Youtube App.
 
@@ -30,5 +30,13 @@ https://github.com/user-attachments/assets/da17908e-fea8-4f62-94ae-f2d7f34fe060
 ### Timestamper
 1. Add a video, either through the "Add Video" button, or sharing from the youtube app.
 2. After tapping a video, tap the "+" floating button to bring up the timestamp editor.
+
+## Tech Stack / Architecture
+The app is split into multiple gradle modules, modeled after [google's architecture recommendations](https://developer.android.com/topic/architecture). 
+- `app`: Main entrypoint for the android app.
+- `core`: Kotlin Multiplatform module containing networking, SQLDelight database, repositories, and use cases.
+- `sharedUi`: Compose Multiplatform module containing most of the app ui.
+- `iosApp`: Entrypoint for the ios app (WIP).
+ 
 ## Acknowledgments
 Inspired by [TimeTags for Youtube](https://github.com/pc035860/yt-timetag).
