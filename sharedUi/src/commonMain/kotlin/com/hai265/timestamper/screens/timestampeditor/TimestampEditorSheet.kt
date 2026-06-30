@@ -1,9 +1,13 @@
 package com.hai265.timestamper.screens.timestampeditor
 
 import android_youtube_timestamps.sharedui.generated.resources.Res
+import android_youtube_timestamps.sharedui.generated.resources.add
 import android_youtube_timestamps.sharedui.generated.resources.check
+import android_youtube_timestamps.sharedui.generated.resources.remove
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.text.input.KeyboardActionHandler
@@ -12,6 +16,7 @@ import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
@@ -22,6 +27,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -35,12 +41,14 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.hai265.timestamper.data.database.Timestamp
-import com.hai265.timestamper.screens.fakeTimestamp1
+import com.hai265.timestamper.screens.durationSaver
 import com.hai265.timestamper.screens.formatDurationToHHMMSS
 import kotlinx.coroutines.DisposableHandle
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.viewmodel.koinViewModel
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.seconds
 import kotlin.uuid.Uuid
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -63,6 +71,7 @@ fun TimestampEditorSheet(
         }
     }
     val textFieldState = rememberTextFieldState(initialText = timestamp.description)
+    var currentTime by rememberSaveable(stateSaver = durationSaver) { mutableStateOf(timestamp.time) }
 
     ModalBottomSheet(
         onDismissRequest = onDismiss,
@@ -70,36 +79,66 @@ fun TimestampEditorSheet(
         dragHandle = {},
     ) {
         TimestampEditorSheetContent(
-            timestamp,
             textFieldState,
+            currentTime,
             focusRequester,
-            { timestamp ->
+            { description, time ->
                 scope.launch {
-                    val savedId = viewmodel.upsertTimestamp(timestamp)
+                    val savedId = viewmodel.upsertTimestamp(
+                        timestamp.copy(
+                            description = description,
+                            time = time
+                        )
+                    )
                     onAddTimestamp(savedId)
                 }
             },
-            hideSheet
+            hideSheet,
+            {
+                currentTime += 1.seconds
+            },
+            {//Don't subtract time if it'll lead to negative time
+                currentTime = maxOf(currentTime - 1.seconds, Duration.ZERO)
+            }
         )
     }
 }
 
 @Composable
 private fun TimestampEditorSheetContent(
-    timestamp: Timestamp,
     textFieldState: TextFieldState,
+    currentTime: Duration,
     focusRequester: FocusRequester,
-    onSave: (Timestamp) -> Unit,
-    hideSheet: () -> DisposableHandle
+    onSave: (description: String, time: Duration) -> Unit,
+    hideSheet: () -> DisposableHandle,
+    onTapAdd: () -> Unit,
+    onTapMinus: () -> Unit
 ) {
     var isMultiline by remember { mutableStateOf(false) }
     Column(modifier = Modifier.padding(16.dp)) {
-        Text(
-            text = "Timestamp: ${timestamp.time.formatDurationToHHMMSS()}",
-            color = MaterialTheme.colorScheme.primary,
-            fontWeight = FontWeight.Bold,
-            maxLines = 1,
-        )
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Text(
+                text = "Timestamp: ${currentTime.formatDurationToHHMMSS()}",
+                color = MaterialTheme.colorScheme.primary,
+                fontWeight = FontWeight.Bold,
+                maxLines = 1,
+            )
+
+            //TODO: add a t
+            Row {
+                IconButton(onClick = onTapMinus) {
+                    Icon(painterResource(Res.drawable.remove), "Subtract Second")
+                }
+                IconButton(onClick = onTapAdd) {
+                    Icon(painterResource(Res.drawable.add), "Add Second")
+                }
+            }
+        }
+
 
         Row(verticalAlignment = if (isMultiline) Alignment.Bottom else Alignment.CenterVertically) {
             TextField(
@@ -111,7 +150,7 @@ private fun TimestampEditorSheetContent(
                     capitalization = KeyboardCapitalization.Sentences
                 ),
                 onKeyboardAction = KeyboardActionHandler {
-                    onSave(timestamp.copy(description = textFieldState.text.toString()))
+                    onSave(textFieldState.text.toString(), currentTime)
                     hideSheet()
                 },
                 onTextLayout = { result ->
@@ -128,7 +167,7 @@ private fun TimestampEditorSheetContent(
             )
             FilledIconButton(
                 onClick = {
-                    onSave(timestamp.copy(description = textFieldState.text.toString()))
+                    onSave(textFieldState.text.toString(), currentTime)
                     hideSheet()
                 }, modifier = Modifier
                     .padding(start = 16.dp)
@@ -143,12 +182,14 @@ private fun TimestampEditorSheetContent(
 @Composable
 fun TestTimestampEditorSheetContentPreview() {
     TimestampEditorSheetContent(
-        timestamp = fakeTimestamp1,
         textFieldState = TextFieldState(),
         focusRequester = FocusRequester(),
-        onSave = {},
+        currentTime = Duration.ZERO,
+        onSave = { _, _ -> },
         hideSheet = {
             DisposableHandle { }
-        }
+        },
+        onTapAdd = {},
+        onTapMinus = {},
     )
 }
