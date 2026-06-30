@@ -21,7 +21,10 @@ There are two main workflows:
 4. Tap "Timestamper".
 5. The timestamp editor will now open.
 
-[Screen_recording_20260629_164811.webm](https://github.com/user-attachments/assets/c75e1d24-7d9d-4085-a54b-275098f549d3)
+
+
+https://github.com/user-attachments/assets/da17908e-fea8-4f62-94ae-f2d7f34fe060
+
 
 
 ### Timestamper
