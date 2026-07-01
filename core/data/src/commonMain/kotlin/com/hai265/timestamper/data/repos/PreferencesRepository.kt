@@ -18,7 +18,6 @@ class PreferencesRepository(private val dataStore: DataStore<Preferences>) {
         }
     }
 
-    fun hideKeyboardOnScreenTap() = get(CLOSE_KEYBOARD_TAP_SCREEN, false)
     suspend fun updateHideKeyboardOnScreenTap(enable: Boolean) =
         set(CLOSE_KEYBOARD_TAP_SCREEN, enable)
 

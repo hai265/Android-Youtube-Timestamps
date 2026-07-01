@@ -31,7 +31,6 @@
     <string name="editor_settings">Editor Settings</string>
     <string name="preferences_action">Preferences</string>
     <string name="delete_timestamp_action">Delete Timestamp</string>
-    <string name="close_keyboard_on_tap">Close keyboard tap screen</string>
     <string name="pause_video_on_edit">Pause video on edit</string>
 
     <!-- LogInScreen -->

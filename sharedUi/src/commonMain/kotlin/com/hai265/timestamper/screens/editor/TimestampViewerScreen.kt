@@ -5,7 +5,6 @@ import android_youtube_timestamps.sharedui.generated.resources.Res
 import android_youtube_timestamps.sharedui.generated.resources.add
 import android_youtube_timestamps.sharedui.generated.resources.add_action
 import android_youtube_timestamps.sharedui.generated.resources.close
-import android_youtube_timestamps.sharedui.generated.resources.close_keyboard_on_tap
 import android_youtube_timestamps.sharedui.generated.resources.delete_timestamp_action
 import android_youtube_timestamps.sharedui.generated.resources.editor_settings
 import android_youtube_timestamps.sharedui.generated.resources.pause_video_on_edit
@@ -25,7 +24,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.calculateEndPadding
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -381,25 +379,9 @@ fun PreferencesDialog(
         Card(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(200.dp)
                 .padding(16.dp)
         ) {
             Column {
-                Row(
-                    modifier = Modifier
-                        .padding(16.dp)
-                        .fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(stringResource(Res.string.close_keyboard_on_tap))
-                    Switch(
-                        checked = preferences.hideKeyboardOnScreenTap,
-                        onCheckedChange = {
-                            viewModel.updateHideKeyboardOnScreenTap(it)
-                        }
-                    )
-                }
                 Row(
                     modifier = Modifier
                         .padding(16.dp)
