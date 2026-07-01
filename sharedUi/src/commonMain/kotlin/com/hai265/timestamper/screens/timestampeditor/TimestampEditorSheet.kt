@@ -186,7 +186,7 @@ private fun TimestampEditorSheetContent(
 
 @Composable
 fun TimeOffsetIndicator(currentTime: Duration, originalTime: Duration) {
-    val offset = (currentTime - originalTime)
+    val offset = (currentTime - originalTime).inWholeSeconds.seconds
     if (offset != Duration.ZERO) {
         Text(
             text = if (offset.isNegative()) "${offset.inWholeSeconds}" else "+${offset.inWholeSeconds}",
