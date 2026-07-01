@@ -1,5 +1,11 @@
 package com.hai265.timestamper.screens.signin
 
+import android_youtube_timestamps.sharedui.generated.resources.Res
+import android_youtube_timestamps.sharedui.generated.resources.email_label
+import android_youtube_timestamps.sharedui.generated.resources.no_account_signup
+import android_youtube_timestamps.sharedui.generated.resources.password_label
+import android_youtube_timestamps.sharedui.generated.resources.sign_in
+import android_youtube_timestamps.sharedui.generated.resources.signing_in_status
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -31,6 +37,7 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import io.github.jan.supabase.exceptions.BadRequestRestException
 import kotlinx.coroutines.launch
+import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -58,7 +65,7 @@ fun LogInScreen(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
-            "Sign In",
+            stringResource(Res.string.sign_in),
             style = MaterialTheme.typography.headlineMedium,
             modifier = Modifier.padding(bottom = 32.dp)
         )
@@ -66,7 +73,7 @@ fun LogInScreen(
         TextField(
             value = email,
             onValueChange = { email = it },
-            label = { Text("Email") },
+            label = { Text(stringResource(Res.string.email_label)) },
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(bottom = 16.dp)
@@ -75,7 +82,7 @@ fun LogInScreen(
         TextField(
             value = password,
             onValueChange = { password = it },
-            label = { Text("Password") },
+            label = { Text(stringResource(Res.string.password_label)) },
             visualTransformation = PasswordVisualTransformation(),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
             modifier = Modifier
@@ -95,7 +102,7 @@ fun LogInScreen(
             onClick = {
                 coroutineScope.launch {
                     isLoading = true
-                    errorMessage = null
+//                    errorMessage = null
                     try {
                         viewModel.signIn(email, password)
                         //TODO: Show toast
@@ -105,9 +112,9 @@ fun LogInScreen(
                     } catch (e: Exception) {
                         //TODO: Expose my own errors instead of supabase's
                         if (e is BadRequestRestException) {
-                            errorMessage = "Invalid email or password"
+//                            errorMessage = stringResource(Res.string.invalid_auth_error)
                         } else {
-                            errorMessage = e.message ?: "An error occurred during sign-in"
+//                            errorMessage = e.message ?: stringResource(Res.string.sign_in_error)
                         }
                     } finally {
                         isLoading = false
@@ -117,7 +124,7 @@ fun LogInScreen(
             modifier = Modifier.align(Alignment.End),
             enabled = !isLoading
         ) {
-            Text(if (isLoading) "Signing In..." else "Sign In")
+            Text(if (isLoading) stringResource(Res.string.signing_in_status) else stringResource(Res.string.sign_in))
         }
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -128,7 +135,7 @@ fun LogInScreen(
             },
             modifier = Modifier.align(Alignment.CenterHorizontally)
         ) {
-            Text("Don't have an account? Sign Up")
+            Text(stringResource(Res.string.no_account_signup))
         }
     }
 

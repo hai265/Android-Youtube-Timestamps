@@ -2,10 +2,29 @@ package com.hai265.timestamper.screens.list
 
 import android_youtube_timestamps.sharedui.generated.resources.Res
 import android_youtube_timestamps.sharedui.generated.resources.add
+import android_youtube_timestamps.sharedui.generated.resources.add_action
+import android_youtube_timestamps.sharedui.generated.resources.add_video_action
+import android_youtube_timestamps.sharedui.generated.resources.cancel_action
+import android_youtube_timestamps.sharedui.generated.resources.confirm_action
 import android_youtube_timestamps.sharedui.generated.resources.default_thumbnail
+import android_youtube_timestamps.sharedui.generated.resources.delete_action
+import android_youtube_timestamps.sharedui.generated.resources.delete_video_confirmation
+import android_youtube_timestamps.sharedui.generated.resources.delete_video_question
+import android_youtube_timestamps.sharedui.generated.resources.empty_video_list
+import android_youtube_timestamps.sharedui.generated.resources.export_action
+import android_youtube_timestamps.sharedui.generated.resources.export_backup_action
+import android_youtube_timestamps.sharedui.generated.resources.import_action
+import android_youtube_timestamps.sharedui.generated.resources.last_edited_label
 import android_youtube_timestamps.sharedui.generated.resources.loading_thumbnail
 import android_youtube_timestamps.sharedui.generated.resources.menu
+import android_youtube_timestamps.sharedui.generated.resources.menu_action
+import android_youtube_timestamps.sharedui.generated.resources.more_options
 import android_youtube_timestamps.sharedui.generated.resources.more_vert
+import android_youtube_timestamps.sharedui.generated.resources.share_timestamps
+import android_youtube_timestamps.sharedui.generated.resources.sign_out_question
+import android_youtube_timestamps.sharedui.generated.resources.video_id_fallback
+import android_youtube_timestamps.sharedui.generated.resources.videos_title
+import android_youtube_timestamps.sharedui.generated.resources.youtube_url_label
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -74,6 +93,7 @@ import kotlinx.datetime.format.Padding
 import kotlinx.datetime.format.char
 import kotlinx.datetime.toLocalDateTime
 import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 import kotlin.time.Clock
 import kotlin.time.Instant
@@ -125,7 +145,7 @@ fun VideoListScreen(
                     scrolledContainerColor = MaterialTheme.colorScheme.background
                 ),
                 title = {
-                    Text("Videos")
+                    Text(stringResource(Res.string.videos_title))
                 },
                 actions = {
                     MenuDropDown(
@@ -155,8 +175,8 @@ fun VideoListScreen(
         floatingActionButton = {
             ExtendedFloatingActionButton(
                 onClick = { addVideoDialog = true },
-                icon = { Icon(painterResource(Res.drawable.add), "Add") },
-                text = { Text("Add Video") },
+                icon = { Icon(painterResource(Res.drawable.add), stringResource(Res.string.add_action)) },
+                text = { Text(stringResource(Res.string.add_video_action)) },
                 expanded = showButton
             )
         },
@@ -235,7 +255,7 @@ private fun VideoListScreenContent(
             contentAlignment = Alignment.Center
         ) {
             Text(
-                "Add videos using the \"Add Video\" button",
+                stringResource(Res.string.empty_video_list),
                 textAlign = TextAlign.Center
             )
         }
@@ -290,11 +310,11 @@ private fun VideoItem(
         ) {
             Column(modifier = Modifier.weight(1f)) {
                 Text(
-                    video.videoTitle ?: "Video ID: ${video.youtubeId}",
+                    video.videoTitle ?: stringResource(Res.string.video_id_fallback, video.youtubeId),
                     style = MaterialTheme.typography.titleMedium,
                 )
                 Text(
-                    "Last Edited: ${video.lastEdited.toFormattedString(TimeZone.currentSystemDefault().id)}",
+                    stringResource(Res.string.last_edited_label, video.lastEdited.toFormattedString(TimeZone.currentSystemDefault().id)),
                     style = MaterialTheme.typography.bodySmall
                 )
             }
@@ -349,21 +369,21 @@ fun VideoDropdownMenu(
         modifier = modifier
     ) {
         IconButton(onClick = { expanded = !expanded }) {
-            Icon(painterResource(Res.drawable.more_vert), contentDescription = "More options")
+            Icon(painterResource(Res.drawable.more_vert), contentDescription = stringResource(Res.string.more_options))
         }
         DropdownMenu(
             expanded = expanded,
             onDismissRequest = { expanded = false }
         ) {
             DropdownMenuItem(
-                text = { Text("Delete", color = MaterialTheme.colorScheme.error) },
+                text = { Text(stringResource(Res.string.delete_action), color = MaterialTheme.colorScheme.error) },
                 onClick = {
                     expanded = false
                     onTapDeleteVideo()
                 }
             )
             DropdownMenuItem(
-                text = { Text("Share Timestamps") },
+                text = { Text(stringResource(Res.string.share_timestamps)) },
                 onClick = {
                     expanded = false
                     onShareTimestamps()
@@ -387,21 +407,21 @@ fun MenuDropDown(
         modifier = modifier
     ) {
         IconButton(onClick = { expanded = !expanded }) {
-            Icon(painterResource(Res.drawable.menu), contentDescription = "Menu")
+            Icon(painterResource(Res.drawable.menu), contentDescription = stringResource(Res.string.menu_action))
         }
         DropdownMenu(
             expanded = expanded,
             onDismissRequest = { expanded = false }
         ) {
             DropdownMenuItem(
-                text = { Text("Import") },
+                text = { Text(stringResource(Res.string.import_action)) },
                 onClick = {
                     expanded = false
                     onTapImportVideo()
                 }
             )
             DropdownMenuItem(
-                text = { Text("Export") },
+                text = { Text(stringResource(Res.string.export_action)) },
                 onClick = {
                     expanded = false
                     onTapExportVideo()
@@ -444,11 +464,11 @@ fun ExportDropdownMenu(
             onDismissRequest = { expanded.value = false }
         ) {
             DropdownMenuItem(
-                text = { Text("Export Backup") },
+                text = { Text(stringResource(Res.string.export_backup_action)) },
                 onClick = onTapExportVideo
             )
             DropdownMenuItem(
-                text = { Text("Share Timestamps") },
+                text = { Text(stringResource(Res.string.share_timestamps)) },
                 onClick = onTapShareVideo
             )
         }
@@ -464,12 +484,12 @@ fun AddVideoDialog(
 
     AlertDialog(
         title = {
-            Text(text = "Add Video")
+            Text(text = stringResource(Res.string.add_video_action))
         },
         text = {
             TextField(
                 state = textFieldState,
-                label = { Text("Youtube URL") }
+                label = { Text(stringResource(Res.string.youtube_url_label)) }
             )
         },
         onDismissRequest = {
@@ -481,7 +501,7 @@ fun AddVideoDialog(
                     onConfirmation(textFieldState.text.toString())
                 }
             ) {
-                Text("Confirm")
+                Text(stringResource(Res.string.confirm_action))
             }
         },
         dismissButton = {
@@ -490,7 +510,7 @@ fun AddVideoDialog(
                     onDismissRequest()
                 }
             ) {
-                Text("Cancel")
+                Text(stringResource(Res.string.cancel_action))
             }
         }
     )
@@ -504,26 +524,26 @@ fun DeleteConfirmationDialog(
     onConfirmation: () -> Unit,
 ) {
     AlertDialog(
-        title = { Text("Delete video?") },
+        title = { Text(stringResource(Res.string.delete_video_question)) },
         text = {
             Text(
                 text = buildAnnotatedString {
                     withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
                         append(video.videoTitle ?: video.youtubeId)
                     }
-                    append("will be removed from your list.")
+                    append(stringResource(Res.string.delete_video_confirmation))
                 }
             )
         },
         onDismissRequest = onDismissRequest,
         confirmButton = {
             TextButton(onClick = onConfirmation) {
-                Text("Delete", color = MaterialTheme.colorScheme.error)
+                Text(stringResource(Res.string.delete_action), color = MaterialTheme.colorScheme.error)
             }
         },
         dismissButton = {
             TextButton(onClick = onDismissRequest) {
-                Text("Cancel")
+                Text(stringResource(Res.string.cancel_action))
             }
         }
     )
@@ -536,7 +556,7 @@ fun SignOutConfirmationDialog(
 ) {
     AlertDialog(
         text = {
-            Text(text = "Are you sure you want to sign out?")
+            Text(text = stringResource(Res.string.sign_out_question))
         }, onDismissRequest = {
             onDismissRequest()
         },
@@ -547,7 +567,7 @@ fun SignOutConfirmationDialog(
                     onDismissRequest()
                 }
             ) {
-                Text("Confirm")
+                Text(stringResource(Res.string.confirm_action))
             }
         },
         dismissButton = {
@@ -556,7 +576,7 @@ fun SignOutConfirmationDialog(
                     onDismissRequest()
                 }
             ) {
-                Text("Cancel")
+                Text(stringResource(Res.string.cancel_action))
             }
         }
     )

@@ -2,8 +2,13 @@ package com.hai265.timestamper.screens.timestampeditor
 
 import android_youtube_timestamps.sharedui.generated.resources.Res
 import android_youtube_timestamps.sharedui.generated.resources.add
+import android_youtube_timestamps.sharedui.generated.resources.add_second
 import android_youtube_timestamps.sharedui.generated.resources.check
+import android_youtube_timestamps.sharedui.generated.resources.description_placeholder
 import android_youtube_timestamps.sharedui.generated.resources.remove
+import android_youtube_timestamps.sharedui.generated.resources.save_action
+import android_youtube_timestamps.sharedui.generated.resources.subtract_second
+import android_youtube_timestamps.sharedui.generated.resources.timestamp_label
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -48,6 +53,7 @@ import com.hai265.timestamper.screens.formatDurationToHHMMSS
 import kotlinx.coroutines.DisposableHandle
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
@@ -127,7 +133,7 @@ private fun TimestampEditorSheetContent(
         ) {
             Row {
                 Text(
-                    text = "Timestamp: ${currentTime.formatDurationToHHMMSS()}",
+                    text = stringResource(Res.string.timestamp_label, currentTime.formatDurationToHHMMSS()),
                     color = MaterialTheme.colorScheme.primary,
                     fontWeight = FontWeight.Bold,
                     maxLines = 1,
@@ -138,10 +144,10 @@ private fun TimestampEditorSheetContent(
                 Spacer(modifier = Modifier.size(4.dp))
                 TimeOffsetIndicator(currentTime, originalTime)
                 IconButton(onClick = onTapMinus) {
-                    Icon(painterResource(Res.drawable.remove), "Subtract Second")
+                    Icon(painterResource(Res.drawable.remove), stringResource(Res.string.subtract_second))
                 }
                 IconButton(onClick = onTapAdd) {
-                    Icon(painterResource(Res.drawable.add), "Add Second")
+                    Icon(painterResource(Res.drawable.add), stringResource(Res.string.add_second))
                 }
             }
         }
@@ -149,7 +155,7 @@ private fun TimestampEditorSheetContent(
         Row(verticalAlignment = if (isMultiline) Alignment.Bottom else Alignment.CenterVertically) {
             TextField(
                 state = textFieldState,
-                placeholder = { Text("Description") },
+                placeholder = { Text(stringResource(Res.string.description_placeholder)) },
                 keyboardOptions = KeyboardOptions.Default.copy(
                     keyboardType = KeyboardType.Text,
                     imeAction = ImeAction.Done,
@@ -178,7 +184,7 @@ private fun TimestampEditorSheetContent(
                 }, modifier = Modifier
                     .padding(start = 16.dp)
             ) {
-                Icon(painterResource(Res.drawable.check), "Save")
+                Icon(painterResource(Res.drawable.check), stringResource(Res.string.save_action))
             }
         }
     }

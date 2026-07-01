@@ -3,7 +3,13 @@ package com.hai265.timestamper.screens.editor
 
 import android_youtube_timestamps.sharedui.generated.resources.Res
 import android_youtube_timestamps.sharedui.generated.resources.add
+import android_youtube_timestamps.sharedui.generated.resources.add_action
 import android_youtube_timestamps.sharedui.generated.resources.close
+import android_youtube_timestamps.sharedui.generated.resources.close_keyboard_on_tap
+import android_youtube_timestamps.sharedui.generated.resources.delete_timestamp_action
+import android_youtube_timestamps.sharedui.generated.resources.editor_settings
+import android_youtube_timestamps.sharedui.generated.resources.pause_video_on_edit
+import android_youtube_timestamps.sharedui.generated.resources.preferences_action
 import android_youtube_timestamps.sharedui.generated.resources.settings
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.LinearEasing
@@ -70,6 +76,7 @@ import com.hai265.timestamper.screens.youtubeplayer.YouTubePlayerController
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
 import kotlin.time.Duration
@@ -152,7 +159,7 @@ fun TimestampViewerScreen(
                     )
                 }
             }) {
-                Icon(painterResource(Res.drawable.add), "Add")
+                Icon(painterResource(Res.drawable.add), stringResource(Res.string.add_action))
             }
         },
         floatingActionButtonPosition = FabPosition.End,
@@ -289,11 +296,11 @@ fun TimestampList(
                         .align(Alignment.TopEnd)
                         .clickable(onClick = onCLickSettings),
                 ) {
-                    Text("Editor Settings")
+                    Text(stringResource(Res.string.editor_settings))
                     Spacer(modifier.size(4.dp))
                     Icon(
                         painter = painterResource(Res.drawable.settings),
-                        contentDescription = "Preferences",
+                        contentDescription = stringResource(Res.string.preferences_action),
                     )
                 }
             }
@@ -358,7 +365,7 @@ fun TimestampItem(
         )
         Icon(
             painter = painterResource(Res.drawable.close),
-            contentDescription = "Delete Timestamp",
+            contentDescription = stringResource(Res.string.delete_timestamp_action),
             modifier = Modifier.clickable(onClick = onClickDelete)
         )
     }
@@ -385,7 +392,7 @@ fun PreferencesDialog(
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text("Close keyboard tap screen")
+                    Text(stringResource(Res.string.close_keyboard_on_tap))
                     Switch(
                         checked = preferences.hideKeyboardOnScreenTap,
                         onCheckedChange = {
@@ -400,7 +407,7 @@ fun PreferencesDialog(
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text("Pause video on edit")
+                    Text(stringResource(Res.string.pause_video_on_edit))
                     Switch(
                         checked = preferences.pauseAndResumeVideoOnEdit,
                         onCheckedChange = {

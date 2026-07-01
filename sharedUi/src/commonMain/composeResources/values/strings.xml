@@ -1,0 +1,53 @@
+<resources>
+    <!-- TimestampEditorSheet -->
+    <string name="timestamp_label">Timestamp: %1$s</string>
+    <string name="subtract_second">Subtract Second</string>
+    <string name="add_second">Add Second</string>
+    <string name="description_placeholder">Description</string>
+    <string name="save_action">Save</string>
+
+    <!-- VideoListScreen -->
+    <string name="videos_title">Videos</string>
+    <string name="add_action">Add</string>
+    <string name="add_video_action">Add Video</string>
+    <string name="empty_video_list">Add videos using the \"Add Video\" button</string>
+    <string name="video_id_fallback">Video ID: %1$s</string>
+    <string name="last_edited_label">Last Edited: %1$s</string>
+    <string name="more_options">More options</string>
+    <string name="delete_action">Delete</string>
+    <string name="share_timestamps">Share Timestamps</string>
+    <string name="menu_action">Menu</string>
+    <string name="import_action">Import</string>
+    <string name="export_action">Export</string>
+    <string name="export_backup_action">Export Backup</string>
+    <string name="youtube_url_label">Youtube URL</string>
+    <string name="confirm_action">Confirm</string>
+    <string name="cancel_action">Cancel</string>
+    <string name="delete_video_question">Delete video?</string>
+    <string name="delete_video_confirmation">will be removed from your list.</string>
+    <string name="sign_out_question">Are you sure you want to sign out?</string>
+
+    <!-- TimestampViewerScreen -->
+    <string name="editor_settings">Editor Settings</string>
+    <string name="preferences_action">Preferences</string>
+    <string name="delete_timestamp_action">Delete Timestamp</string>
+    <string name="close_keyboard_on_tap">Close keyboard tap screen</string>
+    <string name="pause_video_on_edit">Pause video on edit</string>
+
+    <!-- LogInScreen -->
+    <string name="sign_in">Sign In</string>
+    <string name="email_label">Email</string>
+    <string name="password_label">Password</string>
+    <string name="invalid_auth_error">Invalid email or password</string>
+    <string name="sign_in_error">An error occurred during sign-in</string>
+    <string name="signing_in_status">Signing In...</string>
+    <string name="no_account_signup">Don\'t have an account? Sign Up</string>
+
+    <!-- SignUpScreen -->
+    <string name="sign_up_headline">Sign Up</string>
+    <string name="confirm_password_label">Confirm Password</string>
+    <string name="passwords_mismatch_error">Passwords do not match</string>
+    <string name="sign_up_error">An error occurred during sign-up</string>
+    <string name="signing_up_status">Signing Up...</string>
+    <string name="already_have_account_signin">Already have an account? Sign In</string>
+</resources>
