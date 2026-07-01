@@ -119,7 +119,7 @@ private fun TimestampEditorSheetContent(
     onTapMinus: () -> Unit
 ) {
     var isMultiline by remember { mutableStateOf(false) }
-    Column(modifier = Modifier.padding(16.dp)) {
+    Column(modifier = Modifier.padding(start = 16.dp, end = 16.dp)) {
         Row(
             modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically,
@@ -145,7 +145,6 @@ private fun TimestampEditorSheetContent(
                 }
             }
         }
-
 
         Row(verticalAlignment = if (isMultiline) Alignment.Bottom else Alignment.CenterVertically) {
             TextField(
