@@ -3,6 +3,7 @@ import com.hai265.timestamper.App
 import deps.IosFileController
 import deps.IosInsetsController
 import deps.IosOrientationController
+import deps.IosShareTimestampSheet
 
 fun MainViewController() = ComposeUIViewController {
     App(
@@ -10,5 +11,6 @@ fun MainViewController() = ComposeUIViewController {
         orientationController = IosOrientationController(),
         fileController = IosFileController(),
         customTheme = null,
+        shareTimestampSheet = IosShareTimestampSheet()
     )
 }
