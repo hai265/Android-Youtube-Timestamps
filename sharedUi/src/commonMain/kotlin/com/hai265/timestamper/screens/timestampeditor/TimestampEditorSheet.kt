@@ -25,10 +25,8 @@ import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
-import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -40,6 +38,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.layout.onVisibilityChanged
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
@@ -47,6 +46,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.hai265.timestamper.data.database.Timestamp
+import com.hai265.timestamper.screens.bottomSheet.BottomSheet
 import com.hai265.timestamper.screens.durationSaver
 import com.hai265.timestamper.screens.formatDurationToHHMMSS
 import kotlinx.coroutines.DisposableHandle
@@ -66,28 +66,15 @@ fun TimestampEditorSheet(
     onAddTimestamp: (Uuid) -> Unit,
 ) {
     val viewmodel: TimestampEditorViewModel = koinViewModel()
-    val sheetState = rememberModalBottomSheetState()
     val scope = rememberCoroutineScope()
     val focusRequester = remember { FocusRequester() }
 
-    val hideSheet = {
-        scope.launch { sheetState.hide() }.invokeOnCompletion {
-            if (!sheetState.isVisible) {
-                onDismiss()
-            }
-        }
-    }
     val textFieldState = rememberTextFieldState(initialText = timestamp.description)
     var currentTime by rememberSaveable(stateSaver = durationSaver) { mutableStateOf(timestamp.time) }
 
-    if (sheetState.isVisible) {
-        focusRequester.requestFocus()
-    }
-    ModalBottomSheet(
-        onDismissRequest = onDismiss,
-        sheetState = sheetState,
-        dragHandle = {},
-    ) {
+    BottomSheet(
+        onDismiss = onDismiss,
+    ) { hideSheet ->
         TimestampEditorSheetContent(
             textFieldState,
             currentTime,
@@ -122,7 +109,7 @@ private fun TimestampEditorSheetContent(
     originalTime: Duration,
     focusRequester: FocusRequester,
     onSave: (description: String, time: Duration) -> Unit,
-    hideSheet: () -> DisposableHandle,
+    hideSheet: () -> Unit,
     onTapAdd: () -> Unit,
     onTapMinus: () -> Unit
 ) {
@@ -179,6 +166,9 @@ private fun TimestampEditorSheetContent(
                 modifier = Modifier
                     .weight(1f)
                     .focusRequester(focusRequester)
+                    .onVisibilityChanged {
+                        focusRequester.requestFocus()
+                    }
 
             )
             FilledIconButton(
