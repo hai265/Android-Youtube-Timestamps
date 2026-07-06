@@ -40,7 +40,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.layout.onVisibilityChanged
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
@@ -81,6 +80,9 @@ fun TimestampEditorSheet(
     val textFieldState = rememberTextFieldState(initialText = timestamp.description)
     var currentTime by rememberSaveable(stateSaver = durationSaver) { mutableStateOf(timestamp.time) }
 
+    if (sheetState.isVisible) {
+        focusRequester.requestFocus()
+    }
     ModalBottomSheet(
         onDismissRequest = onDismiss,
         sheetState = sheetState,
@@ -133,7 +135,10 @@ private fun TimestampEditorSheetContent(
         ) {
             Row {
                 Text(
-                    text = stringResource(Res.string.timestamp_label, currentTime.formatDurationToHHMMSS()),
+                    text = stringResource(
+                        Res.string.timestamp_label,
+                        currentTime.formatDurationToHHMMSS()
+                    ),
                     color = MaterialTheme.colorScheme.primary,
                     fontWeight = FontWeight.Bold,
                     maxLines = 1,
@@ -144,7 +149,10 @@ private fun TimestampEditorSheetContent(
                 Spacer(modifier = Modifier.size(4.dp))
                 TimeOffsetIndicator(currentTime, originalTime)
                 IconButton(onClick = onTapMinus) {
-                    Icon(painterResource(Res.drawable.remove), stringResource(Res.string.subtract_second))
+                    Icon(
+                        painterResource(Res.drawable.remove),
+                        stringResource(Res.string.subtract_second)
+                    )
                 }
                 IconButton(onClick = onTapAdd) {
                     Icon(painterResource(Res.drawable.add), stringResource(Res.string.add_second))
@@ -171,11 +179,7 @@ private fun TimestampEditorSheetContent(
                 modifier = Modifier
                     .weight(1f)
                     .focusRequester(focusRequester)
-                    .onVisibilityChanged { visible ->
-                        if (visible) {
-                            focusRequester.requestFocus()
-                        }
-                    }
+
             )
             FilledIconButton(
                 onClick = {
