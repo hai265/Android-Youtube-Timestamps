@@ -10,7 +10,7 @@
     <string name="videos_title">Videos</string>
     <string name="add_action">Add</string>
     <string name="add_video_action">Add Video</string>
-    <string name="empty_video_list">Add videos using the \"Add Video\" button</string>
+    <string name="empty_video_list">Add videos using the Add Video button</string>
     <string name="video_id_fallback">Video ID: %1$s</string>
     <string name="last_edited_label">Last Edited: %1$s</string>
     <string name="more_options">More options</string>
@@ -20,7 +20,7 @@
     <string name="import_action">Import</string>
     <string name="export_action">Export</string>
     <string name="export_backup_action">Export Backup</string>
-    <string name="youtube_url_label">Youtube URL</string>
+    <string name="youtube_url_label">YouTube URL</string>
     <string name="confirm_action">Confirm</string>
     <string name="cancel_action">Cancel</string>
     <string name="delete_video_question">Delete video?</string>
