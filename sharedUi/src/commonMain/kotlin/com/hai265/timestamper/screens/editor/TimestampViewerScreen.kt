@@ -283,7 +283,8 @@ fun TimestampList(
     LazyColumn(
         state = listState,
         modifier = modifier,
-        contentPadding = PaddingValues(bottom = 88.dp)
+        contentPadding = PaddingValues(bottom = 88.dp),
+        verticalArrangement = Arrangement.spacedBy(4.dp),
     ) {
         item {
             Box(modifier = Modifier.fillMaxWidth()) {
@@ -338,7 +339,6 @@ fun TimestampItem(
             .fillMaxWidth()
             .background(backgroundColor),
         horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically
     ) {
         Text(
             text = timestamp.time.formatDurationToHHMMSS(),
