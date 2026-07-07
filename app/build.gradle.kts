@@ -40,6 +40,9 @@ extensions.configure<ApplicationExtension> {
         debug {
             enableUnitTestCoverage = true
             enableAndroidTestCoverage = true
+            applicationIdSuffix = ".debug"
+            versionNameSuffix = "-DEBUG"
+            resValue("string", "app_name", "Timestamper Debug")
         }
     }
     compileOptions {
@@ -50,6 +53,7 @@ extensions.configure<ApplicationExtension> {
     buildFeatures {
         compose = true
         buildConfig = true
+        resValues = true
     }
 }
 
