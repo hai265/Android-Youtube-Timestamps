@@ -1,11 +1,10 @@
 package com.hai265.timestamper.screens.bottomSheet
 
+import android.app.Dialog
 import android.content.DialogInterface
 import android.os.Build
 import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import android.view.WindowManager
 import androidx.activity.compose.LocalActivity
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -22,6 +21,7 @@ import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.compose.ui.unit.dp
+import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.hai265.timestamper.screens.R
 import com.hai265.timestamper.theme.AppTheme
@@ -65,21 +65,24 @@ class ModalBottomSheet(
         onDismiss()
     }
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
+    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
+        val dialog = super.onCreateDialog(savedInstanceState)
 
-        val view = inflater.inflate(R.layout.modal_bottom_sheet, container, false)
+        val view = View.inflate(requireContext(), R.layout.modal_bottom_sheet, null)
         val composeView = view.findViewById<ComposeView>(R.id.compose_view)
 
-        dialog?.window?.setSoftInputMode(
+        dialog.window?.setSoftInputMode(
             //https://drive.google.com/file/d/143l-DGaEOnQXLEY1iTv2Rp9Cwkh08M1K/view?usp=sharing
             WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE
             //https://drive.google.com/file/d/1clBQJt_VuhglEFJFlWASKb6p7u31v_Gd/view?usp=sharing
 //            WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE
         )
+
+        dialog.setContentView(view)
+        val behavior = BottomSheetBehavior.from(view.parent as View)
+        behavior.state = BottomSheetBehavior.STATE_EXPANDED
+        behavior.skipCollapsed = true
+
         composeView.apply {
             setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
             setContent {
@@ -93,7 +96,8 @@ class ModalBottomSheet(
                 }
             }
         }
-        return view
+
+        return dialog
     }
 
     companion object {
