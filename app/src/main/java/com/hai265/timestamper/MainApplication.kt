@@ -4,12 +4,14 @@ import android.app.Application
 import coil3.ImageLoader
 import coil3.PlatformContext
 import coil3.SingletonImageLoader
+import coil3.disk.DiskCache
 import coil3.memory.MemoryCache
 import coil3.request.crossfade
 import com.hai265.timestamper.bindings.initKoin
 import com.hai265.timestamper.data.repos.AuthRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import okio.Path.Companion.toOkioPath
 import org.koin.android.ext.android.inject
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
@@ -45,12 +47,12 @@ class MainApplication : Application(), SingletonImageLoader.Factory {
                     .maxSizePercent(context, 0.25)
                     .build()
             }
-//            .diskCache {
-//                DiskCache.Builder()
-//                    .directory(cacheDir.resolve("coil_cache").toOkioPath())
-//                    .maxSizePercent(0.02)
-//                    .build()
-//            }
+            .diskCache {
+                DiskCache.Builder()
+                    .directory(cacheDir.resolve("coil_cache").toOkioPath())
+                    .maxSizePercent(0.02)
+                    .build()
+            }
             .build()
     }
 }
