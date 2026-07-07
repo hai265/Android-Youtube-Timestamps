@@ -18,7 +18,8 @@ sealed interface State {
         val time: Duration
     ) : State
 
-    data object Finished : State //TODO: Message in finished?
+    data object Finished : State
+    data object LaunchApp : State
 }
 
 
@@ -51,7 +52,7 @@ class TimestampDialogActivityViewModel(
                 if (timestamp != null) {
                     _state.update { State.AddTimestamp(id, timestamp) }
                 } else {
-                    _state.update { State.Finished }
+                    _state.update { State.LaunchApp }
                 }
             }
         }
