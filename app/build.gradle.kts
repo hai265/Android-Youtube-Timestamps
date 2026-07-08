@@ -21,7 +21,7 @@ extensions.configure<ApplicationExtension> {
         applicationId = "com.hai265.timestamper"
         minSdk = 30
         targetSdk = 36
-        versionCode = 4
+        versionCode = 5
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
@@ -36,6 +36,9 @@ extensions.configure<ApplicationExtension> {
                 "proguard-rules.pro"
             )
             signingConfig = signingConfigs.getByName("debug")
+            ndk {
+                debugSymbolLevel = "full"
+            }
         }
         debug {
             enableUnitTestCoverage = true
