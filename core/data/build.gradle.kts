@@ -109,7 +109,8 @@ kotlin {
                 implementation(libs.slf4j.android)
                 implementation(libs.ktor.client.okhttp)
                 implementation(libs.koin.android)
-
+                implementation(libs.sqldelight.android.driver)
+                implementation(libs.sqldelight.android.async)
             }
         }
 
@@ -149,8 +150,6 @@ sqldelight {
         create("AppSqlDatabase") {
             packageName.set("com.hai265.timestamper.data")
             generateAsync.set(true)
-            deriveSchemaFromMigrations.set(false)
-            dialect("app.cash.sqldelight:sqlite-3-38-dialect:2.0.2")
         }
     }
 }

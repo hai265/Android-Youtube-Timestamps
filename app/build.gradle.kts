@@ -100,7 +100,6 @@ dependencies {
     implementation(libs.kotlinx.datetime)
     implementation(libs.kotlinx.serialization.core)
     implementation(libs.kotlinx.io.core)
-    implementation(libs.android.driver)
     implementation(platform(libs.koin.bom))
     implementation(libs.koin.android)
     implementation(libs.koin.compose)
