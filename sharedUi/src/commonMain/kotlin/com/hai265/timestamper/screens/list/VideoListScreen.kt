@@ -14,14 +14,17 @@ import android_youtube_timestamps.sharedui.generated.resources.empty_video_list
 import android_youtube_timestamps.sharedui.generated.resources.export_action
 import android_youtube_timestamps.sharedui.generated.resources.export_backup_action
 import android_youtube_timestamps.sharedui.generated.resources.import_action
+import android_youtube_timestamps.sharedui.generated.resources.invalid_url
 import android_youtube_timestamps.sharedui.generated.resources.last_edited_label
 import android_youtube_timestamps.sharedui.generated.resources.loading_thumbnail
 import android_youtube_timestamps.sharedui.generated.resources.menu
 import android_youtube_timestamps.sharedui.generated.resources.menu_action
 import android_youtube_timestamps.sharedui.generated.resources.more_options
 import android_youtube_timestamps.sharedui.generated.resources.more_vert
+import android_youtube_timestamps.sharedui.generated.resources.network_error
 import android_youtube_timestamps.sharedui.generated.resources.share_timestamps
 import android_youtube_timestamps.sharedui.generated.resources.sign_out_question
+import android_youtube_timestamps.sharedui.generated.resources.video_already_exists
 import android_youtube_timestamps.sharedui.generated.resources.video_id_fallback
 import android_youtube_timestamps.sharedui.generated.resources.videos_title
 import android_youtube_timestamps.sharedui.generated.resources.youtube_url_label
@@ -66,7 +69,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -81,6 +83,7 @@ import androidx.compose.ui.unit.dp
 import androidx.window.core.layout.WindowSizeClass
 import coil3.compose.AsyncImage
 import com.hai265.timestamper.data.database.Video
+import com.hai265.timestamper.data.repos.VideoResult
 import com.hai265.timestamper.screens.FileController
 import com.hai265.timestamper.screens.ShareTimestampsSheet
 import com.hai265.timestamper.screens.fakeVideo1
@@ -98,6 +101,19 @@ import org.koin.compose.viewmodel.koinViewModel
 import kotlin.time.Clock
 import kotlin.time.Instant
 
+sealed interface AddVideoDialogState {
+    data object Hidden : AddVideoDialogState
+
+    data class Shown(val error: AddVideoDialogError? = null) :
+        AddVideoDialogState
+}
+
+sealed interface AddVideoDialogError {
+    data object InvalidUrlError : AddVideoDialogError
+    data class NetworkError(val message: String?) : AddVideoDialogError
+    data object AlreadyExistsError : AddVideoDialogError
+}
+
 //https://www.figma.com/design/9GKdOD5q3yAT0mKgrcGmpf/Android-Youtube-Timestamp-Tool?node-id=1-5026&t=xjloAEfEmnkGJuPR-0
 //TODO: Duplicate file number append to extention e.g name.yaml(1) instead of name(1).yaml
 @OptIn(ExperimentalMaterial3Api::class)
@@ -111,7 +127,11 @@ fun VideoListScreen(
 ) {
     val viewmodel: VideoListScreenViewModel = koinViewModel()
     val state by viewmodel.state.collectAsState()
-    var addVideoDialog by rememberSaveable { mutableStateOf(false) }
+    var addVideoDialog by remember {
+        mutableStateOf<AddVideoDialogState>(
+            AddVideoDialogState.Hidden
+        )
+    }
     var videoToDeleteDialog by remember { mutableStateOf<Video?>(null) }
     var signOutDialog by remember { mutableStateOf(false) }
 
@@ -174,8 +194,13 @@ fun VideoListScreen(
         },
         floatingActionButton = {
             ExtendedFloatingActionButton(
-                onClick = { addVideoDialog = true },
-                icon = { Icon(painterResource(Res.drawable.add), stringResource(Res.string.add_action)) },
+                onClick = { addVideoDialog = AddVideoDialogState.Shown() },
+                icon = {
+                    Icon(
+                        painterResource(Res.drawable.add),
+                        stringResource(Res.string.add_action)
+                    )
+                },
                 text = { Text(stringResource(Res.string.add_video_action)) },
                 expanded = showButton
             )
@@ -200,17 +225,36 @@ fun VideoListScreen(
 
     }
 
-    if (addVideoDialog) {
+
+    (addVideoDialog as? AddVideoDialogState.Shown)?.let { shown ->
         AddVideoDialog(
-            onDismissRequest = { addVideoDialog = false },
+            onDismissRequest = { addVideoDialog = AddVideoDialogState.Hidden },
             onConfirmation = { url ->
                 coroutineScope.launch {
                     val videoResult = viewmodel.addVideo(url)
-                    //TODO: handleVideoResult
-//                    handleVideoResult(context, videoResult, { addVideoDialog = false })
-                    addVideoDialog = false
+
+                    addVideoDialog = when (videoResult) {
+                        is VideoResult.Success -> {
+                            AddVideoDialogState.Hidden
+                        }
+
+                        is VideoResult.InvalidUrl -> {
+                            AddVideoDialogState.Shown(AddVideoDialogError.InvalidUrlError)
+                        }
+
+                        is VideoResult.NetworkError -> {
+                            AddVideoDialogState.Shown(AddVideoDialogError.NetworkError(videoResult.errorMessage))
+                        }
+
+                        is VideoResult.VideoAlreadyExists -> {
+                            AddVideoDialogState.Shown(AddVideoDialogError.AlreadyExistsError)
+
+                        }
+                    }
+
                 }
             },
+            error = shown.error,
         )
     }
 
@@ -310,11 +354,17 @@ private fun VideoItem(
         ) {
             Column(modifier = Modifier.weight(1f)) {
                 Text(
-                    video.videoTitle ?: stringResource(Res.string.video_id_fallback, video.youtubeId),
+                    video.videoTitle ?: stringResource(
+                        Res.string.video_id_fallback,
+                        video.youtubeId
+                    ),
                     style = MaterialTheme.typography.titleMedium,
                 )
                 Text(
-                    stringResource(Res.string.last_edited_label, video.lastEdited.toFormattedString(TimeZone.currentSystemDefault().id)),
+                    stringResource(
+                        Res.string.last_edited_label,
+                        video.lastEdited.toFormattedString(TimeZone.currentSystemDefault().id)
+                    ),
                     style = MaterialTheme.typography.bodySmall
                 )
             }
@@ -369,14 +419,22 @@ fun VideoDropdownMenu(
         modifier = modifier
     ) {
         IconButton(onClick = { expanded = !expanded }) {
-            Icon(painterResource(Res.drawable.more_vert), contentDescription = stringResource(Res.string.more_options))
+            Icon(
+                painterResource(Res.drawable.more_vert),
+                contentDescription = stringResource(Res.string.more_options)
+            )
         }
         DropdownMenu(
             expanded = expanded,
             onDismissRequest = { expanded = false }
         ) {
             DropdownMenuItem(
-                text = { Text(stringResource(Res.string.delete_action), color = MaterialTheme.colorScheme.error) },
+                text = {
+                    Text(
+                        stringResource(Res.string.delete_action),
+                        color = MaterialTheme.colorScheme.error
+                    )
+                },
                 onClick = {
                     expanded = false
                     onTapDeleteVideo()
@@ -407,7 +465,10 @@ fun MenuDropDown(
         modifier = modifier
     ) {
         IconButton(onClick = { expanded = !expanded }) {
-            Icon(painterResource(Res.drawable.menu), contentDescription = stringResource(Res.string.menu_action))
+            Icon(
+                painterResource(Res.drawable.menu),
+                contentDescription = stringResource(Res.string.menu_action)
+            )
         }
         DropdownMenu(
             expanded = expanded,
@@ -479,6 +540,7 @@ fun ExportDropdownMenu(
 fun AddVideoDialog(
     onDismissRequest: () -> Unit,
     onConfirmation: (url: String) -> Unit,
+    error: AddVideoDialogError?
 ) {
     val textFieldState = rememberTextFieldState()
 
@@ -487,10 +549,21 @@ fun AddVideoDialog(
             Text(text = stringResource(Res.string.add_video_action))
         },
         text = {
-            TextField(
-                state = textFieldState,
-                label = { Text(stringResource(Res.string.youtube_url_label)) }
-            )
+            Column {
+                TextField(
+                    state = textFieldState,
+                    label = { Text(stringResource(Res.string.youtube_url_label)) }
+                )
+                error?.let {
+                    val errorMessage = when (it) {
+                        AddVideoDialogError.AlreadyExistsError -> stringResource(Res.string.video_already_exists)
+                        AddVideoDialogError.InvalidUrlError -> stringResource(Res.string.invalid_url)
+                        is AddVideoDialogError.NetworkError -> it.message
+                            ?: stringResource(Res.string.network_error)
+                    }
+                    Text(errorMessage, color = MaterialTheme.colorScheme.error)
+                }
+            }
         },
         onDismissRequest = {
             onDismissRequest()
@@ -538,7 +611,10 @@ fun DeleteConfirmationDialog(
         onDismissRequest = onDismissRequest,
         confirmButton = {
             TextButton(onClick = onConfirmation) {
-                Text(stringResource(Res.string.delete_action), color = MaterialTheme.colorScheme.error)
+                Text(
+                    stringResource(Res.string.delete_action),
+                    color = MaterialTheme.colorScheme.error
+                )
             }
         },
         dismissButton = {

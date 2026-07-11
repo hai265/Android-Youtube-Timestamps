@@ -26,7 +26,9 @@
     <string name="delete_video_question">Delete video?</string>
     <string name="delete_video_confirmation">will be removed from your list.</string>
     <string name="sign_out_question">Are you sure you want to sign out?</string>
-
+    <string name="invalid_url">Url is invalid.</string>
+    <string name="video_already_exists">Video already exists.</string>
+    <string name="network_error">A network error occurred.</string>
     <!-- TimestampViewerScreen -->
     <string name="editor_settings">Editor Settings</string>
     <string name="preferences_action">Preferences</string>
