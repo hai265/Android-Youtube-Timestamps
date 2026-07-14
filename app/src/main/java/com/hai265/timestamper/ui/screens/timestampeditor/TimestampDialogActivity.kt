@@ -69,6 +69,7 @@ class TimestampDialogActivity : FragmentActivity() {
 
                     State.LaunchApp -> {
                         startActivity(Intent(this, MainActivity::class.java))
+                        finish()
                     }
 
                     State.Finished -> {
