@@ -60,9 +60,16 @@ class ModalBottomSheet : BottomSheetDialogFragment() {
     private var colorScheme: ColorScheme? = null
 
     override fun onDismiss(dialog: DialogInterface) {
-        //TODO: This gets called on rotation, which causes the activity to be dismissed
         super.onDismiss(dialog)
-        onDismiss?.invoke()
+
+        val isRotating = activity?.isChangingConfigurations == true
+
+        if (!isRotating) {
+            onDismiss?.invoke()
+            this.onDismiss = null
+            this.content = null
+            this.colorScheme = null
+        }
     }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
