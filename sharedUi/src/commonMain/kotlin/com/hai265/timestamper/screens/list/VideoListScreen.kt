@@ -558,8 +558,9 @@ fun AddVideoDialog(
                     val errorMessage = when (it) {
                         AddVideoDialogError.AlreadyExistsError -> stringResource(Res.string.video_already_exists)
                         AddVideoDialogError.InvalidUrlError -> stringResource(Res.string.invalid_url)
-                        is AddVideoDialogError.NetworkError -> it.message
-                            ?: stringResource(Res.string.network_error)
+                        is AddVideoDialogError.NetworkError ->
+                            if (!it.message.isNullOrEmpty()) it.message
+                            else stringResource(Res.string.network_error)
                     }
                     Text(errorMessage, color = MaterialTheme.colorScheme.error)
                 }

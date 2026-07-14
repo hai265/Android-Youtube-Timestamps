@@ -41,7 +41,7 @@ class YoutubeMetadataApiServiceImplKtor(private val httpClient: HttpClient) :
                         videoUrl,
                         response.body()
                     )
-
+                //Http 401 oembed not allowed
                 else -> YoutubeMetadataResult.HttpError(
                     response.status.value,
                     response.status.description

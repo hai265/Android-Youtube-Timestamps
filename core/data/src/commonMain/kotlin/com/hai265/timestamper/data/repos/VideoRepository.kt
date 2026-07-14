@@ -54,6 +54,7 @@ class VideoRepository(
             is YoutubeMetadataResult.HttpError -> {
                 val message = when (metadataResult.statusCode) {
                     400 -> "Video Doesn't Exist"
+                    401 -> "oembed Not Allowed"
                     403 -> "Video Is Private"
                     else -> metadataResult.message
                 }
