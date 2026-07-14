@@ -44,7 +44,7 @@ actual fun BottomSheet(
     }
 
     LaunchedEffect(Unit) {
-        val bottomSheet = ModalBottomSheet(onDismiss, content, colorScheme)
+        val bottomSheet = ModalBottomSheet.newInstance(onDismiss, content, colorScheme)
 
         bottomSheet.show(
             activity.supportFragmentManager,
@@ -53,16 +53,16 @@ actual fun BottomSheet(
     }
 }
 
-class ModalBottomSheet(
-    private val onDismiss: () -> Unit,
-    private val content: @Composable (hideSheet: () -> Unit) -> Unit,
-    private val colorScheme: ColorScheme?
-) :
-    BottomSheetDialogFragment() {
+class ModalBottomSheet : BottomSheetDialogFragment() {
+
+    private var onDismiss: (() -> Unit)? = null
+    private var content: (@Composable (hideSheet: () -> Unit) -> Unit)? = null
+    private var colorScheme: ColorScheme? = null
 
     override fun onDismiss(dialog: DialogInterface) {
+        //TODO: This gets called on rotation, which causes the activity to be dismissed
         super.onDismiss(dialog)
-        onDismiss()
+        onDismiss?.invoke()
     }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
@@ -89,7 +89,7 @@ class ModalBottomSheet(
                 AppTheme(customColor = colorScheme) {
                     androidx.compose.material3.Surface {
                         Column {
-                            content { dismiss() }
+                            content?.invoke { dismiss() }
                             Spacer(modifier = Modifier.size(16.dp))
                         }
                     }
@@ -102,5 +102,15 @@ class ModalBottomSheet(
 
     companion object {
         const val TAG = "ModalBottomSheet"
+
+        fun newInstance(
+            onDismiss: () -> Unit,
+            content: @Composable (hideSheet: () -> Unit) -> Unit,
+            colorScheme: ColorScheme?
+        ): ModalBottomSheet = ModalBottomSheet().apply {
+            this.onDismiss = onDismiss
+            this.content = content
+            this.colorScheme = colorScheme
+        }
     }
 }
