@@ -1,9 +1,11 @@
 package com.hai265.timestamper.data.network
 
+import com.hai265.timestamper.data.getYouTubeIdFromUrl
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.get
 import io.ktor.http.HttpStatusCode
+import io.ktor.http.contentLength
 import kotlinx.io.IOException
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -34,7 +36,12 @@ class YoutubeMetadataApiServiceImplKtor(private val httpClient: HttpClient) :
                 }
             }
             when (response.status) {
-                HttpStatusCode.OK -> YoutubeMetadataResult.Success(response.body())
+                HttpStatusCode.OK ->
+                    returnYoutubeMetadata(
+                        videoUrl,
+                        response.body()
+                    )
+
                 else -> YoutubeMetadataResult.HttpError(
                     response.status.value,
                     response.status.description
@@ -43,6 +50,57 @@ class YoutubeMetadataApiServiceImplKtor(private val httpClient: HttpClient) :
         } catch (e: IOException) {
             YoutubeMetadataResult.NetworkError(e.message)
         }
+    }
+
+    private suspend fun returnYoutubeMetadata(
+        youtubeUrl: String,
+        metadata: YoutubeMetadata
+    ): YoutubeMetadataResult {
+        return getYouTubeIdFromUrl(youtubeUrl)?.let {
+            val thumbnailUrl = getValidYoutubeThumbnail(it)
+            YoutubeMetadataResult.Success(
+                metadata.copy(
+                    thumbnail = thumbnailUrl
+                )
+            )
+        } ?: YoutubeMetadataResult.NetworkError("Youtube url empty")
+    }
+
+    suspend fun getValidYoutubeThumbnail(
+        videoId: String
+    ): String {
+        for (quality in THUMBNAIL_QUALITIES) {
+            val url = "https://img.youtube.com/vi/$videoId/$quality"
+            if (thumbnailExists(url)) {
+                return url
+            }
+        }
+        // last resort fallback, always exists
+        return "https://img.youtube.com/vi/$videoId/hqdefault.jpg"
+    }
+
+    private suspend fun thumbnailExists(url: String): Boolean {
+        return try {
+            val response = httpClient.get(url)
+            if (response.status != HttpStatusCode.OK) return false
+
+            val contentLength = response.contentLength()
+
+            val size = contentLength ?: response.body<ByteArray>().size.toLong()
+
+            size > MIN_VALID_THUMBNAIL_BYTES
+        } catch (e: IOException) {
+            false
+        }
+    }
+
+    companion object {
+        private val THUMBNAIL_QUALITIES = listOf(
+            "maxresdefault.jpg",
+            "mqdefault.jpg",
+        )
+
+        private const val MIN_VALID_THUMBNAIL_BYTES = 5000L
     }
 }
 
