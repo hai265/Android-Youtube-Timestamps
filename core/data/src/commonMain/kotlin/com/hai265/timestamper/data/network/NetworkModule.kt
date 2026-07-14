@@ -27,7 +27,10 @@ val networkModule = module {
 //    }
 
     single<YoutubeMetadataApiService> {
-        YoutubeMetadataApiServiceImplKtor(get())
+        YoutubeMetadataApiImpl(
+            YoutubeMetadataApiOEmbedImpl(get()),
+            YoutubeMetadataOpenGraphImpl(get())
+        )
     }
 
     single {
