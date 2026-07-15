@@ -1,3 +1,14 @@
+> [!NOTE]
+> I'm currently recruiting testers for the Google Play version! I'll need 12 testers over 14 days for me to be able to publish on the store. If you join then you'll receive the latest versions as I update.
+> 
+> If you're interested then follow the instructions below:
+> 1. Join the google group: https://groups.google.com/g/timestamper-app-test
+>  
+> 2. Opt-in to the test: https://play.google.com/apps/testing/com.hai265.timestamper
+>  
+> 3. Download the app:  https://play.google.com/store/apps/details?id=com.hai265.timestamper 
+
+
 <img width="1920" height="1080" alt="Copy of Umapyoi Github Image" src="https://github.com/user-attachments/assets/fa4a7bc5-de5b-426f-b595-14997c47ba4f" />
 
 > [!CAUTION]
