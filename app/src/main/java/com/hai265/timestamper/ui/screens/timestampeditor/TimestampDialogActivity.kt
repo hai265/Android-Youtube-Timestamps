@@ -14,6 +14,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.lifecycleScope
+import com.hai265.timestamper.MainActivity
 import com.hai265.timestamper.data.database.Timestamp
 import com.hai265.timestamper.screens.timestampeditor.State
 import com.hai265.timestamper.screens.timestampeditor.TimestampDialogActivityViewModel
@@ -66,12 +67,17 @@ class TimestampDialogActivity : FragmentActivity() {
                         )
                     }
 
+                    State.LaunchApp -> {
+                        startActivity(Intent(this, MainActivity::class.java))
+                        finish()
+                    }
+
                     State.Finished -> {
                         finish()
                     }
 
                     State.Initial -> {
-
+                        //Nothing
                     }
                 }
             }

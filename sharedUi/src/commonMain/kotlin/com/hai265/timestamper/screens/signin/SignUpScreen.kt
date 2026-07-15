@@ -1,5 +1,14 @@
 package com.hai265.timestamper.screens.signin
 
+import android_youtube_timestamps.sharedui.generated.resources.Res
+import android_youtube_timestamps.sharedui.generated.resources.already_have_account_signin
+import android_youtube_timestamps.sharedui.generated.resources.confirm_password_label
+import android_youtube_timestamps.sharedui.generated.resources.email_label
+import android_youtube_timestamps.sharedui.generated.resources.password_label
+import android_youtube_timestamps.sharedui.generated.resources.passwords_mismatch_error
+import android_youtube_timestamps.sharedui.generated.resources.sign_up_error
+import android_youtube_timestamps.sharedui.generated.resources.sign_up_headline
+import android_youtube_timestamps.sharedui.generated.resources.signing_up_status
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -28,6 +37,8 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
+import org.jetbrains.compose.resources.getString
+import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -56,7 +67,7 @@ fun SignUpScreen(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
-            "Sign Up",
+            stringResource(Res.string.sign_up_headline),
             style = MaterialTheme.typography.headlineMedium,
             modifier = Modifier.padding(bottom = 32.dp)
         )
@@ -64,7 +75,7 @@ fun SignUpScreen(
         TextField(
             value = email,
             onValueChange = { email = it },
-            label = { Text("Email") },
+            label = { Text(stringResource(Res.string.email_label)) },
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(bottom = 16.dp)
@@ -73,7 +84,7 @@ fun SignUpScreen(
         TextField(
             value = password,
             onValueChange = { password = it },
-            label = { Text("Password") },
+            label = { Text(stringResource(Res.string.password_label)) },
             visualTransformation = PasswordVisualTransformation(),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
             modifier = Modifier
@@ -84,7 +95,7 @@ fun SignUpScreen(
         TextField(
             value = confirmPassword,
             onValueChange = { confirmPassword = it },
-            label = { Text("Confirm Password") },
+            label = { Text(stringResource(Res.string.confirm_password_label)) },
             visualTransformation = PasswordVisualTransformation(),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
             modifier = Modifier
@@ -106,7 +117,7 @@ fun SignUpScreen(
                     isLoading = true
                     errorMessage = null
                     if (password != confirmPassword) {
-                        errorMessage = "Passwords do not match"
+                        errorMessage = getString(Res.string.passwords_mismatch_error)
                         isLoading = false
                         return@launch
                     }
@@ -117,7 +128,7 @@ fun SignUpScreen(
 //                            .show()
                         onSignUpSuccess()
                     } catch (e: Exception) {
-                        errorMessage = e.message ?: "An error occurred during sign-up"
+                        errorMessage = e.message ?: getString(Res.string.sign_up_error)
                     } finally {
                         isLoading = false
                     }
@@ -126,14 +137,14 @@ fun SignUpScreen(
             modifier = Modifier.align(Alignment.End),
             enabled = !isLoading
         ) {
-            Text(if (isLoading) "Signing Up..." else "Sign Up")
+            Text(if (isLoading) stringResource(Res.string.signing_up_status) else stringResource(Res.string.sign_up_headline))
         }
 
         TextButton(
             onClick = onClickLogin,
             modifier = Modifier.align(Alignment.CenterHorizontally)
         ) {
-            Text("Already have an account? Sign In")
+            Text(stringResource(Res.string.already_have_account_signin))
         }
     }
 

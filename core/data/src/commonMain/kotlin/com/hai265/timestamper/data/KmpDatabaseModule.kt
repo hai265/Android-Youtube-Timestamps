@@ -20,17 +20,16 @@ import com.hai265.timestamper.data.repos.PreferencesRepository
 import com.hai265.timestamper.data.repos.TimestampRepository
 import com.hai265.timestamper.data.repos.VideoRepository
 import com.powersync.connectors.PowerSyncBackendConnector
-import com.powersync.integrations.sqldelight.PowerSyncDriver
 import org.koin.dsl.module
 
 val dataModule = module {
     includes(networkModule, preferencesModule, powersyncModule)
-    single<SqlDriver> {
-        PowerSyncDriver(
-            db = get(),
-            scope = get()
-        )
-    }
+//    single<SqlDriver> {
+//        PowerSyncDriver(
+//            db = get(),
+//            scope = get()
+//        )
+//    }
     single {
         AppSqlDatabase(
             driver = get<SqlDriver>(),

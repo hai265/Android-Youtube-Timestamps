@@ -18,7 +18,8 @@ sealed interface State {
         val time: Duration
     ) : State
 
-    data object Finished : State //TODO: Message in finished?
+    data object Finished : State
+    data object LaunchApp : State
 }
 
 
@@ -30,8 +31,7 @@ class TimestampDialogActivityViewModel(
     val state = _state.asStateFlow()
 
     suspend fun addVideo(url: String) {
-        val videoResult = repo.addVideo(url)
-        when (videoResult) {
+        when (val videoResult = repo.addVideo(url)) {
             is VideoResult.InvalidUrl -> {
                 _state.update { State.Finished }
             }
@@ -51,7 +51,7 @@ class TimestampDialogActivityViewModel(
                 if (timestamp != null) {
                     _state.update { State.AddTimestamp(id, timestamp) }
                 } else {
-                    _state.update { State.Finished }
+                    _state.update { State.LaunchApp }
                 }
             }
         }

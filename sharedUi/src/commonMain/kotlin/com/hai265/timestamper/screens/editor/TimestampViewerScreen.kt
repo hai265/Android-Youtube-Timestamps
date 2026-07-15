@@ -3,7 +3,12 @@ package com.hai265.timestamper.screens.editor
 
 import android_youtube_timestamps.sharedui.generated.resources.Res
 import android_youtube_timestamps.sharedui.generated.resources.add
+import android_youtube_timestamps.sharedui.generated.resources.add_action
 import android_youtube_timestamps.sharedui.generated.resources.close
+import android_youtube_timestamps.sharedui.generated.resources.delete_timestamp_action
+import android_youtube_timestamps.sharedui.generated.resources.editor_settings
+import android_youtube_timestamps.sharedui.generated.resources.pause_video_on_edit
+import android_youtube_timestamps.sharedui.generated.resources.preferences_action
 import android_youtube_timestamps.sharedui.generated.resources.settings
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.LinearEasing
@@ -19,7 +24,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.calculateEndPadding
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -70,6 +74,7 @@ import com.hai265.timestamper.screens.youtubeplayer.YouTubePlayerController
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
 import kotlin.time.Duration
@@ -152,7 +157,7 @@ fun TimestampViewerScreen(
                     )
                 }
             }) {
-                Icon(painterResource(Res.drawable.add), "Add")
+                Icon(painterResource(Res.drawable.add), stringResource(Res.string.add_action))
             }
         },
         floatingActionButtonPosition = FabPosition.End,
@@ -278,7 +283,8 @@ fun TimestampList(
     LazyColumn(
         state = listState,
         modifier = modifier,
-        contentPadding = PaddingValues(bottom = 88.dp)
+        contentPadding = PaddingValues(bottom = 88.dp),
+        verticalArrangement = Arrangement.spacedBy(4.dp),
     ) {
         item {
             Box(modifier = Modifier.fillMaxWidth()) {
@@ -289,11 +295,11 @@ fun TimestampList(
                         .align(Alignment.TopEnd)
                         .clickable(onClick = onCLickSettings),
                 ) {
-                    Text("Editor Settings")
+                    Text(stringResource(Res.string.editor_settings))
                     Spacer(modifier.size(4.dp))
                     Icon(
                         painter = painterResource(Res.drawable.settings),
-                        contentDescription = "Preferences",
+                        contentDescription = stringResource(Res.string.preferences_action),
                     )
                 }
             }
@@ -333,7 +339,6 @@ fun TimestampItem(
             .fillMaxWidth()
             .background(backgroundColor),
         horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically
     ) {
         Text(
             text = timestamp.time.formatDurationToHHMMSS(),
@@ -358,7 +363,7 @@ fun TimestampItem(
         )
         Icon(
             painter = painterResource(Res.drawable.close),
-            contentDescription = "Delete Timestamp",
+            contentDescription = stringResource(Res.string.delete_timestamp_action),
             modifier = Modifier.clickable(onClick = onClickDelete)
         )
     }
@@ -374,7 +379,6 @@ fun PreferencesDialog(
         Card(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(200.dp)
                 .padding(16.dp)
         ) {
             Column {
@@ -385,22 +389,7 @@ fun PreferencesDialog(
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text("Close keyboard tap screen")
-                    Switch(
-                        checked = preferences.hideKeyboardOnScreenTap,
-                        onCheckedChange = {
-                            viewModel.updateHideKeyboardOnScreenTap(it)
-                        }
-                    )
-                }
-                Row(
-                    modifier = Modifier
-                        .padding(16.dp)
-                        .fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text("Pause video on edit")
+                    Text(stringResource(Res.string.pause_video_on_edit))
                     Switch(
                         checked = preferences.pauseAndResumeVideoOnEdit,
                         onCheckedChange = {

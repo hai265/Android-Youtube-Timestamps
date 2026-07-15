@@ -21,6 +21,7 @@ import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.sample
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -34,7 +35,6 @@ data class TimestampEditorState(
 )
 
 data class Preferences(
-    val hideKeyboardOnScreenTap: Boolean = false,
     val pauseAndResumeVideoOnEdit: Boolean = false,
 )
 
@@ -83,21 +83,18 @@ class TimestampViewerViewModel(
                 initialValue = TimestampEditorState()
             )
 
-    val preferences = combine(
-        preferencesRepository.hideKeyboardOnScreenTap(),
+    val preferences =
         preferencesRepository.pauseVideoOnKeyboardVisible()
-    )
-    { hideKeyboardOnScreenTap, pauseAndResumeVideoOnEdit ->
-        Preferences(
-            hideKeyboardOnScreenTap = hideKeyboardOnScreenTap,
-            pauseAndResumeVideoOnEdit = pauseAndResumeVideoOnEdit,
-        )
-    }
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5000L),
-            initialValue = Preferences()
-        )
+            .map { pauseAndResumeVideoOnEdit ->
+                Preferences(
+                    pauseAndResumeVideoOnEdit = pauseAndResumeVideoOnEdit,
+                )
+            }
+            .stateIn(
+                scope = viewModelScope,
+                started = SharingStarted.WhileSubscribed(5000L),
+                initialValue = Preferences()
+            )
 
     fun updateHideKeyboardOnScreenTap(enabled: Boolean) {
         viewModelScope.launch {

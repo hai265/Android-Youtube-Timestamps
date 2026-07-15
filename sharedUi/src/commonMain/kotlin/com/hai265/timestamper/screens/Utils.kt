@@ -1,6 +1,9 @@
 package com.hai265.timestamper.screens
 
+import androidx.compose.runtime.saveable.Saver
 import kotlin.time.Duration
+import kotlin.time.DurationUnit
+import kotlin.time.toDuration
 
 fun Duration.formatDurationToHHMMSS(): String =
     toComponents { hours, minutes, seconds, _ ->
@@ -13,3 +16,8 @@ fun Duration.formatDurationToHHMMSS(): String =
             "$mm:$ss"
         }
     }
+
+val durationSaver = Saver<Duration, Int>(
+    save = { it.toInt(DurationUnit.MILLISECONDS) },
+    restore = { it.toDuration(DurationUnit.MILLISECONDS) }
+)

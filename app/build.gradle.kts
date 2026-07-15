@@ -21,7 +21,7 @@ extensions.configure<ApplicationExtension> {
         applicationId = "com.hai265.timestamper"
         minSdk = 30
         targetSdk = 36
-        versionCode = 1
+        versionCode = 6
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
@@ -36,10 +36,16 @@ extensions.configure<ApplicationExtension> {
                 "proguard-rules.pro"
             )
             signingConfig = signingConfigs.getByName("debug")
+            ndk {
+                debugSymbolLevel = "full"
+            }
         }
         debug {
             enableUnitTestCoverage = true
             enableAndroidTestCoverage = true
+            applicationIdSuffix = ".debug"
+            versionNameSuffix = "-DEBUG"
+            resValue("string", "app_name", "Timestamper Debug")
         }
     }
     compileOptions {
@@ -50,6 +56,7 @@ extensions.configure<ApplicationExtension> {
     buildFeatures {
         compose = true
         buildConfig = true
+        resValues = true
     }
 }
 
@@ -93,7 +100,6 @@ dependencies {
     implementation(libs.kotlinx.datetime)
     implementation(libs.kotlinx.serialization.core)
     implementation(libs.kotlinx.io.core)
-    implementation(libs.android.driver)
     implementation(platform(libs.koin.bom))
     implementation(libs.koin.android)
     implementation(libs.koin.compose)

@@ -10,4 +10,8 @@ class IosInsetsController : InsetsController {
     override fun showSystemBars() {
         //TODO
     }
+
+    override fun reset() {
+//TODO
+    }
 }
