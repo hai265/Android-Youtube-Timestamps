@@ -605,6 +605,7 @@ fun DeleteConfirmationDialog(
                     withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
                         append(video.videoTitle ?: video.youtubeId)
                     }
+                    append(" ")
                     append(stringResource(Res.string.delete_video_confirmation))
                 }
             )
